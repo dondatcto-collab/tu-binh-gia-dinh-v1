@@ -1,0 +1,66 @@
+case_id: BT-0005
+category: GOLD-BT
+title_vi: "Dạng D — Chi kho, tạp khí, và là chỗ các nguồn khác thứ tự"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: >
+  Thìn và Sửu là hai trong bốn Chi kho. Đây cũng là chỗ Uyên Hải Tử Bình
+  và bảng đời sau ghi THỨ TỰ KHÁC NHAU, dù cùng tập Can.
+  Ca này chốt rằng Engine dùng thứ tự của NGUỒN CHÍNH, và vẫn giữ lại
+  thứ tự của nguồn kia mà không hợp nhất.
+input:
+  cac_chi: [THIN, SUU]
+expected:
+  - stage: FINAL
+    stage_key: "tang_can:THIN"
+    review_status: APPROVED
+    payload: [AT, MAU, QUY]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-005
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 辰藏乙戊三分癸
+        dịch nghĩa  -> Thìn tàng Ất, Mậu, ba phần Quý
+        suy ra      -> Thìn chứa Ất, Mậu, Quý
+      CẢNH BÁO CHO NGƯỜI DUYỆT:
+        Chỉ riêng câu này có chữ 三分, nghe như một con số.
+        Tôi KHÔNG quy nó thành tỷ lệ. Chưa rõ đó là lượng khí, số ngày,
+        hay chỉ là chữ đệm cho đủ vần.
+        DỊ BIỆT THỨ TỰ: bảng đời sau ghi 辰藏戊乙癸 tức Mậu đứng trước.
+        Cùng tập Can, khác thứ tự. Duyệt ca này nghĩa là chấp nhận dùng
+        thứ tự Uyên Hải Tử Bình làm source_order, KHÔNG phải chấp nhận
+        rằng thứ tự đó mang nghĩa mạnh yếu.
+  - stage: FINAL
+    stage_key: "tang_can:SUU"
+    review_status: APPROVED
+    payload: [QUY, TAN, KY]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-002
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 丑癸辛金己土同
+        dịch nghĩa  -> Sửu có Quý, Tân kim, Kỷ thổ cùng
+        suy ra      -> Sửu chứa Quý, Tân, Kỷ
+      CẢNH BÁO CHO NGƯỜI DUYỆT:
+        DỊ BIỆT THỨ TỰ: bảng đời sau ghi 丑藏己癸辛, tức thứ tự đảo lại.
+        Quy tắc BT-HIDDEN-ORDER-001 đang ở trạng thái CONFLICTED vì việc này.
+  - stage: FINAL
+    stage_key: "vai_tro:THIN"
+    review_status: APPROVED
+    payload: NOT_ASSIGNED
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-005
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        căn cứ      -> bài phú 又地支藏遁歌 CHỈ liệt kê Can, KHÔNG gọi tên
+                       bản khí, trung khí, dư khí, và không nói mạnh yếu
+        suy ra      -> không có căn cứ trong nguồn để gán vai trò
+                       => semantic_role_status phải là NOT_ASSIGNED
+      GHI CHÚ: lớp này kiểm rằng hệ thống KHÔNG tự suy diễn vai trò.
+      Việc vai trò ngữ nghĩa được gán thế nào thuộc nhóm BT-SEASON-POWER,
+      chưa làm, và sẽ dùng nguồn khác.

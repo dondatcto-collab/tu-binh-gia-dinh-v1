@@ -1,0 +1,140 @@
+# THẬP THẦN — mười tên gọi quan hệ giữa Nhật chủ và một Can khác.
+#
+# CÁCH DỰNG: KHÔNG chép bảng 10x10.
+# Mười tên gọi sinh ra từ hai chiều:
+#   chiều quan hệ ngũ hành  — 5 khả năng
+#   quan hệ âm dương        — 2 khả năng
+# 5 nhân 2 bằng 10. Mã tự nhân ra, không liệt kê tay.
+#
+# KHÔNG có điểm số, không tốt xấu, không hỷ kỵ, không cát hung.
+
+ruleset_id: THAPTHAN-V1
+version: "1.0.0"
+source_id: SRC-UHTB-CHEP
+passage_id: PSG-UHTB-THAPTHAN
+
+# --- Năm chiều quan hệ ngũ hành -------------------------------------
+chieu_quan_he:
+  - code: DONG_HANH
+    name_original: "同類"
+    dich: "cùng hành với Nhật chủ"
+  - code: TA_SINH
+    name_original: "我生"
+    dich: "Nhật chủ sinh ra đối tượng"
+  - code: SINH_TA
+    name_original: "生我"
+    dich: "đối tượng sinh ra Nhật chủ"
+  - code: TA_KHAC
+    name_original: "我剋"
+    dich: "Nhật chủ khắc đối tượng"
+  - code: KHAC_TA
+    name_original: "剋我"
+    dich: "đối tượng khắc Nhật chủ"
+
+# --- Mười tên gọi, mỗi tên là một ô của lưới 5 nhân 2 ----------------
+# DONG_TINH  = cùng âm dương với Nhật chủ
+# KHAC_TINH  = khác âm dương với Nhật chủ
+thap_than:
+  - { rule_id: BT-TG-001, code: TY_KIEN,     name_vi: "Tỷ Kiên",    name_original: "比肩",
+      chieu: DONG_HANH, tinh: DONG_TINH }
+  - { rule_id: BT-TG-002, code: KIEP_TAI,    name_vi: "Kiếp Tài",   name_original: "劫財",
+      chieu: DONG_HANH, tinh: KHAC_TINH }
+  - { rule_id: BT-TG-003, code: THUC_THAN,   name_vi: "Thực Thần",  name_original: "食神",
+      chieu: TA_SINH,   tinh: DONG_TINH }
+  - { rule_id: BT-TG-004, code: THUONG_QUAN, name_vi: "Thương Quan", name_original: "傷官",
+      chieu: TA_SINH,   tinh: KHAC_TINH }
+  - { rule_id: BT-TG-005, code: THIEN_TAI,   name_vi: "Thiên Tài",  name_original: "偏財",
+      chieu: TA_KHAC,   tinh: DONG_TINH }
+  - { rule_id: BT-TG-006, code: CHINH_TAI,   name_vi: "Chính Tài",  name_original: "正財",
+      chieu: TA_KHAC,   tinh: KHAC_TINH }
+  - { rule_id: BT-TG-007, code: THAT_SAT,    name_vi: "Thất Sát",   name_original: "七殺",
+      chieu: KHAC_TA,   tinh: DONG_TINH }
+  - { rule_id: BT-TG-008, code: CHINH_QUAN,  name_vi: "Chính Quan", name_original: "正官",
+      chieu: KHAC_TA,   tinh: KHAC_TINH }
+  - { rule_id: BT-TG-009, code: THIEN_AN,    name_vi: "Thiên Ấn",   name_original: "偏印",
+      chieu: SINH_TA,   tinh: DONG_TINH }
+  - { rule_id: BT-TG-010, code: CHINH_AN,    name_vi: "Chính Ấn",   name_original: "正印",
+      chieu: SINH_TA,   tinh: KHAC_TINH }
+
+# --- Chứng cứ trong nguyên văn cho từng ô ----------------------------
+# Mỗi dòng là một ví dụ cụ thể mà bài văn nói thẳng ra, dùng để kiểm lại
+# quy tắc "đồng tính hay khác tính" ở trên. Không suy diễn.
+vi_du_trong_nguyen_van:
+  - { nhat_chu: GIAP, doi_tuong: CANH, ket_qua: THAT_SAT,
+      nguyen_van: "甲見庚為殺，陽見陽也", dich: "Giáp thấy Canh là Sát, dương thấy dương" }
+  - { nhat_chu: GIAP, doi_tuong: TAN, ket_qua: CHINH_QUAN,
+      nguyen_van: "見辛為官，陽見陰也", dich: "thấy Tân là Quan, dương thấy âm" }
+  - { nhat_chu: AT, doi_tuong: CANH, ket_qua: CHINH_QUAN,
+      nguyen_van: "乙木庚為官", dich: "Ất mộc thấy Canh là Quan" }
+  - { nhat_chu: AT, doi_tuong: TAN, ket_qua: THAT_SAT,
+      nguyen_van: "見辛為殺", dich: "thấy Tân là Sát" }
+  - { nhat_chu: GIAP, doi_tuong: QUY, ket_qua: CHINH_AN,
+      nguyen_van: "甲見癸為印綬", dich: "Giáp thấy Quý là Ấn Thụ" }
+  - { nhat_chu: AT, doi_tuong: NHAM, ket_qua: CHINH_AN,
+      nguyen_van: "乙見壬為印綬", dich: "Ất thấy Nhâm là Ấn Thụ" }
+  - { nhat_chu: GIAP, doi_tuong: NHAM, ket_qua: THIEN_AN,
+      nguyen_van: "甲見壬為偏印", dich: "Giáp thấy Nhâm là Thiên Ấn" }
+  - { nhat_chu: AT, doi_tuong: QUY, ket_qua: THIEN_AN,
+      nguyen_van: "乙見癸為偏印", dich: "Ất thấy Quý là Thiên Ấn" }
+  - { nhat_chu: GIAP, doi_tuong: BINH, ket_qua: THUC_THAN,
+      nguyen_van: "甲見丙為食神", dich: "Giáp thấy Bính là Thực Thần" }
+  - { nhat_chu: GIAP, doi_tuong: DINH, ket_qua: THUONG_QUAN,
+      nguyen_van: "見丁為傷官", dich: "thấy Đinh là Thương Quan" }
+  - { nhat_chu: AT, doi_tuong: DINH, ket_qua: THUC_THAN,
+      nguyen_van: "乙見丁為食神", dich: "Ất thấy Đinh là Thực Thần" }
+  - { nhat_chu: AT, doi_tuong: BINH, ket_qua: THUONG_QUAN,
+      nguyen_van: "見丙為傷官", dich: "thấy Bính là Thương Quan" }
+
+# --- LỊCH SỬ THUẬT NGỮ: Tỷ Kiên và Dương Nhận ------------------------
+#
+# NOT_A_DIRECT_ALIAS.
+#
+# Hai thứ này KHÔNG phải hai tên của cùng một khái niệm. Ghi rõ để đời sau
+# không lầm mà nối chúng lại.
+#
+#   TY_KIEN     thuộc BT-TG. Là một QUAN HỆ giữa Nhật chủ và một Can:
+#               cùng hành, cùng âm dương. Xác định bằng hai Can.
+#
+#   DUONG_NHAN  là một KHÁI NIỆM CỔ RIÊNG, sẽ thuộc nhóm khác về sau.
+#               Uyên Hải Tử Bình định nghĩa nó theo VỊ TRÍ: "祿前一位",
+#               tức Chi đứng ngay sau Lộc của Nhật chủ. Ví dụ Giáp lộc ở Dần
+#               thì Mão là Dương Nhận. Nó nói về ĐỊA CHI, không phải Thiên Can.
+#               Và chỉ năm Can dương mới có: "甲丙戊庚壬五陽有刃，
+#               乙丁己辛癸五陰無刃".
+#
+# Vì sao dễ lầm: quyển một Uyên Hải Tử Bình, khi liệt kê năm loại quan hệ,
+# đặt Dương Nhận vào ô đồng hành đồng tính. Đó là cách dùng thuật ngữ CỦA
+# ĐOẠN ĐÓ, không phải một định nghĩa thứ hai cho Tỷ Kiên.
+#
+# HỆ THỐNG KHÔNG mô hình hóa TY_KIEN bằng DUONG_NHAN, và ngược lại.
+lich_su_thuat_ngu:
+  rule_id: BT-TG-CONFLICT-001
+  status: CONFLICTED
+  quan_he: NOT_A_DIRECT_ALIAS
+  muc_dich: "Ghi lịch sử thuật ngữ. KHÔNG dùng để tra cứu, không dùng để tính."
+  o_lien_quan: { chieu: DONG_HANH, tinh: DONG_TINH }
+  cac_cach_dung:
+    - ten: TY_KIEN
+      name_original: "比肩"
+      thuoc_nhom: BT-TG
+      loai_khai_niem: TEN_GOD_RELATION
+      xac_dinh_bang: "Nhật chủ và một Thiên Can"
+      nguon: "Uyên Hải Tử Bình, phần Thập Thần"
+      nguyen_van: "以甲為例：見甲為比肩、兄弟"
+      la_quy_uoc_dang_dung: true
+    - ten: DUONG_NHAN
+      name_original: "羊刃"
+      thuoc_nhom: BT-DN
+      loai_khai_niem: SEPARATE_CLASSICAL_CONCEPT
+      xac_dinh_bang: "vị trí Địa Chi so với Lộc của Nhật chủ (祿前一位)"
+      nguon: "Uyên Hải Tử Bình, quyển một, đoạn năm loại và mục Luận Dương Nhận"
+      nguyen_van: "五曰同類之陰陽，曰劫財、曰羊刃…陽見陽為羊刃 / 夫陽刃者…以祿前一位是也"
+      la_quy_uoc_dang_dung: false
+      ghi_chu: >
+        KHÔNG phải một Thập Thần. Chưa làm ở giai đoạn này.
+        Nhóm BT-DN để dành, chưa có quy tắc nào. Không dùng BT-YR vì tên đó đã là Lưu niên.
+  quyet_dinh: >
+    Ô đồng hành đồng tính trong BT-TG là TY_KIEN, một quan hệ giữa hai Thiên Can.
+    Dương Nhận là chuyện khác, xét theo Địa Chi, sẽ làm ở nhóm BT-YR.
+    Bản ghi này chỉ giữ dấu vết vì sao một đoạn cổ thư dùng chữ Dương Nhận
+    ở chỗ đời sau dùng chữ Tỷ Kiên.

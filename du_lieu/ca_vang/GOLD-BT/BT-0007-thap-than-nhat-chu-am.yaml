@@ -1,0 +1,33 @@
+case_id: BT-0007
+category: GOLD-BT
+title_vi: "Thập Thần — Nhật chủ Ất, kiểm quy ước đảo khi Nhật chủ là Can âm"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: >
+  Nhật chủ âm. Đây là chỗ dễ sai nhất: cùng một Can đối tượng nhưng
+  Nhật chủ đổi âm dương thì Chính và Thiên đảo chỗ.
+  Nguyên văn nói thẳng bốn cặp Ất, dùng đúng để kiểm.
+input:
+  day_master: AT
+  cac_can_doi_tuong: [CANH, TAN, NHAM, QUY, BINH, DINH]
+expected:
+  - { stage: FINAL, stage_key: "thap_than:AT:CANH", review_status: APPROVED,
+      payload: CHINH_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-008; nguyên văn -> 乙木庚為官; loại chứng cứ -> NÓI THẲNG. So với BT-0006: Giáp gặp Canh là Thất Sát, Ất gặp Canh là Chính Quan. Đảo đúng như quy tắc âm dương." }
+  - { stage: FINAL, stage_key: "thap_than:AT:TAN", review_status: APPROVED,
+      payload: THAT_SAT, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-007; nguyên văn -> 見辛為殺; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:AT:NHAM", review_status: APPROVED,
+      payload: CHINH_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-010; nguyên văn -> 乙見壬為印綬; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:AT:QUY", review_status: APPROVED,
+      payload: THIEN_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-009; nguyên văn -> 乙見癸為偏印; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:AT:DINH", review_status: APPROVED,
+      payload: THUC_THAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-003; nguyên văn -> 乙見丁為食神; loại chứng cứ -> NÓI THẲNG. Chú ý: Thực Thần là ĐỒNG tính, không phải khác tính." }
+  - { stage: FINAL, stage_key: "thap_than:AT:BINH", review_status: APPROVED,
+      payload: THUONG_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-004; nguyên văn -> 見丙為傷官; loại chứng cứ -> NÓI THẲNG." }

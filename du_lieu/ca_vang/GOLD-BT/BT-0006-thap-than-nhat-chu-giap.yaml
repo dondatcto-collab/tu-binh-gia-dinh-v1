@@ -1,0 +1,46 @@
+case_id: BT-0006
+category: GOLD-BT
+title_vi: "Thập Thần — Nhật chủ Giáp gặp đủ mười Thiên Can"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: >
+  Một Nhật chủ dương gặp đủ mười Can, ra đủ mười Thập Thần.
+  TEN_GOD_CLASS_COVERAGE của riêng ca này là 10/10.
+  Sáu trong mười ô có nguyên văn nói thẳng; bốn ô còn lại suy từ quy tắc
+  đồng tính khác tính mà chính đoạn đó xác lập. Ghi rõ ô nào thuộc loại nào.
+input:
+  day_master: GIAP
+  cac_can_doi_tuong: [GIAP, AT, BINH, DINH, MAU, KY, CANH, TAN, NHAM, QUY]
+expected:
+  - { stage: FINAL, stage_key: "thap_than:GIAP:BINH", review_status: APPROVED,
+      payload: THUC_THAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-003; SOURCE_ID = SRC-UHTB-CHEP, PSG-UHTB-THAPTHAN; nguyên văn -> 甲見丙為食神; loại chứng cứ -> NÓI THẲNG TRONG SÁCH." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:DINH", review_status: APPROVED,
+      payload: THUONG_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-004; nguyên văn -> 見丁為傷官; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:CANH", review_status: APPROVED,
+      payload: THAT_SAT, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-007; nguyên văn -> 甲見庚為殺，陽見陽也; loại chứng cứ -> NÓI THẲNG, kèm lý do âm dương." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:TAN", review_status: APPROVED,
+      payload: CHINH_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-008; nguyên văn -> 見辛為官，陽見陰也; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:NHAM", review_status: APPROVED,
+      payload: THIEN_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-009; nguyên văn -> 甲見壬為偏印; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:QUY", review_status: APPROVED,
+      payload: CHINH_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-010; nguyên văn -> 甲見癸為印綬; loại chứng cứ -> NÓI THẲNG." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:MAU", review_status: APPROVED,
+      payload: THIEN_TAI, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-005; nguyên văn -> 二曰財…陽見陰為正財，陰見陰為偏財; loại chứng cứ -> SUY TỪ QUY TẮC. Sách chỉ nêu hai trong bốn ô của mục Tài. Giáp dương gặp Mậu dương là đồng tính, nên là Thiên Tài." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:KY", review_status: APPROVED,
+      payload: CHINH_TAI, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-006; nguyên văn -> 陽見陰為正財; loại chứng cứ -> NÓI THẲNG quy tắc, áp cho cặp Giáp Kỷ." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:GIAP", review_status: APPROVED,
+      payload: TY_KIEN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-001; nguyên văn -> 以甲為例：見甲為比肩、兄弟 (phần Thập Thần); loại chứng cứ -> NÓI THẲNG. CẢNH BÁO: quyển một CÙNG SÁCH gọi ô này là 羊刃 chứ không phải 比肩. Xem BT-TG-CONFLICT-001, đang CONFLICTED. Duyệt lớp này nghĩa là chấp nhận dùng quy ước Tỷ Kiên, KHÔNG phải phủ nhận cách gọi kia." }
+  - { stage: FINAL, stage_key: "thap_than:GIAP:AT", review_status: APPROVED,
+      payload: KIEP_TAI, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-002; nguyên văn -> 見乙為劫財、敗財; loại chứng cứ -> NÓI THẲNG. Hai nguồn trong sách đồng ý ở ô này." }

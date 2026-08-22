@@ -1,0 +1,14 @@
+case_id: HK-0001
+category: GOLD-HK
+title_vi: "Ngày đối với việc Khai trương theo Hiệp Kỷ"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: null
+notes: >
+  BLOCKED ở tầng dữ liệu: chưa có bộ quy tắc Hiệp Kỷ nào được xác minh.
+  Không được suy diễn đáp án từ lịch vạn niên hay nội dung trên mạng.
+input:
+  solar_date: "2026-09-01"
+  event_code: KHAI_TRUONG
+expected: []

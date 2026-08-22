@@ -1,0 +1,42 @@
+# Không gian tên quy tắc. Cố định theo mục 6 của đặc tả.
+rule_namespaces:
+  - { namespace: TIME,        name_vi: "Mốc thời gian",           description: "Quy tắc về lịch pháp và mốc chuyển" }
+  - { namespace: BT-BASE,     name_vi: "Bát Tự nền",              description: "Lập trụ, nhật chủ, nền tảng" }
+  - { namespace: BT-TG,       name_vi: "Thập Thần",               description: "Xác định và luận Thập Thần" }
+  - { namespace: BT-ML,       name_vi: "Nguyệt lệnh",             description: "Đắc lệnh, tư lệnh, nguyệt lệnh" }
+  - { namespace: BT-PAT,      name_vi: "Cách cục",                description: "Thành, bại, cứu ứng" }
+  - { namespace: BT-REL,      name_vi: "Quan hệ Can Chi",         description: "Hợp, xung, hình, hại, phá" }
+  - { namespace: BT-HUA,      name_vi: "Hóa khí",                 description: "Điều kiện hợp mà hóa" }
+  - { namespace: BT-USE,      name_vi: "Dụng Hỷ Kỵ",              description: "Xác định yếu tố thuận nghịch" }
+  - { namespace: BT-DY,       name_vi: "Đại vận",                 description: "Khởi vận, thuận nghịch, luận vận" }
+  - { namespace: BT-YR,       name_vi: "Lưu niên",                description: "Luận năm" }
+  - { namespace: BT-MO,       name_vi: "Lưu nguyệt",              description: "Luận tháng" }
+  - { namespace: BT-DAY,      name_vi: "Luận ngày",               description: "Ngày đối với cá nhân" }
+  - { namespace: BT-HR,       name_vi: "Luận giờ",                description: "Giờ đối với cá nhân" }
+  - { namespace: HK-GENERAL,  name_vi: "Hiệp Kỷ chung",           description: "Nguyên tắc tổng quát" }
+  - { namespace: HK-EVENT,    name_vi: "Hiệp Kỷ theo việc",       description: "Quy tắc gắn với loại việc" }
+  - { namespace: HK-DAY,      name_vi: "Hiệp Kỷ theo ngày",       description: "Quy tắc chọn ngày" }
+  - { namespace: HK-HOUR,     name_vi: "Hiệp Kỷ theo giờ",        description: "Quy tắc chọn giờ" }
+  - { namespace: HK-CONTROL,  name_vi: "Hiệp Kỷ chế hóa",         description: "Chế, hóa, giải, kỵ" }
+  - { namespace: SS,          name_vi: "Thần Sát",                description: "Chỉ giải thích, không tự lật kết luận" }
+  - { namespace: FUS,         name_vi: "Hợp lưu",                 description: "Mười lăm bước hợp lưu" }
+  - { namespace: SCORE,       name_vi: "Chấm điểm",               description: "Trọng số và mức trần" }
+  - { namespace: EXP,         name_vi: "Diễn giải",               description: "Sắp xếp lý do cho tầng viết lời" }
+  - { namespace: TEST,        name_vi: "Kiểm thử",                description: "Quy tắc phục vụ kiểm thử" }
+
+# Loại việc: mới chỉ để chỗ trống. Chưa có bộ quy tắc nào đứng sau.
+# Chỉ chuyển sang ACTIVE khi đã có event_rule_pack với nguồn Hiệp Kỷ xác minh.
+event_types:
+  - { event_type_id: EVT-KHAI-TRUONG,  code: KHAI_TRUONG,  name_vi: "Khai trương",        name_original: "開市" }
+  - { event_type_id: EVT-KY-HOP-DONG,  code: KY_HOP_DONG,  name_vi: "Ký hợp đồng",        name_original: "立券交易" }
+  - { event_type_id: EVT-DAU-TU,       code: DAU_TU,       name_vi: "Đầu tư",             name_original: null }
+  - { event_type_id: EVT-MUA-TAI-SAN,  code: MUA_TAI_SAN,  name_vi: "Mua tài sản",        name_original: "納財" }
+  - { event_type_id: EVT-DONG-THO,     code: DONG_THO,     name_vi: "Động thổ",           name_original: "動土" }
+  - { event_type_id: EVT-XAY-DUNG,     code: XAY_DUNG,     name_vi: "Xây dựng",           name_original: "修造" }
+  - { event_type_id: EVT-NHAP-TRACH,   code: NHAP_TRACH,   name_vi: "Nhập trạch",         name_original: "入宅" }
+  - { event_type_id: EVT-CUOI-HOI,     code: CUOI_HOI,     name_vi: "Cưới hỏi",           name_original: "嫁娶" }
+  - { event_type_id: EVT-XUAT-HANH,    code: XUAT_HANH,    name_vi: "Xuất hành",          name_original: "出行" }
+  - { event_type_id: EVT-NHAM-CHUC,    code: NHAM_CHUC,    name_vi: "Nhậm chức",          name_original: "上官赴任" }
+  - { event_type_id: EVT-THI-CU,       code: THI_CU,       name_vi: "Thi cử",             name_original: null }
+  - { event_type_id: EVT-HOC-TAP,      code: HOC_TAP,      name_vi: "Học tập",            name_original: "入學" }
+  - { event_type_id: EVT-DIEU-TRI,     code: DIEU_TRI,     name_vi: "Điều trị",           name_original: "療病" }

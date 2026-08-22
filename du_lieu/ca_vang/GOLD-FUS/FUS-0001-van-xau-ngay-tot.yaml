@@ -1,0 +1,14 @@
+case_id: FUS-0001
+category: GOLD-FUS
+title_vi: "Vận bất lợi cộng ngày rất tốt — trần bối cảnh phải chặn"
+ruleset_version: "RS-2026.08-P1"
+review_status: PENDING
+source_id: null
+notes: >
+  Kiểm tra CONTEXT CAP ở mục 16. Ngày tốt không được xoá bối cảnh vận xấu.
+  Chờ hiệu chỉnh bằng ca vàng đã duyệt trước khi chốt con số trần.
+input:
+  person_score: 92
+  event_score: 34
+  context_state: SEVERELY_ADVERSE
+expected: []

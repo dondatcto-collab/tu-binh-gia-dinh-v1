@@ -1,0 +1,14 @@
+case_id: END-0001
+category: GOLD-END
+title_vi: "Đầu vào tới đầu ra — tìm ngày cho một loại việc"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: null
+notes: "Ca xuyên suốt. Chỉ chạy được khi đủ tám tầng phía trước."
+input:
+  profile_ref: "PLACEHOLDER"
+  event_code: KY_HOP_DONG
+  date_from: "2026-09-01"
+  date_to: "2026-09-30"
+expected: []

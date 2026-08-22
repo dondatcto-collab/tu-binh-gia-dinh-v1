@@ -1,0 +1,7 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+du_lieu/kho/*.sqlite3*
+sao-luu/

@@ -1,0 +1,127 @@
+# QUYỀN KHÍ THEO TIẾT — 節氣分日 / 人元司事
+#
+# ĐỌC KỸ:
+# Tệp này CHỈ GHI LẠI NGUỒN NÓI GÌ. Nó KHÔNG kết luận Can nào mạnh yếu.
+# Không có tỷ lệ, không có điểm số, không có 60/30/10.
+# Không được dùng source_order của Tàng Can để suy ra bất cứ điều gì ở đây.
+#
+# Bảng này tổ chức theo TIẾT KHÍ, không theo Chi tháng. Đó là cách nguồn viết.
+
+ruleset_id: SEASONPOWER-V1
+version: "1.0.0"
+status: PROVISIONAL
+
+# =====================================================================
+# TRUYỀN THỐNG A — Uyên Hải Tử Bình
+# =====================================================================
+truyen_thong:
+  - tradition: UYEN_HAI_TU_BINH
+    source_id: SRC-UHTB-CHEP
+    passage_id: PSG-UHTB-QUYENKHI
+    chapter: "Uyên Hải Tử Bình, quyển một — bài phú chia ngày theo tiết"
+    status: PROVISIONAL
+    ghi_chu_chung: >
+      Bài phú này KHÔNG hoàn chỉnh. Nhiều câu thiếu số ngày, vài câu có chữ
+      đáng ngờ. Tôi chép nguyên trạng và đánh dấu từng câu, KHÔNG vá.
+    cac_doan:
+      - { tiet: LAP_XUAN, nguyen_van: "立春念三丙火用，餘日甲木旺提綱",
+          doan: [{ so_ngay: 3, can: BINH }, { so_ngay: null, can: GIAP, ghi_chu: "các ngày còn lại" }],
+          parse_status: PARSED,
+          ghi_chu: "念三 đọc là 廿三 tức hai mươi ba, hay là 三 tức ba? Tôi chọn cách đọc nào cũng là suy diễn, nên để so_ngay=3 kèm cảnh báo AMBIGUOUS_COUNT." }
+      - { tiet: KINH_TRAP, nguyen_van: "驚蟄乙木未用事",
+          doan: [], parse_status: NO_DAY_COUNT,
+          ghi_chu: "Nói Ất mộc CHƯA dụng sự. Không cho số ngày, không cho Can đương quyền." }
+      - { tiet: XUAN_PHAN, nguyen_van: "春分乙木正相當",
+          doan: [{ so_ngay: null, can: AT }], parse_status: NO_DAY_COUNT,
+          ghi_chu: "Chỉ nêu Ất mộc, không cho số ngày." }
+      - { tiet: THANH_MINH, nguyen_van: "清明乙木十日管，後來八日癸水詳",
+          doan: [{ so_ngay: 10, can: AT }, { so_ngay: 8, can: QUY }],
+          parse_status: PARSED }
+      - { tiet: COC_VU, nguyen_van: "穀雨前三戊土盛，其中土旺要消詳",
+          doan: [{ so_ngay: 3, can: MAU }], parse_status: PARTIAL,
+          ghi_chu: "Chỉ nói ba ngày đầu. Phần sau nói 'thổ vượng cần xét kỹ', không phải một khoảng ngày." }
+      - { tiet: LAP_HA, nguyen_van: "立夏又伏戊土取",
+          doan: [{ so_ngay: null, can: MAU }], parse_status: NO_DAY_COUNT }
+      - { tiet: TIEU_MAN, nguyen_van: "小滿過午丙火光",
+          doan: [{ so_ngay: null, can: BINH }], parse_status: NO_DAY_COUNT,
+          ghi_chu: "'過午' chưa rõ là qua giờ Ngọ, qua tháng Ngọ, hay chữ khác." }
+      - { tiet: MANG_CHUNG, nguyen_van: "芒種己土相當好，中停七日火高強",
+          doan: [{ so_ngay: null, can: KY }, { so_ngay: 7, can: null, ghi_chu: "chỉ nói 火, không nói Bính hay Đinh" }],
+          parse_status: PARTIAL,
+          ghi_chu: "Câu sau nói 'hỏa' chung, không chỉ rõ Bính hay Đinh. Không được tự chọn." }
+      - { tiet: HA_CHI, nguyen_van: "夏至陰生陽極利，丙丁火旺有主張",
+          doan: [{ so_ngay: null, can: BINH }, { so_ngay: null, can: DINH }],
+          parse_status: NO_DAY_COUNT,
+          ghi_chu: "Nêu cả Bính lẫn Đinh cùng lúc, không phân ngày." }
+      - { tiet: TIEU_THU, nguyen_van: "小暑十日丁火旺，後來三日乙木芳，己土三日威風盛",
+          doan: [{ so_ngay: 10, can: DINH }, { so_ngay: 3, can: AT }, { so_ngay: 3, can: KY }],
+          parse_status: PARSED,
+          ghi_chu: "Đáng chú ý: Ất mộc xuất hiện trong Tiểu Thử. Bảng Tàng Can KHÔNG cho Mùi hay Ngọ chứa Ất ở vị trí này. Đây là dấu hiệu hai bảng KHÔNG cùng một hệ." }
+      - { tiet: DAI_THU, nguyen_van: "大暑己土十日黃",
+          doan: [{ so_ngay: 10, can: KY }], parse_status: PARSED }
+      - { tiet: LAP_THU, nguyen_van: "立秋十日壬水漲",
+          doan: [{ so_ngay: 10, can: NHAM }], parse_status: PARSED,
+          ghi_chu: "Đáng ngờ: Lập Thu mở tháng Thân. Bảng Tàng Can cho Thân chứa Canh, Nhâm, Mậu — có Nhâm, nhưng thứ tự khác hẳn." }
+      - { tiet: XU_THU, nguyen_van: "處暑十五庚金良",
+          doan: [{ so_ngay: 15, can: CANH }], parse_status: PARSED }
+      - { tiet: BACH_LO, nguyen_van: "白露七日庚金旺，八日辛兮福獨行",
+          doan: [{ so_ngay: 7, can: CANH }, { so_ngay: 8, can: TAN }],
+          parse_status: PARSED }
+      - { tiet: HAN_LO, nguyen_van: "寒露七日辛金管，八日丁火又水降",
+          doan: [{ so_ngay: 7, can: TAN }, { so_ngay: 8, can: DINH }],
+          parse_status: SUSPECT_TEXT,
+          ghi_chu: "'又水降' không rõ nghĩa. Có thể là chữ hỏng. Không tự đoán." }
+      - { tiet: SUONG_GIANG, nguyen_van: "霜降己土十五日，其中雜氣取無妨",
+          doan: [{ so_ngay: 15, can: KY }], parse_status: PARSED }
+      - { tiet: LAP_DONG, nguyen_van: "立冬七日癸水旺，壬水八日更流忙",
+          doan: [{ so_ngay: 7, can: QUY }, { so_ngay: 8, can: NHAM }],
+          parse_status: SUSPECT_TEXT,
+          ghi_chu: "Đáng ngờ: Quý trước Nhâm. Các câu khác thường nêu Can dương trước. Chép nguyên trạng." }
+      - { tiet: TIEU_TUYET, nguyen_van: "小雪七日壬水急，八日甲水又芬芳",
+          doan: [{ so_ngay: 7, can: NHAM }, { so_ngay: 8, can: null }],
+          parse_status: SUSPECT_TEXT,
+          ghi_chu: "'甲水' là chữ HỎNG: Giáp thuộc Mộc, không phải Thủy. Có thể là 癸水. TÔI KHÔNG SỬA. Để can=null." }
+      - { tiet: DAI_TUYET, nguyen_van: "大雪七日壬水管",
+          doan: [{ so_ngay: 7, can: NHAM }], parse_status: PARSED }
+      - { tiet: DONG_CHI, nguyen_van: "冬至癸水更深旺",
+          doan: [{ so_ngay: null, can: QUY }], parse_status: NO_DAY_COUNT }
+      - { tiet: TIEU_HAN, nguyen_van: "小寒七日癸水養，八日辛金丑庫藏",
+          doan: [{ so_ngay: 7, can: QUY }, { so_ngay: 8, can: TAN }],
+          parse_status: PARSED }
+      - { tiet: DAI_HAN, nguyen_van: "大寒十日己土盛，術者精研仔細詳",
+          doan: [{ so_ngay: 10, can: KY }], parse_status: PARSED }
+
+  # =====================================================================
+  # TRUYỀN THỐNG B — Tam Mệnh Thông Hội
+  # =====================================================================
+  - tradition: TAM_MENH_THONG_HOI
+    source_id: SRC-TMTH-CHEP
+    passage_id: PSG-TMTH-NHANNGUYEN
+    chapter: "Tam Mệnh Thông Hội, quyển hai, Luận Nhân Nguyên Ty Sự"
+    status: NOT_TRANSCRIBED
+    ghi_chu_chung: >
+      TÔI CHƯA LẤY ĐƯỢC BẢNG CHIA NGÀY CỦA NGUỒN NÀY.
+      Tra được phần mở đầu của thiên (đã lưu ở PSG-TMTH-NHANNGUYEN), nhưng
+      phần bảng số ngày cụ thể thì chưa đọc được toàn văn.
+      Vì vậy KHÔNG có gì để đối chiếu. Không được suy ra rằng hai nguồn
+      đồng thuận, cũng không được suy ra rằng chúng mâu thuẫn.
+      Điều CHẮC CHẮN đã tra được: người biên chú bản in hiện đại ghi rằng
+      "藏干之深淺尚無一定之標準" — độ sâu nông của Tàng Can chưa có chuẩn nhất định,
+      và "古代術士對此說法並不相同" — thuật sĩ đời xưa nói không giống nhau.
+    cac_doan: []
+
+# =====================================================================
+# ĐIỀU CẤM — ghi thành dữ liệu để test kiểm được
+# =====================================================================
+cam:
+  - khong_dung_ty_le: "Không 60/30/10, không 70/20/10, không phần trăm."
+  - khong_diem_so: "Không strength score."
+  - khong_gan_vai_tro_tu_thu_tu: "Không suy MAIN_QI, MIDDLE_QI, RESIDUAL_QI từ source_order."
+  - khong_ket_luan_vuong_suy: "Không kết luận Nhật chủ mạnh hay yếu."
+  - khong_trung_binh_hoa: "Nguồn khác nhau thì để CONFLICTED, không lấy trung bình."
+
+# Bản chép dùng để hiển thị và nghiên cứu. KHÔNG phải chân lý mạnh yếu.
+primary_transcription: UYEN_HAI_TU_BINH
+canh_bao_primary: >
+  PRIMARY_TRANSCRIPTION chỉ có nghĩa "bản này được hiển thị trước".
+  Nó KHÔNG có nghĩa bản này đúng hơn bản kia.

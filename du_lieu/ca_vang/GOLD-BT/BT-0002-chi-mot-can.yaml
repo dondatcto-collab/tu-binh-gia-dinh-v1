@@ -1,0 +1,39 @@
+case_id: BT-0002
+category: GOLD-BT
+title_vi: "Dạng A — Chi chỉ chứa một Can"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: >
+  Kiểm dạng cấu trúc đơn giản nhất. Hai Chi Tý và Dậu, mỗi Chi một Can.
+  Ca này KHÔNG kiểm mạnh yếu, KHÔNG kiểm vai trò ngữ nghĩa.
+input:
+  cac_chi: [TY, DAU]
+expected:
+  - stage: FINAL
+    stage_key: "tang_can:TY"
+    review_status: APPROVED
+    payload: [QUY]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-001
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 子宮癸水在其中
+        dịch nghĩa  -> cung Tý có Quý thủy ở trong
+        suy ra      -> Tý chứa đúng một Can là Quý
+      GHI CHÚ: bảng đời sau (SRC-BANG-DOI-SAU) ghi 子中單癸水, cùng kết quả.
+  - stage: FINAL
+    stage_key: "tang_can:DAU"
+    review_status: APPROVED
+    payload: [TAN]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-010
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 酉宮辛金獨豐隆
+        dịch nghĩa  -> cung Dậu chỉ riêng Tân kim đầy đặn
+        suy ra      -> Dậu chứa đúng một Can là Tân
+      GHI CHÚ: một bản chép ghi 辛字 thay vì 辛金, chỉ là dị bản chữ.

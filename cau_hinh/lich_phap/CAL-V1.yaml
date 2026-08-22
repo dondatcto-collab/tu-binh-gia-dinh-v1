@@ -1,0 +1,51 @@
+calendar_ruleset_id: CAL-V1
+version: "1.0.0"
+name_vi: "Bộ quy ước lịch chuẩn V1"
+status: ACTIVE
+is_default: true
+source_id: null
+notes: >
+  Bộ quy ước mặc định cho V1. Mọi mốc đổi năm, đổi tháng, đổi ngày đọc từ đây.
+  Engine không được chứa hằng số tương đương.
+
+settings:
+  YEAR_BOUNDARY:
+    value: LI_CHUN
+    type: STRING
+    notes: "Đổi năm tại tiết Lập Xuân, không đổi tại mùng một tháng giêng."
+  MONTH_BOUNDARY:
+    value: JIE
+    type: STRING
+    notes: "Đổi tháng tại Tiết, không đổi tại Khí."
+  DAY_BOUNDARY:
+    value: "00:00"
+    type: TIME
+    notes: "Đổi ngày lúc nửa đêm theo giờ đồng hồ."
+  TRUE_SOLAR_TIME:
+    value: "false"
+    type: BOOL
+    notes: "Chưa dùng giờ mặt trời thật ở V1."
+  LOCAL_TIMEZONE:
+    value: "true"
+    type: BOOL
+    notes: "Dùng múi giờ nơi sinh."
+  HISTORICAL_TIMEZONE:
+    value: "true"
+    type: BOOL
+    notes: "Tra múi giờ theo thời điểm lịch sử, không dùng múi giờ hiện nay."
+  HOUR_STEM_LATE_ZI:
+    value: DUNG_CAN_NGAY_HIEN_TAI
+    type: STRING
+    notes: "Can giờ Tý phần trước nửa đêm. Điểm có tranh luận, phải khai báo rõ."
+  GANZHI_RULESET:
+    value: GZ-V1
+    type: STRING
+    notes: "Bộ quy ước Can Chi đi kèm."
+  HOUR_STEM_LATE_ZI_STATUS:
+    value: NOT_VERIFIED
+    type: STRING
+    notes: "Chưa đủ nguồn để chốt. Giá trị đang dùng chỉ là implementation_default."
+  HOUR_STEM_LATE_ZI_SCORING:
+    value: NOT_FOR_GOLDEN_SCORING
+    type: STRING
+    notes: "Không được dùng phần này để tuyên bố Giai đoạn 2 đúng tuyệt đối."

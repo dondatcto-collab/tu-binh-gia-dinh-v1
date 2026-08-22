@@ -1,0 +1,53 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f766e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Tử Bình Gia Đình"><title>Tử Bình Gia Đình - V1</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-192.png"><link rel="stylesheet" href="/static/app.css"></head><body>
+<div class="app">
+<header class="topbar"><div class="brand"><div class="brand-mark">命</div><div><h1>Tử Bình Gia Đình</h1><small>Hiểu thời vận - chọn thời điểm có căn cứ</small></div></div></header>
+<main>
+<section id="screen-home" class="screen active">
+  <div class="hero"><h2 id="home-title">Chào gia đình</h2><div class="muted">Chọn một người để xem dữ liệu cá nhân.</div><div class="profile-picker"><select id="profile-select"></select><button class="btn secondary" onclick="openAddProfile()">+ Thêm</button></div></div>
+  <div id="status-banner"></div>
+  <div class="grid4">
+    <button class="action-card" onclick="openQuestion('month')"><span class="ico">🗓️</span><b>Tháng này của tôi</b><span>Đại vận → năm → tháng, hợp lưu theo dữ liệu hiện có</span></button>
+    <button class="action-card" onclick="openQuestion('today')"><span class="ico">☀️</span><b>Hôm nay thế nào?</b><span>Xem cấu trúc ngày và giờ; không bịa điểm khi chưa đủ căn cứ</span></button>
+    <button class="action-card" onclick="navTo('work')"><span class="ico">🔎</span><b>Tìm ngày cho một việc</b><span>Khung đã sẵn sàng; Hiệp Kỷ hiện chưa có quy tắc</span></button>
+    <button class="action-card" onclick="openQuestion('long')"><span class="ico">🧭</span><b>Xem vận dài hạn</b><span>Giai đoạn 10 năm, năm hiện tại và tháng hiện tại</span></button>
+  </div>
+</section>
+
+<section id="screen-calendar" class="screen">
+  <div class="section-title"><h2>Lịch cá nhân</h2><span class="pill">Theo người đang chọn</span></div>
+  <div class="card"><div class="calendar-head"><button class="btn secondary small" onclick="moveMonth(-1)">‹</button><b id="cal-title"></b><button class="btn secondary small" onclick="moveMonth(1)">›</button></div><div class="calendar-grid" id="calendar-grid"></div></div>
+  <div id="calendar-detail" class="card"><div class="muted">Chọn một ngày để xem cấu trúc. Vì chưa có hệ chấm điểm, lịch không tô xanh/đỏ giả.</div></div>
+</section>
+
+<section id="screen-work" class="screen">
+  <div class="section-title"><h2>Tìm ngày cho một việc</h2><span class="pill">13 nhóm V1</span></div>
+  <div class="card"><label>Việc cần làm</label><select id="work-type"></select><div class="form-grid" style="margin-top:10px"><div><label>Từ ngày</label><input id="work-from" type="date"></div><div><label>Đến ngày</label><input id="work-to" type="date"></div></div><button class="btn" style="margin-top:12px" onclick="findDates()">Quét các ngày</button></div>
+  <div id="work-result"></div>
+</section>
+
+<section id="screen-profile" class="screen">
+  <div class="section-title"><h2>Hồ sơ gia đình</h2><button class="btn" onclick="openAddProfile()">+ Thêm người</button></div><div id="profile-list"></div>
+</section>
+
+<section id="screen-settings" class="screen">
+  <div class="section-title"><h2>Cài đặt</h2><span class="pill">Chỉ thay cách hiển thị</span></div>
+  <div class="card"><h3>Phong cách hiển thị</h3><div class="theme-grid" id="theme-grid"></div><p class="muted">Đổi phong cách không làm thay đổi dữ liệu, quy tắc hay kết quả.</p></div>
+  <div class="card"><h3>Hiển thị</h3><label>Cỡ chữ</label><select id="font-size" onchange="saveSettings()"><option value="normal">Bình thường</option><option value="large">Lớn</option></select><label style="margin-top:12px">Ngày âm</label><select disabled><option>Chưa có bộ tính trong V1 hiện tại</option></select></div>
+  <div class="card"><h3>Cài ứng dụng trên điện thoại</h3><div id="install-state" class="muted">Mở app bằng HTTPS để cài lên màn hình chính.</div><button id="install-button" class="btn" style="width:100%;margin-top:10px;display:none" onclick="installPWA()">Cài ứng dụng</button><div class="notice" style="margin-top:10px"><b>iPhone/iPad</b>Safari → Chia sẻ → Thêm vào Màn hình chính → bật “Mở dưới dạng ứng dụng web”.<br><br><b>Android</b>Chrome → menu ⋮ → Cài ứng dụng / Thêm vào màn hình chính.</div></div>
+  <div class="card"><h3>Bảo vệ gia đình</h3><button class="btn secondary" style="width:100%" onclick="changeFamilyPinLocal()">Nhập / đổi mã PIN truy cập</button><p class="muted">Mã PIN thật được đặt trên máy chủ. Điện thoại chỉ lưu mã để gửi kèm khi gọi Engine.</p></div>
+  <div class="card"><h3>Dữ liệu và hỗ trợ</h3><a class="btn secondary" href="/huong-dan" style="display:block;text-decoration:none;text-align:center">Hướng dẫn sử dụng</a><p class="muted">Khi chạy trên máy chủ, hồ sơ nằm trong cơ sở dữ liệu của máy chủ. Hãy bật lưu trữ bền vững và sao lưu định kỳ.</p></div>
+</section>
+
+<section id="screen-result" class="screen"><div class="section-title"><h2 id="result-title">Kết quả</h2><button class="btn secondary small" onclick="navTo('home')">Về trang chủ</button></div><div id="result-body"></div></section>
+</main>
+<nav class="bottom-nav"><div class="inner">
+<button class="nav-btn active" data-nav="home" onclick="navTo('home')"><span class="nicon">🏠</span>Trang chủ</button>
+<button class="nav-btn" data-nav="calendar" onclick="navTo('calendar')"><span class="nicon">📅</span>Lịch</button>
+<button class="nav-btn" data-nav="work" onclick="navTo('work')"><span class="nicon">💼</span>Việc</button>
+<button class="nav-btn" data-nav="profile" onclick="navTo('profile')"><span class="nicon">👤</span>Hồ sơ</button>
+<button class="nav-btn" data-nav="settings" onclick="navTo('settings')"><span class="nicon">⚙️</span>Cài đặt</button>
+</div></nav>
+</div>
+
+<div id="profile-modal" class="modal"><div class="modal-box"><div class="section-title"><h2 id="profile-form-title">Thêm người</h2><button class="btn secondary small" onclick="closeProfileModal()">Đóng</button></div><div id="avatar-area"><h3>Chọn hình đại diện</h3><div class="avatar-grid" id="avatar-grid"></div></div><div class="form-grid" style="margin-top:14px"><div class="full"><label>Tên</label><input id="p-name" placeholder="Ví dụ: Mẹ"></div><div><label>Giới tính</label><select id="p-gender"><option value="NAM">Nam</option><option value="NU">Nữ</option></select></div><div><label>Ngày sinh</label><input id="p-date" type="date"></div><div><label>Giờ sinh</label><input id="p-time" type="time"></div><div><label>Nơi sinh</label><input id="p-place" placeholder="Ví dụ: Cần Thơ"></div><div class="full"><label>Múi giờ nơi sinh</label><select id="p-timezone"></select><div class="muted" style="font-size:.82rem;margin-top:4px">Gia đình ở Việt Nam giữ mặc định Asia/Ho_Chi_Minh. Nếu sinh ở nước khác, hãy chọn đúng múi giờ.</div></div></div><div class="notice">Nên nhập đúng giờ sinh theo giấy tờ hoặc thông tin gia đình. Sai giờ có thể làm thay đổi Tứ Trụ; V1 không tự đoán giờ sinh.</div><div id="profile-error" style="color:var(--danger);font-weight:700"></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveProfile()">Lưu hồ sơ</button></div></div>
+<script src="/static/app.js"></script></body></html>

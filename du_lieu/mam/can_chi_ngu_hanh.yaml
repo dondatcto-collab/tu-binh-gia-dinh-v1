@@ -1,0 +1,49 @@
+# Dữ liệu nền bất biến. Không thuộc phạm vi tranh luận giữa các trường phái.
+# Không đưa Thần Sát, Tàng Can hay quy tắc Hiệp Kỷ vào đây.
+
+elements:
+  - { element_code: MOC,  name_vi: "Mộc",  name_original: "木" }
+  - { element_code: HOA,  name_vi: "Hỏa",  name_original: "火" }
+  - { element_code: THO,  name_vi: "Thổ",  name_original: "土" }
+  - { element_code: KIM,  name_vi: "Kim",  name_original: "金" }
+  - { element_code: THUY, name_vi: "Thủy", name_original: "水" }
+
+element_relations:
+  # Tương sinh
+  - { from_element: MOC,  to_element: HOA,  relation: SINH }
+  - { from_element: HOA,  to_element: THO,  relation: SINH }
+  - { from_element: THO,  to_element: KIM,  relation: SINH }
+  - { from_element: KIM,  to_element: THUY, relation: SINH }
+  - { from_element: THUY, to_element: MOC,  relation: SINH }
+  # Tương khắc
+  - { from_element: MOC,  to_element: THO,  relation: KHAC }
+  - { from_element: THO,  to_element: THUY, relation: KHAC }
+  - { from_element: THUY, to_element: HOA,  relation: KHAC }
+  - { from_element: HOA,  to_element: KIM,  relation: KHAC }
+  - { from_element: KIM,  to_element: MOC,  relation: KHAC }
+
+stems:
+  - { stem_index: 1,  code: GIAP,  name_vi: "Giáp",  name_original: "甲", polarity: DUONG, element_code: MOC }
+  - { stem_index: 2,  code: AT,    name_vi: "Ất",    name_original: "乙", polarity: AM,    element_code: MOC }
+  - { stem_index: 3,  code: BINH,  name_vi: "Bính",  name_original: "丙", polarity: DUONG, element_code: HOA }
+  - { stem_index: 4,  code: DINH,  name_vi: "Đinh",  name_original: "丁", polarity: AM,    element_code: HOA }
+  - { stem_index: 5,  code: MAU,   name_vi: "Mậu",   name_original: "戊", polarity: DUONG, element_code: THO }
+  - { stem_index: 6,  code: KY,    name_vi: "Kỷ",    name_original: "己", polarity: AM,    element_code: THO }
+  - { stem_index: 7,  code: CANH,  name_vi: "Canh",  name_original: "庚", polarity: DUONG, element_code: KIM }
+  - { stem_index: 8,  code: TAN,   name_vi: "Tân",   name_original: "辛", polarity: AM,    element_code: KIM }
+  - { stem_index: 9,  code: NHAM,  name_vi: "Nhâm",  name_original: "壬", polarity: DUONG, element_code: THUY }
+  - { stem_index: 10, code: QUY,   name_vi: "Quý",   name_original: "癸", polarity: AM,    element_code: THUY }
+
+branches:
+  - { branch_index: 1,  code: TY,   name_vi: "Tý",   name_original: "子", polarity: DUONG, element_code: THUY }
+  - { branch_index: 2,  code: SUU,  name_vi: "Sửu",  name_original: "丑", polarity: AM,    element_code: THO }
+  - { branch_index: 3,  code: DAN,  name_vi: "Dần",  name_original: "寅", polarity: DUONG, element_code: MOC }
+  - { branch_index: 4,  code: MAO,  name_vi: "Mão",  name_original: "卯", polarity: AM,    element_code: MOC }
+  - { branch_index: 5,  code: THIN, name_vi: "Thìn", name_original: "辰", polarity: DUONG, element_code: THO }
+  - { branch_index: 6,  code: TI,   name_vi: "Tị",   name_original: "巳", polarity: AM,    element_code: HOA }
+  - { branch_index: 7,  code: NGO,  name_vi: "Ngọ",  name_original: "午", polarity: DUONG, element_code: HOA }
+  - { branch_index: 8,  code: MUI,  name_vi: "Mùi",  name_original: "未", polarity: AM,    element_code: THO }
+  - { branch_index: 9,  code: THAN, name_vi: "Thân", name_original: "申", polarity: DUONG, element_code: KIM }
+  - { branch_index: 10, code: DAU,  name_vi: "Dậu",  name_original: "酉", polarity: AM,    element_code: KIM }
+  - { branch_index: 11, code: TUAT, name_vi: "Tuất", name_original: "戌", polarity: DUONG, element_code: THO }
+  - { branch_index: 12, code: HOI,  name_vi: "Hợi",  name_original: "亥", polarity: AM,    element_code: THUY }

@@ -1,0 +1,6 @@
+pyyaml>=6.0
+fastapi>=0.110
+uvicorn>=0.27
+astronomy-engine>=2.1
+pymeeus>=0.5
+pytest>=8.0

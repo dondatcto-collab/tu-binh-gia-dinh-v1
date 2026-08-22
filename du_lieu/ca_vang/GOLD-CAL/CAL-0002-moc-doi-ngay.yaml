@@ -1,0 +1,97 @@
+case_id: CAL-0002
+category: GOLD-CAL
+title_vi: "Mốc đổi ngày — cùng một thời điểm dưới CAL-V1 và CAL-V1-23H"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-CHUA-CO-NGUON
+source_location: "nguồn theo từng lớp ghi ở mục expected"
+
+notes: >
+  DUYỆT TỪNG PHẦN. Duyệt: trụ ngày hai ngày, hành vi đổi ngày của hai bộ quy ước,
+  chi giờ, và cảnh báo ranh giới.
+  KHÔNG duyệt: Can giờ Tý khoảng 23:00 tới 23:59 của CAL-V1. Lớp đó để CONFLICTED
+  và bị bộ chạy loại khỏi phần chấm. Đây là KNOWN_CONFLICT mang sang giai đoạn sau.
+
+input:
+  timezone_name: "Asia/Ho_Chi_Minh"
+  birth_place_text: "Cần Thơ, Việt Nam"
+  gioi_tinh: NAM
+  so_sanh_bo_lich: [CAL-V1, CAL-V1-23H]
+  cac_thoi_diem:
+    - { nhan: T2259, dia_phuong: "2024-06-10 22:59:00" }
+    - { nhan: T2300, dia_phuong: "2024-06-10 23:00:00" }
+    - { nhan: T2359, dia_phuong: "2024-06-10 23:59:00" }
+    - { nhan: T0000, dia_phuong: "2024-06-11 00:00:00" }
+    - { nhan: T0100, dia_phuong: "2024-06-11 01:00:00" }
+
+expected:
+  # ============ ĐÃ DUYỆT ============
+
+  # --- Trụ ngày dưới CAL-V1: đổi lúc nửa đêm ---
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1:T2259", review_status: APPROVED,
+      payload: AT-TI, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "TIME-0005 chu kỳ 60 ngày. Mốc neo 2024-06-11 = Bính Ngọ. Đối chiếu SRC-DOI-CHIEU-HD." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1:T2300", review_status: APPROVED,
+      payload: AT-TI, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "CAL-V1 đặt DAY_BOUNDARY = 00:00 nên 23:00 vẫn là ngày cũ." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1:T2359", review_status: APPROVED,
+      payload: AT-TI, source_id: SRC-CHUA-CO-NGUON, source_note: "Như trên." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1:T0000", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Đúng nửa đêm thì sang ngày mới." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1:T0100", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON, source_note: "Như trên." }
+
+  # --- Trụ ngày dưới CAL-V1-23H: đổi lúc 23 giờ ---
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1-23H:T2259", review_status: APPROVED,
+      payload: AT-TI, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Chưa tới 23:00 nên vẫn ngày cũ." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1-23H:T2300", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "CAL-V1-23H đặt DAY_BOUNDARY = 23:00. Đây là điểm khác duy nhất so với CAL-V1." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1-23H:T2359", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON, source_note: "Như trên." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1-23H:T0000", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Hai bộ quy ước gặp lại nhau tại đây." }
+  - { stage: FINAL, stage_key: "tru_ngay:CAL-V1-23H:T0100", review_status: APPROVED,
+      payload: BINH-NGO, source_id: SRC-CHUA-CO-NGUON, source_note: "Như trên." }
+
+  # --- Chi giờ: giống nhau ở cả hai bộ, không phụ thuộc mốc đổi ngày ---
+  - { stage: FINAL, stage_key: "chi_gio:CAL-V1:T2259", review_status: APPROVED,
+      payload: HOI, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Chi giờ đổi tại mốc lẻ. 22:59 còn thuộc giờ Hợi." }
+  - { stage: FINAL, stage_key: "chi_gio:CAL-V1:T2300", review_status: APPROVED,
+      payload: TY, source_id: SRC-CHUA-CO-NGUON, source_note: "Giờ Tý bắt đầu lúc 23:00." }
+  - { stage: FINAL, stage_key: "chi_gio:CAL-V1:T0000", review_status: APPROVED,
+      payload: TY, source_id: SRC-CHUA-CO-NGUON, source_note: "Nửa đêm vẫn trong giờ Tý." }
+  - { stage: FINAL, stage_key: "chi_gio:CAL-V1:T0100", review_status: APPROVED,
+      payload: SUU, source_id: SRC-CHUA-CO-NGUON, source_note: "Giờ Sửu bắt đầu lúc 01:00." }
+  - { stage: FINAL, stage_key: "chi_gio:CAL-V1-23H:T2300", review_status: APPROVED,
+      payload: TY, source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Chi giờ độc lập với mốc đổi ngày. Hai bộ phải giống nhau ở đây." }
+
+  # --- Cảnh báo ranh giới ---
+  - { stage: FINAL, stage_key: "canh_bao:CAL-V1:T2300", review_status: APPROVED,
+      payload: [GIO_TY_TRUOC_NUA_DEM, SAT_BIEN_CHI_GIO, SAT_MOC_GIO_TY],
+      source_id: SRC-CHUA-CO-NGUON,
+      source_note: "23:00 dưới CAL-V1: sát mốc giờ Tý, sát biên chi giờ, và đang ở phần giờ Tý trước nửa đêm." }
+  - { stage: FINAL, stage_key: "canh_bao:CAL-V1:T0000", review_status: APPROVED,
+      payload: [SAT_MOC_DOI_NGAY],
+      source_id: SRC-CHUA-CO-NGUON,
+      source_note: "Đúng mốc đổi ngày của CAL-V1." }
+
+  # ============ CHƯA DUYỆT — KNOWN_CONFLICT ============
+  # Bộ chạy bỏ qua các lớp này. Chúng không được tính vào tỷ lệ đạt.
+
+  - { stage: FINAL, stage_key: "CAL-V1:T2300", review_status: CONFLICTED,
+      payload: { year_pillar: GIAP-THIN, month_pillar: CANH-NGO,
+                 day_pillar: AT-TI, hour_pillar: BINH-TY },
+      source_note: "TIME-0007. Can giờ Tý trong khoảng 23:00 tới 23:59 khi mốc đổi ngày là 00:00. Hai cách hiểu chưa ngã ngũ. Giá trị Bính Tý ở đây chỉ là implementation_default, đánh dấu NOT_VERIFIED và NOT_FOR_GOLDEN_SCORING." }
+  - { stage: FINAL, stage_key: "CAL-V1:T2359", review_status: CONFLICTED,
+      payload: { year_pillar: GIAP-THIN, month_pillar: CANH-NGO,
+                 day_pillar: AT-TI, hour_pillar: BINH-TY },
+      source_note: "Cùng tranh luận TIME-0007." }

@@ -1,0 +1,87 @@
+case_id: BT-0008
+category: GOLD-BT
+title_vi: "Thập Thần áp vào Tứ Trụ đầy đủ, kể cả Can tàng bốn Chi"
+ruleset_version: "RS-2026.08-P1"
+review_status: PENDING
+reviewed_by: null
+source_id: SRC-UHTB-CHEP
+
+notes: >
+  Nối tầng Tàng Can của Giai đoạn 3A với tầng Thập Thần của 3B.
+
+  ĐẦU VÀO LÀ MỘT TỨ TRỤ CÓ THẬT, không phải mảnh ghép rời.
+  Tứ trụ này lấy từ ca vàng CAL-0001 ĐÃ ĐƯỢC DUYỆT: sinh 1990-02-04 lúc 12:00
+  giờ Việt Nam, nam. Calendar Engine cho ra Canh Ngọ, Mậu Dần, Canh Tý, Nhâm Ngọ.
+  Nhờ vậy ca này không tự bịa đầu vào, mà tựa lên một kết quả anh đã duyệt.
+
+  ĐIỂM CẦN CHỐT: Can ngày CHÍNH LÀ Nhật chủ, nên nó KHÔNG có Thập Thần với
+  chính nó. Hệ thống trả về NHAT_CHU thay vì gán bừa Tỷ Kiên.
+
+# ---------------------------------------------------------------
+# INPUT FOUR PILLARS
+#   Năm : Canh Ngọ    Tháng: Mậu Dần
+#   Ngày: Canh Tý     Giờ  : Nhâm Ngọ
+#
+# DAY MASTER      : CANH (Canh kim, dương)
+#
+# VISIBLE STEMS   : YEAR=CANH, MONTH=MAU, DAY=CANH, HOUR=NHAM
+#
+# HIDDEN STEMS    (theo BT-HIDDEN-*, thứ tự là THỨ TỰ NGUỒN)
+#   Ngọ  -> Đinh, Kỷ            (BT-HIDDEN-007)
+#   Dần  -> Giáp, Bính, Mậu     (BT-HIDDEN-003)
+#   Tý   -> Quý                 (BT-HIDDEN-001)
+# ---------------------------------------------------------------
+
+input:
+  day_master: CANH
+  nguon_tu_tru: "CAL-0001 đã duyệt — sinh 1990-02-04 12:00 giờ Việt Nam, nam"
+  tu_tru:
+    can: { YEAR: CANH, MONTH: MAU, DAY: CANH, HOUR: NHAM }
+    chi: { YEAR: NGO, MONTH: DAN, DAY: TY, HOUR: NGO }
+
+expected:
+  # ===== CAN LỘ =====
+  - { stage: FINAL, stage_key: "vi_tri:YEAR_STEM", review_status: PENDING,
+      payload: TY_KIEN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-001. Canh gặp Canh: cùng hành Kim, cùng dương => đồng hành đồng tính => Tỷ Kiên. Nguyên văn quy ước: 以甲為例：見甲為比肩. CẢNH BÁO: quyển một cùng sách gọi ô này là 羊刃; xem BT-TG-CONFLICT-001, ghi NOT_A_DIRECT_ALIAS." }
+  - { stage: FINAL, stage_key: "vi_tri:MONTH_STEM", review_status: PENDING,
+      payload: THIEN_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-009. Mậu thổ sinh Canh kim => sinh ta. Cùng dương => đồng tính => Thiên Ấn. Nguyên văn quy ước: 三曰生氣之陰陽…甲見壬為偏印 (đồng tính là Thiên Ấn)." }
+  - { stage: FINAL, stage_key: "vi_tri:DAY_STEM", review_status: PENDING,
+      payload: NHAT_CHU, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-001..010 (không ô nào áp dụng). Nguyên văn: 取日干為主 — lấy Can ngày làm chủ. Suy ra: Can ngày là điểm quy chiếu, không phải đối tượng so với chính nó. Hệ thống trả NHAT_CHU, không trả Tỷ Kiên." }
+  - { stage: FINAL, stage_key: "vi_tri:HOUR_STEM", review_status: PENDING,
+      payload: THUC_THAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-TG-003. Canh kim sinh Nhâm thủy => ta sinh. Cùng dương => đồng tính => Thực Thần. Nguyên văn: 甲見丙為食神 xác lập rằng Thực Thần là ĐỒNG tính." }
+
+  # ===== CAN TÀNG — TRỤ NĂM, Chi Ngọ =====
+  - { stage: FINAL, stage_key: "vi_tri:YEAR_HIDDEN_1", review_status: PENDING,
+      payload: CHINH_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-007 rồi BT-TG-008. Ngọ tàng Đinh (午宮丁火并己土). Đinh hỏa khắc Canh kim => khắc ta. Đinh âm, Canh dương => khác tính => Chính Quan." }
+  - { stage: FINAL, stage_key: "vi_tri:YEAR_HIDDEN_2", review_status: PENDING,
+      payload: CHINH_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-007 rồi BT-TG-010. Ngọ tàng Kỷ. Kỷ thổ sinh Canh kim => sinh ta. Kỷ âm, Canh dương => khác tính => Chính Ấn." }
+
+  # ===== CAN TÀNG — TRỤ THÁNG, Chi Dần =====
+  - { stage: FINAL, stage_key: "vi_tri:MONTH_HIDDEN_1", review_status: PENDING,
+      payload: THIEN_TAI, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-003 rồi BT-TG-005. Dần tàng Giáp (寅宮甲木兼丙戊). Canh kim khắc Giáp mộc => ta khắc. Cùng dương => đồng tính => Thiên Tài. CẢNH BÁO: số 1/2/3 là THỨ TỰ NGUỒN, KHÔNG phải thứ tự mạnh yếu. Xem BT-HIDDEN-ORDER-001, đang CONFLICTED." }
+  - { stage: FINAL, stage_key: "vi_tri:MONTH_HIDDEN_2", review_status: PENDING,
+      payload: THAT_SAT, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-003 rồi BT-TG-007. Dần tàng Bính. Bính hỏa khắc Canh kim => khắc ta. Cùng dương => đồng tính => Thất Sát. Nguyên văn: 甲見庚為殺，陽見陽也 xác lập đồng tính là Sát." }
+  - { stage: FINAL, stage_key: "vi_tri:MONTH_HIDDEN_3", review_status: PENDING,
+      payload: THIEN_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-003 rồi BT-TG-009. Dần tàng Mậu. Mậu thổ sinh Canh kim => sinh ta. Cùng dương => đồng tính => Thiên Ấn." }
+
+  # ===== CAN TÀNG — TRỤ NGÀY, Chi Tý =====
+  - { stage: FINAL, stage_key: "vi_tri:DAY_HIDDEN_1", review_status: PENDING,
+      payload: THUONG_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-001 rồi BT-TG-004. Tý tàng Quý (子宮癸水在其中). Canh kim sinh Quý thủy => ta sinh. Quý âm, Canh dương => khác tính => Thương Quan." }
+
+  # ===== CAN TÀNG — TRỤ GIỜ, Chi Ngọ =====
+  - { stage: FINAL, stage_key: "vi_tri:HOUR_HIDDEN_1", review_status: PENDING,
+      payload: CHINH_QUAN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-007 rồi BT-TG-008. Giống YEAR_HIDDEN_1 vì cùng Chi Ngọ. Lớp này kiểm rằng cùng một Chi ở hai trụ khác nhau cho cùng kết quả." }
+  - { stage: FINAL, stage_key: "vi_tri:HOUR_HIDDEN_2", review_status: PENDING,
+      payload: CHINH_AN, source_id: SRC-UHTB-CHEP,
+      source_note: "EXPECTED_DERIVATION: SOURCE_RULE_ID = BT-HIDDEN-007 rồi BT-TG-010. Giống YEAR_HIDDEN_2." }

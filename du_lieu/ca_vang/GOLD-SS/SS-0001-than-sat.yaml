@@ -1,0 +1,11 @@
+case_id: SS-0001
+category: GOLD-SS
+title_vi: "Thần Sát chỉ được giải thích, không được lật kết luận"
+ruleset_version: "RS-2026.08-P1"
+review_status: PENDING
+source_id: null
+notes: "Chờ nguồn và công thức khởi Thần Sát đã đối chiếu."
+input:
+  chart_ref: "PLACEHOLDER"
+  than_sat_code: "PLACEHOLDER"
+expected: []

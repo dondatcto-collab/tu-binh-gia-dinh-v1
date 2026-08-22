@@ -1,0 +1,30 @@
+TỬ BÌNH GIA ĐÌNH - V1
+=====================
+
+WINDOWS - CÁCH NHANH NHẤT
+1. Cài Python 3.11 trở lên, nhớ tick "Add Python to PATH".
+2. Giải nén toàn bộ thư mục app.
+3. Bấm đúp CAI-DAT-VA-CHAY.bat.
+4. Lần đầu cần Internet để cài thư viện.
+5. Trình duyệt sẽ mở http://127.0.0.1:8000
+
+APP HIỆN LÀM ĐƯỢC
+- Lưu nhiều hồ sơ gia đình.
+- Tính Tứ Trụ, Tàng Can, Thập Thần, Nguyệt lệnh.
+- Xem Đại vận/Năm/Tháng/Ngày theo các rule đã có.
+- Bấm "Tại sao?" để truy về Rule/Source/Version.
+
+APP CHƯA ĐƯỢC PHÉP LÀM
+- Chấm điểm ngày tốt/xấu.
+- Xếp hạng ngày theo 13 loại việc.
+- Chọn giờ tốt cá nhân.
+- Kết luận Dụng/Hỷ/Kỵ, cách cục, vượng suy.
+
+Lý do: chưa đủ quy tắc có nguồn. App cố ý không bịa kết quả.
+
+SAO LƯU
+File chính: du_lieu/kho/xemngay.sqlite3
+Có thể chép file này sang ổ khác để sao lưu.
+
+Y TẾ
+Không dùng app để trì hoãn cấp cứu hoặc thay chỉ định bác sĩ.

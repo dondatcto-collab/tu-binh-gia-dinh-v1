@@ -1,0 +1,120 @@
+# TÀNG CAN — bảng Can ẩn trong 12 Địa Chi.
+#
+# ĐỌC KỸ TRƯỚC KHI SỬA:
+#
+# Tệp này CHỈ trả lời một câu hỏi: "Chi này chứa những Thiên Can nào?"
+# Nó KHÔNG trả lời: Can nào đương quyền, mạnh yếu ra sao, chiếm mấy phần.
+# Câu hỏi thứ hai thuộc nhóm BT-SEASON-POWER, chưa làm ở giai đoạn này.
+#
+# KHÔNG được thêm tỷ lệ. KHÔNG được thêm 60/30/10.
+# KHÔNG được tự gọi Can nào là bản khí, trung khí hay dư khí.
+
+ruleset_id: TANGCAN-V1
+version: "1.0.0"
+source_id: SRC-UHTB-CHEP
+passage_id: PSG-UHTB-TANGCAN
+
+# --- Bảng chính, giữ ĐÚNG thứ tự bài phú Uyên Hải Tử Bình -----------
+bang:
+  - branch: TY
+    stems: [QUY]
+    nguyen_van: "子宮癸水在其中"
+    dich: "Cung Tý có Quý thủy ở trong"
+  - branch: SUU
+    stems: [QUY, TAN, KY]
+    nguyen_van: "丑癸辛金己土同"
+    dich: "Sửu có Quý, Tân kim, Kỷ thổ cùng"
+  - branch: DAN
+    stems: [GIAP, BINH, MAU]
+    nguyen_van: "寅宮甲木兼丙戊"
+    dich: "Cung Dần có Giáp mộc kèm Bính, Mậu"
+  - branch: MAO
+    stems: [AT]
+    nguyen_van: "卯宮乙木獨相逢"
+    dich: "Cung Mão chỉ gặp riêng Ất mộc"
+  - branch: THIN
+    stems: [AT, MAU, QUY]
+    nguyen_van: "辰藏乙戊三分癸"
+    dich: "Thìn tàng Ất, Mậu, ba phần Quý"
+    ghi_chu_nguyen_van: >
+      Chỉ riêng câu này có chữ "三分" nghe như một con số.
+      TÔI KHÔNG QUY NÓ THÀNH TỶ LỆ. Không rõ đó là lượng khí, là số ngày,
+      hay chỉ là chữ đệm cho đủ vần. Ghi lại nguyên trạng để người duyệt xét.
+  - branch: TI
+    stems: [CANH, BINH, MAU]
+    nguyen_van: "巳中庚金丙戊叢"
+    dich: "Trong Tị có Canh kim, Bính, Mậu tụ"
+  - branch: NGO
+    stems: [DINH, KY]
+    nguyen_van: "午宮丁火并己土"
+    dich: "Cung Ngọ có Đinh hỏa cùng Kỷ thổ"
+  - branch: MUI
+    stems: [AT, KY, DINH]
+    nguyen_van: "未宮乙己丁共宗"
+    dich: "Cung Mùi có Ất, Kỷ, Đinh chung gốc"
+  - branch: THAN
+    stems: [CANH, NHAM, MAU]
+    nguyen_van: "申位庚金壬水戊"
+    dich: "Ngôi Thân có Canh kim, Nhâm thủy, Mậu"
+  - branch: DAU
+    stems: [TAN]
+    nguyen_van: "酉宮辛金獨豐隆"
+    dich: "Cung Dậu chỉ riêng Tân kim đầy đặn"
+  - branch: TUAT
+    stems: [TAN, DINH, MAU]
+    nguyen_van: "戌宮辛金及丁戊"
+    dich: "Cung Tuất có Tân kim và Đinh, Mậu"
+  - branch: HOI
+    stems: [NHAM, GIAP]
+    nguyen_van: "亥藏壬甲是真蹤"
+    dich: "Hợi tàng Nhâm, Giáp là dấu thật"
+
+# --- Dị bản chữ giữa hai bản chép -----------------------------------
+# Không đổi tập Can, chỉ khác chữ. Ghi lại để không ai tưởng bản nào sai.
+di_ban_chu:
+  - { cau: "午宮丁火并己土", ban_khac: "午宮丁火拼己土", khac_o: "并 / 拼" }
+  - { cau: "未宮乙己丁共宗", ban_khac: "未宮乙己丁其宗", khac_o: "共 / 其" }
+  - { cau: "亥藏壬甲是真蹤", ban_khac: "亥中壬甲是真蹤", khac_o: "藏 / 中" }
+  - { cau: "酉宮辛金獨豐隆", ban_khac: "酉宮辛字獨豐隆", khac_o: "金 / 字" }
+
+# --- Dị biệt THỨ TỰ giữa các truyền thống ---------------------------
+#
+# ĐÂY LÀ PHÁT HIỆN QUAN TRỌNG NHẤT CỦA GIAI ĐOẠN NÀY.
+#
+# SỰ KIỆN quan sát được: hai nguồn ghi cùng TẬP CAN nhưng khác THỨ TỰ ở 5 Chi.
+# KHÔNG ĐƯỢC HỢP NHẤT ÂM THẦM.
+#
+# Vì sao thứ tự khác nhau thì TÔI KHÔNG BIẾT. Xem mục giả thuyết bên dưới.
+thu_tu_di_biet:
+  - branch: SUU
+    uhtb: [QUY, TAN, KY]
+    ban_doi_sau: [KY, QUY, TAN]
+  - branch: THIN
+    uhtb: [AT, MAU, QUY]
+    ban_doi_sau: [MAU, AT, QUY]
+  - branch: TI
+    uhtb: [CANH, BINH, MAU]
+    ban_doi_sau: [BINH, MAU, CANH]
+  - branch: MUI
+    uhtb: [AT, KY, DINH]
+    ban_doi_sau: [KY, DINH, AT]
+  - branch: TUAT
+    uhtb: [TAN, DINH, MAU]
+    ban_doi_sau: [MAU, TAN, DINH]
+
+# Bảy Chi còn lại (Tý, Dần, Mão, Ngọ, Thân, Dậu, Hợi) không có dị biệt thứ tự.
+
+# --- Giả thuyết về nguyên nhân dị biệt thứ tự -----------------------
+# STATUS = HYPOTHESIS. Đây là phỏng đoán của tôi, CHƯA CÓ NGUỒN NÀO.
+# Không được dùng để suy ra bất cứ điều gì, không được đưa vào tính toán.
+gia_thuyet_thu_tu:
+  status: HYPOTHESIS
+  source_id: null
+  canh_bao: "Chưa có nguồn. Ghi lại để người duyệt biết tôi đang nghĩ gì, không hơn."
+  cac_gia_thuyet:
+    - ma: GT-01
+      noi_dung: "Uyên Hải Tử Bình có thể xếp theo trình tự khí lên ngôi trong tháng."
+      bang_chung: "KHÔNG CÓ. Bài phú không nói gì về trình tự thời gian."
+    - ma: GT-02
+      noi_dung: "Bảng đời sau có thể xếp Can mạnh nhất lên trước."
+      bang_chung: "KHÔNG CÓ. Bảng đó không tự nói mình xếp theo tiêu chí nào."

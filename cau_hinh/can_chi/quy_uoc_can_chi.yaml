@@ -1,0 +1,147 @@
+# Quy ước Can Chi và tiết khí.
+#
+# Toàn bộ nội dung tệp này là QUY ƯỚC, không phải thiên văn.
+# Phần tính toán đọc từ đây, không được chép cứng vào mã.
+#
+# Trạng thái chung: PROVISIONAL.
+# Các bảng dưới đây là quy ước phổ biến và ổn định, nhưng chưa gắn được
+# với trang sách cụ thể trong nguồn lõi đã chốt. Chờ anh Đạt cấp nguồn
+# rồi mới chuyển sang VERIFIED.
+
+ruleset_id: GZ-V1
+version: "1.0.0"
+status: PROVISIONAL
+source_id: null
+notes: >
+  Chưa có nguồn sách. Đối chiếu độc lập bằng hai cài đặt khác nhau
+  (sxtwl và lunar-python) cho kết quả trùng khớp, nhưng hai cài đặt đó
+  cùng xuất phát từ một truyền thống nên KHÔNG được coi là hai bằng chứng
+  độc lập hoàn toàn.
+
+# --- Ánh xạ tên mốc lịch sang mã tiết khí --------------------------
+# Bộ quy ước lịch khai YEAR_BOUNDARY = LI_CHUN. Bảng này dịch tên đó
+# thành mã tiết khí. Thêm cách tính năm mới thì thêm dòng ở đây, không sửa mã.
+anh_xa_moc_doi_nam:
+  LI_CHUN: LAP_XUAN
+
+# Loại tiết dùng để mở tháng, tra theo MONTH_BOUNDARY.
+anh_xa_moc_doi_thang:
+  JIE: JIE
+  QI: QI
+
+# Tên loại tiết mở đầu tháng trong bảng tiết khí bên dưới.
+kind_mo_thang: JIE
+
+# --- 24 tiết khí, theo kinh độ mặt trời biểu kiến -------------------
+# kind: JIE = Tiết (mở đầu tháng), QI = Khí (giữa tháng)
+tiet_khi:
+  - { code: LAP_XUAN,   name_vi: "Lập Xuân",   name_original: "立春", longitude: 315, kind: JIE, month_branch: DAN }
+  - { code: VU_THUY,    name_vi: "Vũ Thủy",    name_original: "雨水", longitude: 330, kind: QI }
+  - { code: KINH_TRAP,  name_vi: "Kinh Trập",  name_original: "驚蟄", longitude: 345, kind: JIE, month_branch: MAO }
+  - { code: XUAN_PHAN,  name_vi: "Xuân Phân",  name_original: "春分", longitude: 0,   kind: QI }
+  - { code: THANH_MINH, name_vi: "Thanh Minh", name_original: "清明", longitude: 15,  kind: JIE, month_branch: THIN }
+  - { code: COC_VU,     name_vi: "Cốc Vũ",     name_original: "穀雨", longitude: 30,  kind: QI }
+  - { code: LAP_HA,     name_vi: "Lập Hạ",     name_original: "立夏", longitude: 45,  kind: JIE, month_branch: TI }
+  - { code: TIEU_MAN,   name_vi: "Tiểu Mãn",   name_original: "小滿", longitude: 60,  kind: QI }
+  - { code: MANG_CHUNG, name_vi: "Mang Chủng", name_original: "芒種", longitude: 75,  kind: JIE, month_branch: NGO }
+  - { code: HA_CHI,     name_vi: "Hạ Chí",     name_original: "夏至", longitude: 90,  kind: QI }
+  - { code: TIEU_THU,   name_vi: "Tiểu Thử",   name_original: "小暑", longitude: 105, kind: JIE, month_branch: MUI }
+  - { code: DAI_THU,    name_vi: "Đại Thử",    name_original: "大暑", longitude: 120, kind: QI }
+  - { code: LAP_THU,    name_vi: "Lập Thu",    name_original: "立秋", longitude: 135, kind: JIE, month_branch: THAN }
+  - { code: XU_THU,     name_vi: "Xử Thử",     name_original: "處暑", longitude: 150, kind: QI }
+  - { code: BACH_LO,    name_vi: "Bạch Lộ",    name_original: "白露", longitude: 165, kind: JIE, month_branch: DAU }
+  - { code: THU_PHAN,   name_vi: "Thu Phân",   name_original: "秋分", longitude: 180, kind: QI }
+  - { code: HAN_LO,     name_vi: "Hàn Lộ",     name_original: "寒露", longitude: 195, kind: JIE, month_branch: TUAT }
+  - { code: SUONG_GIANG,name_vi: "Sương Giáng",name_original: "霜降", longitude: 210, kind: QI }
+  - { code: LAP_DONG,   name_vi: "Lập Đông",   name_original: "立冬", longitude: 225, kind: JIE, month_branch: HOI }
+  - { code: TIEU_TUYET, name_vi: "Tiểu Tuyết", name_original: "小雪", longitude: 240, kind: QI }
+  - { code: DAI_TUYET,  name_vi: "Đại Tuyết",  name_original: "大雪", longitude: 255, kind: JIE, month_branch: TY }
+  - { code: DONG_CHI,   name_vi: "Đông Chí",   name_original: "冬至", longitude: 270, kind: QI }
+  - { code: TIEU_HAN,   name_vi: "Tiểu Hàn",   name_original: "小寒", longitude: 285, kind: JIE, month_branch: SUU }
+  - { code: DAI_HAN,    name_vi: "Đại Hàn",    name_original: "大寒", longitude: 300, kind: QI }
+
+# --- Trụ năm --------------------------------------------------------
+# Can Chi năm suy từ số năm theo chu kỳ 60.
+tru_nam:
+  cong_thuc: "stem_index0 = (nam - moc_nam) % 10 ; branch_index0 = (nam - moc_nam) % 12"
+  moc_nam: 4
+  ghi_chu: "Năm 4 sau Công nguyên ứng với Giáp Tý. Quy ước phổ biến."
+
+# --- Trụ tháng: Ngũ Hổ Độn -----------------------------------------
+# Ở TẦNG TRI THỨC chỉ có 5 NHÓM, không phải 10 quy tắc rời.
+# 10 khóa tra cứu do mã tự dựng từ 5 nhóm này. Không liệt kê tay.
+ngu_ho_don:
+  name_original: "五虎遁"
+  status: VERIFIED
+  source_id: SRC-UHTB-CHEP
+  nhom:
+    - { can_nam: [GIAP, KY],   can_thang_dan: BINH,
+        nguyen_van: "甲己之年丙作首", dich: "Năm Giáp hoặc Kỷ thì tháng Dần khởi từ Bính" }
+    - { can_nam: [AT, CANH],   can_thang_dan: MAU,
+        nguyen_van: "乙庚之歲戊為頭", dich: "Năm Ất hoặc Canh thì tháng Dần khởi từ Mậu" }
+    - { can_nam: [BINH, TAN],  can_thang_dan: CANH,
+        nguyen_van: "丙辛之歲尋庚上", dich: "Năm Bính hoặc Tân thì tìm lên Canh" }
+    - { can_nam: [DINH, NHAM], can_thang_dan: NHAM,
+        nguyen_van: "丁壬壬位順行流", dich: "Năm Đinh hoặc Nhâm thì từ ngôi Nhâm thuận dòng" }
+    - { can_nam: [MAU, QUY],   can_thang_dan: GIAP,
+        nguyen_van: "戊癸何方發　甲寅之上好追求", dich: "Năm Mậu hoặc Quý khởi từ đâu, hãy tìm ở Giáp Dần" }
+
+# --- Trụ ngày: chu kỳ 60 liên tục -----------------------------------
+# Mốc neo ghi bằng SỐ NGÀY JULIUS, không ghi bằng ngày dương lịch.
+# Lý do: mốc nằm ở năm 720 trước Công nguyên, thời đó lịch Gregory chưa có.
+# Số ngày Julius không phụ thuộc vào loại lịch nào, nên không gây hiểu nhầm.
+tru_ngay:
+  moc:
+    jdn: 1458496
+    can: KY
+    chi: TI
+    mo_ta: "Ngày 22 tháng 2 năm 720 trước Công nguyên theo lịch Julius"
+    nguon: "Xuân Thu, Lỗ Ẩn Công năm thứ ba: 己巳，日有食之"
+  status: VERIFIED
+  ghi_chu: >
+    TIME-0005B. Mốc này đứng được nhờ ba đường độc lập gặp nhau:
+    sách chép ngày Kỷ Tị có nhật thực; thiên văn xác nhận có nhật thực thấy
+    được ở nước Lỗ sáng hôm đó, che 35 phần trăm, lúc khoảng 6 giờ 26;
+    và chiếu chu kỳ 60 từ mốc này tới nay thì khớp mọi ngày đã kiểm.
+
+# --- Trụ giờ: Ngũ Thử Độn -------------------------------------------
+# Cũng 5 NHÓM. Câu hỏi mà bảng này trả lời:
+#   khi ĐÃ biết Can ngày dùng để khởi giờ, thì Can giờ Tý bắt đầu từ đâu.
+# Việc CHỌN Can ngày nào ở khoảng trước nửa đêm là chuyện khác, thuộc TIME-0007.
+ngu_thu_don:
+  name_original: "五鼠遁"
+  status: VERIFIED
+  source_id: SRC-UHTB-CHEP
+  nhom:
+    - { can_ngay: [GIAP, KY],   can_gio_ty: GIAP,
+        nguyen_van: "甲己還加甲", dich: "Ngày Giáp hoặc Kỷ thì giờ Tý là Giáp Tý" }
+    - { can_ngay: [AT, CANH],   can_gio_ty: BINH,
+        nguyen_van: "乙庚丙作初", dich: "Ngày Ất hoặc Canh thì khởi đầu là Bính" }
+    - { can_ngay: [BINH, TAN],  can_gio_ty: MAU,
+        nguyen_van: "丙辛從戊起", dich: "Ngày Bính hoặc Tân thì khởi từ Mậu" }
+    - { can_ngay: [DINH, NHAM], can_gio_ty: CANH,
+        nguyen_van: "丁壬庚子居", dich: "Ngày Đinh hoặc Nhâm thì ở Canh Tý" }
+    - { can_ngay: [MAU, QUY],   can_gio_ty: NHAM,
+        nguyen_van: "戊癸何方發　壬子是真途", dich: "Ngày Mậu hoặc Quý khởi từ đâu, Nhâm Tý là đường thật" }
+
+# --- Ranh giới chi giờ ----------------------------------------------
+# Giờ Tý bắt đầu lúc 23 giờ. Mỗi chi kéo dài 2 giờ.
+chi_gio:
+  moc_bat_dau_phut: 1380     # 23 giờ 00 phút
+  do_dai_phut: 120
+  chi_dau_tien: TY
+
+# --- Can giờ khi rơi vào phần giờ Tý trước nửa đêm -------------------
+# Đây là điểm CÓ TRANH LUẬN THẬT SỰ giữa các trường phái.
+# Không được tự chọn. Phải khai báo ở từng bộ quy ước lịch.
+can_gio_phan_dem:
+  status: CONFLICTED
+  cac_cach_hieu:
+    - code: DUNG_CAN_NGAY_HIEN_TAI
+      mo_ta: "Giờ Tý từ 23:00 tới 23:59 vẫn dùng Can của ngày đang diễn ra."
+    - code: DUNG_CAN_NGAY_HOM_SAU
+      mo_ta: "Giờ Tý từ 23:00 tới 23:59 dùng Can của ngày hôm sau."
+  ghi_chu: >
+    Thư viện lunar-python chọn cách thứ hai. Chưa rõ căn cứ sách.
+    Bộ tính KHÔNG được tự chọn; phải đọc khoá HOUR_STEM_LATE_ZI
+    từ bộ quy ước lịch đang dùng.

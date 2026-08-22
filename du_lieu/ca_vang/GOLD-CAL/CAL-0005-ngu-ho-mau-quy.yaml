@@ -1,0 +1,36 @@
+case_id: CAL-0005
+category: GOLD-CAL
+title_vi: "Ngũ Hổ Độn nhóm Mậu/Quý — năm Mậu Thân 2028, tháng Dần"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: "Phủ nhóm thứ năm, đóng đủ 5 trên 5 nhóm Ngũ Hổ Độn."
+input:
+  timezone_name: "Asia/Ho_Chi_Minh"
+  gioi_tinh: NAM
+  calendar_ruleset_id: CAL-V1
+  cac_thoi_diem:
+    - { nhan: THANG_DAN, dia_phuong: "2028-02-20 12:00:00" }
+expected:
+  - stage: FINAL
+    stage_key: "CAL-V1:THANG_DAN"
+    review_status: APPROVED
+    payload: { year_pillar: MAU-THAN, month_pillar: GIAP-DAN,
+               day_pillar: AT-HOI, hour_pillar: NHAM-NGO }
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = TIME-0003 (trụ tháng), TIME-0004 (trụ giờ)
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-NGUHO và PSG-UHTB-NGUTHU
+        nguyên văn  -> 戊癸何方發　甲寅之上好追求
+        dịch nghĩa  -> năm Mậu hoặc Quý khởi từ đâu, hãy tìm ở Giáp Dần
+        suy ra      -> tháng Dần chính là Giáp Dần => trụ tháng = Giáp Dần
+        trụ giờ     -> ngày Ất thuộc nhóm Ất/Canh, giờ Tý khởi Bính;
+                       Bính + 6 bước = Nhâm => Nhâm Ngọ
+      GHI CHÚ VỀ NỀN TẢNG (cập nhật 2026-08-21):
+        Trụ ngày trong ca này đến từ TIME-0005A (chu kỳ 60 liên tục, VERIFIED cao)
+        và TIME-0005B (mốc neo Kỷ Tị năm 720 trước Công nguyên, VERIFIED vừa).
+        Mốc neo để MEDIUM vì việc định niên câu chép là nghiên cứu hiện đại.
+        Ca này KHÔNG chạm tới TIME-0007, vì mốc giờ tránh khoảng trước nửa đêm.

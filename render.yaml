@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: tu-binh-gia-dinh-v1
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m kich_ban.chay_cloud
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: XEMNGAY_DB_PATH
+        value: /var/data/xemngay.sqlite3
+      - key: FAMILY_PIN
+        sync: false
+    disk:
+      name: tu-binh-data
+      mountPath: /var/data
+      sizeGB: 1

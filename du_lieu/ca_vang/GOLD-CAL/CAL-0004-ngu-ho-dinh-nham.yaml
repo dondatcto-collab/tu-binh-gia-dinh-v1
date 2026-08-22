@@ -1,0 +1,36 @@
+case_id: CAL-0004
+category: GOLD-CAL
+title_vi: "Ngũ Hổ Độn nhóm Đinh/Nhâm — năm Đinh Mùi 2027, tháng Dần"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: "Phủ nhóm thứ tư của Ngũ Hổ Độn."
+input:
+  timezone_name: "Asia/Ho_Chi_Minh"
+  gioi_tinh: NAM
+  calendar_ruleset_id: CAL-V1
+  cac_thoi_diem:
+    - { nhan: THANG_DAN, dia_phuong: "2027-02-20 12:00:00" }
+expected:
+  - stage: FINAL
+    stage_key: "CAL-V1:THANG_DAN"
+    review_status: APPROVED
+    payload: { year_pillar: DINH-MUI, month_pillar: NHAM-DAN,
+               day_pillar: CANH-NGO, hour_pillar: NHAM-NGO }
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = TIME-0003 (trụ tháng), TIME-0004 (trụ giờ)
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-NGUHO và PSG-UHTB-NGUTHU
+        nguyên văn  -> 丁壬壬位順行流
+        dịch nghĩa  -> năm Đinh hoặc Nhâm thì từ ngôi Nhâm thuận dòng
+        suy ra      -> tháng Dần khởi Nhâm => trụ tháng = Nhâm Dần
+        trụ giờ     -> 乙庚丙作初: ngày Canh thuộc nhóm Ất/Canh, giờ Tý khởi Bính;
+                       giờ Ngọ cách Tý sáu bước, Bính + 6 = Nhâm => Nhâm Ngọ
+      GHI CHÚ VỀ NỀN TẢNG (cập nhật 2026-08-21):
+        Trụ ngày trong ca này đến từ TIME-0005A (chu kỳ 60 liên tục, VERIFIED cao)
+        và TIME-0005B (mốc neo Kỷ Tị năm 720 trước Công nguyên, VERIFIED vừa).
+        Mốc neo để MEDIUM vì việc định niên câu chép là nghiên cứu hiện đại.
+        Ca này KHÔNG chạm tới TIME-0007, vì mốc giờ tránh khoảng trước nửa đêm.

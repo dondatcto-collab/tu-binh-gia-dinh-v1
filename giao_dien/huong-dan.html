@@ -1,0 +1,12 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hướng dẫn - Tử Bình Gia Đình</title><link rel="stylesheet" href="/static/app.css"></head><body><div class="app"><header class="topbar"><div class="brand"><div class="brand-mark">?</div><div><h1>Hướng dẫn sử dụng</h1><small>Dành cho người không biết Tử Bình</small></div></div></header><main>
+<div class="hero"><h2>Chỉ cần nhớ 5 mục</h2><p>Trang chủ để xem nhanh, Lịch để chọn ngày, Việc để quét khoảng ngày, Hồ sơ để quản lý thành viên, Cài đặt để đổi cách hiển thị.</p><a class="btn" href="/" style="display:inline-block;text-decoration:none">Mở ứng dụng</a></div>
+<div class="card"><h3>1. Tạo hồ sơ</h3><p>Vào <b>Hồ sơ → Thêm người</b>, chọn một trong 6 avatar, nhập tên, giới tính, ngày giờ sinh và nơi sinh. Gia đình sinh tại Việt Nam giữ múi giờ <b>Asia/Ho_Chi_Minh</b>.</p><div class="notice">Nên nhập đúng giờ sinh. Nếu giờ sinh chỉ là phỏng đoán, kết quả Tứ Trụ có thể khác; V1 không tự sửa hoặc đoán giờ.</div></div>
+<div class="card"><h3>2. Xem “Tháng này” và “Hôm nay”</h3><p>App hợp lưu các tầng dữ liệu đã có: Đại vận → Năm → Tháng → Ngày. Hiện V1 chưa có đủ rule để kết luận thuận/xấu nên sẽ nói rõ <b>chưa đủ căn cứ</b> thay vì tạo điểm giả.</p></div>
+<div class="card"><h3>3. Dùng Lịch</h3><p>Chọn một ngày để xem Can Chi và các lớp liên quan. Khi scoring chưa được hiệu chỉnh, lịch cố ý không tô xanh/đỏ.</p></div>
+<div class="card"><h3>4. Tìm ngày cho một việc</h3><p>Chọn loại việc và khoảng ngày. Hệ thống hiện quét được cấu trúc từng ngày, nhưng chưa xếp hạng vì kho quy tắc Hiệp Kỷ đang rỗng.</p></div>
+<div class="card"><h3>5. Nút “Tại sao?”</h3><p>Phần chuyên sâu cho phép xem Rule, nguồn, phiên bản và trạng thái xác minh. Người dùng bình thường không cần đọc phần này.</p></div>
+<div class="card"><h3>Phong cách hiển thị</h3><p>Vào <b>Cài đặt</b> để chọn: Hiện đại sáng, Tối thư giãn, Đông phương, Tối cao cấp hoặc Tối xanh dịu. Thay giao diện không thay dữ liệu hay kết quả.</p></div>
+<div class="card"><h3>Sao lưu</h3><pre>python -m kich_ban.sao_luu luu sao-luu
+python -m kich_ban.sao_luu phuc sao-luu/xemngay-YYYYMMDD-HHMM.sqlite3</pre><p>File dữ liệu chính: <code>du_lieu/kho/xemngay.sqlite3</code>.</p></div>
+<div class="notice danger"><b>Y tế</b>Ứng dụng không thay bác sĩ, không dùng để trì hoãn cấp cứu hoặc thay chỉ định chuyên môn.</div>
+</main></div></body></html>

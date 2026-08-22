@@ -1,0 +1,68 @@
+case_id: CAL-0001
+category: GOLD-CAL
+title_vi: "Mốc Lập Xuân 1990 — trụ năm và trụ tháng đổi tại đâu"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-VSOP87-AE
+source_location: "nguồn theo từng lớp ghi ở mục expected"
+
+notes: >
+  Duyệt ngày 2026-08-21. Nguồn ghi theo từng lớp, không ghi một nguồn chung.
+  Lưu ý: một mình thời điểm 12:00 không phân biệt được ba cách tính mốc đổi năm,
+  vì Tết âm lịch 1990 rơi vào 27 tháng 1. Phải có cả hai thời điểm mới cô lập được.
+
+input:
+  timezone_name: "Asia/Ho_Chi_Minh"
+  birth_place_text: "Cần Thơ, Việt Nam"
+  gioi_tinh: NAM
+  calendar_ruleset_id: CAL-V1
+  tiet_khi_can_tinh:
+    - { code: LAP_XUAN, nam: 1990 }
+  cac_thoi_diem:
+    - { nhan: TRUOC_LAP_XUAN, dia_phuong: "1990-02-04 06:00:00" }
+    - { nhan: SAU_LAP_XUAN,   dia_phuong: "1990-02-04 12:00:00" }
+
+expected:
+  # --- Lớp 1: thời điểm tiết khí ---
+  - stage: INTERMEDIATE
+    stage_key: "tiet_khi:LAP_XUAN:1990"
+    review_status: APPROVED
+    payload: "1990-02-04T02:14:00Z"
+    tolerance_seconds: 60
+    source_id: SRC-VSOP87-AE
+    source_note: "Kinh độ mặt trời biểu kiến 315 độ. Đối chiếu pymeeus và sxtwl, lệch dưới 4 giây. 02:14 giờ UTC là 09:14 giờ Việt Nam."
+
+  # --- Lớp 2: múi giờ ---
+  - stage: INTERMEDIATE
+    stage_key: "utc_offset:SAU_LAP_XUAN"
+    review_status: APPROVED
+    payload: 420
+    source_id: SRC-VSOP87-AE
+    source_note: "Múi giờ Việt Nam năm 1990 là UTC+7, tra từ cơ sở dữ liệu múi giờ lịch sử của hệ điều hành."
+
+  # --- Lớp 3: bốn trụ trước mốc ---
+  - stage: FINAL
+    stage_key: "CAL-V1:TRUOC_LAP_XUAN"
+    review_status: APPROVED
+    payload:
+      year_pillar: KY-TI
+      month_pillar: DINH-SUU
+      day_pillar: CANH-TY
+      hour_pillar: KY-MAO
+    source_id: SRC-CHUA-CO-NGUON
+    source_note: "Trụ năm và trụ tháng theo TIME-0002 (mở tháng tại Tiết). Can tháng theo TIME-0003 Ngũ Hổ Độn. Trụ ngày theo TIME-0005 chu kỳ 60. Can giờ theo TIME-0004 Ngũ Thử Độn. Bốn quy tắc này đều PROVISIONAL, chưa có trang sách; đáp án được duyệt dựa trên đối chiếu SRC-DOI-CHIEU-HD."
+
+  # --- Lớp 4: bốn trụ sau mốc ---
+  - stage: FINAL
+    stage_key: "CAL-V1:SAU_LAP_XUAN"
+    review_status: APPROVED
+    payload:
+      year_pillar: CANH-NGO
+      month_pillar: MAU-DAN
+      day_pillar: CANH-TY
+      hour_pillar: NHAM-NGO
+    source_id: SRC-CHUA-CO-NGUON
+    source_note: "Cùng bộ quy tắc như lớp trên: TIME-0002, TIME-0003, TIME-0004, TIME-0005. Thời điểm này nằm sau Lập Xuân 09:14 nên trụ năm sang Canh Ngọ."

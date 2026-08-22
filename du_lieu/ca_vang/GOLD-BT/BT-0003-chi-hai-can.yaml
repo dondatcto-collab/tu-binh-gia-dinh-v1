@@ -1,0 +1,38 @@
+case_id: BT-0003
+category: GOLD-BT
+title_vi: "Dạng B — Chi chứa hai Can"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: "Kiểm dạng hai Can. Ngọ và Hợi."
+input:
+  cac_chi: [NGO, HOI]
+expected:
+  - stage: FINAL
+    stage_key: "tang_can:NGO"
+    review_status: APPROVED
+    payload: [DINH, KY]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-007
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 午宮丁火并己土
+        dịch nghĩa  -> cung Ngọ có Đinh hỏa cùng Kỷ thổ
+        suy ra      -> Ngọ chứa Đinh rồi Kỷ, theo đúng thứ tự câu phú
+      GHI CHÚ: bảng đời sau ghi 午中丁己土, cùng tập và cùng thứ tự.
+  - stage: FINAL
+    stage_key: "tang_can:HOI"
+    review_status: APPROVED
+    payload: [NHAM, GIAP]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-012
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 亥藏壬甲是真蹤
+        dịch nghĩa  -> Hợi tàng Nhâm, Giáp là dấu thật
+        suy ra      -> Hợi chứa Nhâm rồi Giáp, KHÔNG có Mậu
+      GHI CHÚ: có truyền thống thêm Mậu vào Hợi. Mọi nguồn tra được lần này
+      đều KHÔNG thêm. Nếu anh biết nguồn ghi khác, phải chuyển sang CONFLICTED.

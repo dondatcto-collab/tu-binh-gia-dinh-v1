@@ -1,0 +1,39 @@
+case_id: BT-0004
+category: GOLD-BT
+title_vi: "Dạng C — Chi chứa ba Can, không có dị biệt thứ tự"
+ruleset_version: "RS-2026.08-P1"
+review_status: APPROVED
+reviewed_by: "Đạt Võ"
+source_id: SRC-UHTB-CHEP
+notes: >
+  Dần và Thân đều ba Can, và là hai trong bảy Chi mà các truyền thống
+  ghi CÙNG một thứ tự. Chọn chúng để tách bạch với ca dị biệt.
+input:
+  cac_chi: [DAN, THAN]
+expected:
+  - stage: FINAL
+    stage_key: "tang_can:DAN"
+    review_status: APPROVED
+    payload: [GIAP, BINH, MAU]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-003
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 寅宮甲木兼丙戊
+        dịch nghĩa  -> cung Dần có Giáp mộc kèm Bính, Mậu
+        suy ra      -> Dần chứa Giáp, Bính, Mậu theo thứ tự đó
+      GHI CHÚ: bảng đời sau ghi 寅中甲丙戊, TRÙNG cả tập lẫn thứ tự.
+  - stage: FINAL
+    stage_key: "tang_can:THAN"
+    review_status: APPROVED
+    payload: [CANH, NHAM, MAU]
+    source_id: SRC-UHTB-CHEP
+    source_note: |
+      EXPECTED_DERIVATION:
+        SOURCE_RULE_ID = BT-HIDDEN-009
+        SOURCE_ID      = SRC-UHTB-CHEP, đoạn PSG-UHTB-TANGCAN
+        nguyên văn  -> 申位庚金壬水戊
+        dịch nghĩa  -> ngôi Thân có Canh kim, Nhâm thủy, Mậu
+        suy ra      -> Thân chứa Canh, Nhâm, Mậu theo thứ tự đó
+      GHI CHÚ: bảng đời sau ghi 申裡庚壬戊, TRÙNG cả tập lẫn thứ tự.

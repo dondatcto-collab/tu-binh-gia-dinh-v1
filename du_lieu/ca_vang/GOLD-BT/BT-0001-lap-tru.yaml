@@ -1,0 +1,13 @@
+case_id: BT-0001
+category: GOLD-BT
+title_vi: "Lập bốn trụ và xác định Nhật chủ"
+ruleset_version: "RS-2026.08-P1"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: null
+notes: "Chờ ca mẫu trích từ Tử Bình Chân Thuyên kèm người duyệt."
+input:
+  birth_datetime_local: "1985-08-21 07:30"
+  gender: NAM
+  timezone_name: "Asia/Ho_Chi_Minh"
+expected: []

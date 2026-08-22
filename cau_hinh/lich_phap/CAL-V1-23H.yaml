@@ -1,0 +1,52 @@
+calendar_ruleset_id: CAL-V1-23H
+version: "1.0.0"
+name_vi: "Bộ quy ước lịch V1, đổi ngày lúc 23 giờ"
+status: EXPERIMENTAL
+is_default: false
+source_id: null
+notes: >
+  Giống CAL-V1 ở mọi điểm, chỉ khác mốc đổi ngày.
+  Dùng để nghiên cứu quy tắc đổi ngày đầu giờ Tý.
+  Không được bật làm mặc định khi chưa có ca vàng đã duyệt.
+
+settings:
+  YEAR_BOUNDARY:
+    value: LI_CHUN
+    type: STRING
+    notes: "Giống CAL-V1."
+  MONTH_BOUNDARY:
+    value: JIE
+    type: STRING
+    notes: "Giống CAL-V1."
+  DAY_BOUNDARY:
+    value: "23:00"
+    type: TIME
+    notes: "Đổi ngày lúc 23 giờ. Đây là điểm khác duy nhất so với CAL-V1."
+  TRUE_SOLAR_TIME:
+    value: "false"
+    type: BOOL
+    notes: "Giống CAL-V1."
+  LOCAL_TIMEZONE:
+    value: "true"
+    type: BOOL
+    notes: "Giống CAL-V1."
+  HISTORICAL_TIMEZONE:
+    value: "true"
+    type: BOOL
+    notes: "Giống CAL-V1."
+  HOUR_STEM_LATE_ZI:
+    value: DUNG_CAN_NGAY_HOM_SAU
+    type: STRING
+    notes: "Can giờ Tý phần trước nửa đêm. Điểm có tranh luận, phải khai báo rõ."
+  GANZHI_RULESET:
+    value: GZ-V1
+    type: STRING
+    notes: "Bộ quy ước Can Chi đi kèm."
+  HOUR_STEM_LATE_ZI_STATUS:
+    value: NOT_VERIFIED
+    type: STRING
+    notes: "Chưa đủ nguồn để chốt. Giá trị đang dùng chỉ là implementation_default."
+  HOUR_STEM_LATE_ZI_SCORING:
+    value: NOT_FOR_GOLDEN_SCORING
+    type: STRING
+    notes: "Không được dùng phần này để tuyên bố Giai đoạn 2 đúng tuyệt đối."
