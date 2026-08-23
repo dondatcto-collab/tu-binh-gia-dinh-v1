@@ -24,19 +24,19 @@ rule_namespaces:
   - { namespace: EXP,         name_vi: "Diễn giải",               description: "Sắp xếp lý do cho tầng viết lời" }
   - { namespace: TEST,        name_vi: "Kiểm thử",                description: "Quy tắc phục vụ kiểm thử" }
 
-# Loại việc: mới chỉ để chỗ trống. Chưa có bộ quy tắc nào đứng sau.
-# Chỉ chuyển sang ACTIVE khi đã có event_rule_pack với nguồn Hiệp Kỷ xác minh.
+# 13 nhóm việc V1 đã khóa.
+# ACTIVE khi có V1-basic rule pack; mapping PROVISIONAL vẫn phải hiện trạng thái trong giải thích.
 event_types:
-  - { event_type_id: EVT-KHAI-TRUONG,  code: KHAI_TRUONG,  name_vi: "Khai trương",        name_original: "開市" }
-  - { event_type_id: EVT-KY-HOP-DONG,  code: KY_HOP_DONG,  name_vi: "Ký hợp đồng",        name_original: "立券交易" }
-  - { event_type_id: EVT-DAU-TU,       code: DAU_TU,       name_vi: "Đầu tư",             name_original: null }
-  - { event_type_id: EVT-MUA-TAI-SAN,  code: MUA_TAI_SAN,  name_vi: "Mua tài sản",        name_original: "納財" }
-  - { event_type_id: EVT-DONG-THO,     code: DONG_THO,     name_vi: "Động thổ",           name_original: "動土" }
-  - { event_type_id: EVT-XAY-DUNG,     code: XAY_DUNG,     name_vi: "Xây dựng",           name_original: "修造" }
-  - { event_type_id: EVT-NHAP-TRACH,   code: NHAP_TRACH,   name_vi: "Nhập trạch",         name_original: "入宅" }
-  - { event_type_id: EVT-CUOI-HOI,     code: CUOI_HOI,     name_vi: "Cưới hỏi",           name_original: "嫁娶" }
-  - { event_type_id: EVT-XUAT-HANH,    code: XUAT_HANH,    name_vi: "Xuất hành",          name_original: "出行" }
-  - { event_type_id: EVT-NHAM-CHUC,    code: NHAM_CHUC,    name_vi: "Nhậm chức",          name_original: "上官赴任" }
-  - { event_type_id: EVT-THI-CU,       code: THI_CU,       name_vi: "Thi cử",             name_original: null }
-  - { event_type_id: EVT-HOC-TAP,      code: HOC_TAP,      name_vi: "Học tập",            name_original: "入學" }
-  - { event_type_id: EVT-DIEU-TRI,     code: DIEU_TRI,     name_vi: "Điều trị",           name_original: "療病" }
+  - { event_type_id: EVT-KHAI-TRUONG, code: KHAI_TRUONG, name_vi: "Khai trương / khởi sự kinh doanh", name_original: "開市" }
+  - { event_type_id: EVT-KY-HOP-DONG, code: KY_HOP_DONG, name_vi: "Ký hợp đồng / giao dịch quan trọng", name_original: "立券交易" }
+  - { event_type_id: EVT-MUA-TAI-SAN, code: MUA_TAI_SAN, name_vi: "Mua tài sản lớn", name_original: "納財" }
+  - { event_type_id: EVT-DONG-THO, code: DONG_THO, name_vi: "Động thổ / sửa nhà", name_original: "興造動土" }
+  - { event_type_id: EVT-NHAP-TRACH, code: NHAP_TRACH, name_vi: "Nhập trạch / chuyển nhà", name_original: "般移/移徙" }
+  - { event_type_id: EVT-CUOI-HOI, code: CUOI_HOI, name_vi: "Cưới hỏi", name_original: "嫁娶" }
+  - { event_type_id: EVT-XUAT-HANH, code: XUAT_HANH, name_vi: "Đi xa / xuất hành", name_original: "出行" }
+  - { event_type_id: EVT-DIEU-TRI, code: DIEU_TRI, name_vi: "Khám / điều trị / thủ thuật linh hoạt", name_original: "求醫療病" }
+  - { event_type_id: EVT-DAM-PHAN, code: DAM_PHAN, name_vi: "Gặp gỡ / đàm phán quan trọng", name_original: "會親友" }
+  - { event_type_id: EVT-NHAM-CHUC, code: NHAM_CHUC, name_vi: "Bắt đầu công việc mới / nhận chức", name_original: "上官赴任" }
+  - { event_type_id: EVT-THI-CU, code: THI_CU, name_vi: "Thi cử / phỏng vấn", name_original: "入學" }
+  - { event_type_id: EVT-CAU-TAI, code: CAU_TAI, name_vi: "Cầu tài / thu hồi tiền / giao dịch", name_original: "納財" }
+  - { event_type_id: EVT-AN-TANG, code: AN_TANG, name_vi: "An táng / tang sự", name_original: "安葬" }

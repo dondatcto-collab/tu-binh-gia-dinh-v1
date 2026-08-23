@@ -26,6 +26,7 @@ from loi.kho_du_lieu.nap_mam import nap_mam
 from loi.lich.quy_uoc_can_chi import CHI, CHI_VI
 from loi.nen.phien_ban import DB_MAC_DINH, ENGINE_VERSION, RULESET_VERSION
 from loi.van import dong_thoi_gian as dtg
+from loi.quyet_dinh.v1 import quan_he_chi, xep_hang
 
 app = FastAPI(title="Tử Bình Gia Đình V1 — Stateless API")
 
@@ -86,6 +87,12 @@ class WorkRequest(ProfileRequest):
     den_ngay: str
 
 
+class CalendarMonthRequest(ProfileRequest):
+    year: int
+    month: int
+    viec: str | None = None
+
+
 def _ho_so(v: ProfileVao) -> HoSo:
     if not v.full_name.strip():
         raise HTTPException(400, "Chưa nhập tên.")
@@ -126,6 +133,21 @@ def _ngay_ho_so(hs: HoSo, raw: str | None) -> date:
         raise HTTPException(400, f"Múi giờ hồ sơ không hợp lệ: {hs.timezone_name}") from e
 
 
+GIO_KHOANG = [
+    "23:00–01:00","01:00–03:00","03:00–05:00","05:00–07:00",
+    "07:00–09:00","09:00–11:00","11:00–13:00","13:00–15:00",
+    "15:00–17:00","17:00–19:00","19:00–21:00","21:00–23:00",
+]
+
+def _gio_tham_khao(kq):
+    natal = kq.base_state["tu_tru"]["ngay"]["chi"]
+    out=[]
+    for i,ch in enumerate(CHI):
+        qh=quan_he_chi(natal,ch)
+        nhan = "Phù hợp tham khảo" if qh.muc=="POSITIVE" else ("Nên cân nhắc" if qh.muc=="CAUTION" else "Trung tính")
+        out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,"relation":qh.ma,"ly_do":qh.mo_ta})
+    return out
+
 @app.get("/api/health")
 def health():
     return {
@@ -148,12 +170,14 @@ def tinh_trang():
             "quy_tac_verified": d("SELECT COUNT(*) n FROM rule_versions WHERE status='VERIFIED'"),
             "quy_tac_provisional": d("SELECT COUNT(*) n FROM rule_versions WHERE status='PROVISIONAL'"),
             "quy_tac_conflicted": d("SELECT COUNT(*) n FROM rule_versions WHERE status='CONFLICTED'"),
-            "quy_tac_hiep_ky": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace LIKE 'HK-%'"),
-            "cham_diem": "NOT_CALIBRATED",
+            "quy_tac_hiep_ky": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace LIKE 'HK-%' AND is_active=1"),
+            "quy_tac_quan_he": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace='BT-REL' AND is_active=1"),
+            "cham_diem": "ORDINAL_V1_BASIC",
             "profile_storage": "DEVICE_ONLY",
             "canh_bao": (
-                "Lõi tính toán đã chạy. Các kết luận thuận/nghịch, xếp hạng hoặc điểm số "
-                "chỉ được hiển thị khi nhóm quy tắc quyết định tương ứng đã đủ căn cứ xác minh."
+                "Lõi tính toán và lớp quyết định V1-basic đã chạy. App có thể trả lời nhịp tháng/ngày "
+                "và xếp hạng ngày theo lớp 12 Trực của Hiệp Kỷ + quan hệ Địa Chi cá nhân. "
+                "Điểm 0-10 và các lớp sâu chưa được tự bịa khi chưa hiệu chỉnh."
             ),
         }
 
@@ -163,8 +187,8 @@ def loai_viec():
     with _conn() as c:
         rows = c.execute("SELECT code, name_vi, status FROM event_types ORDER BY name_vi").fetchall()
     return [
-        {"code": r["code"], "ten": r["name_vi"], "muc_ho_tro": "NO_RULE" if r["status"] != "ACTIVE" else "ACTIVE"}
-        for r in rows
+        {"code": r["code"], "ten": r["name_vi"], "muc_ho_tro": "ACTIVE_BASIC" if r["status"] == "ACTIVE" else "NO_RULE"}
+        for r in rows if r["status"] != "DEPRECATED"
     ]
 
 
@@ -193,10 +217,7 @@ def hom_nay(v: DayRequest):
             "ngay": d.isoformat(),
             "don_gian": tang_1(kq, scope="day"),
             "chuyen_sau": tang_2(kq),
-            "gio_trong_ngay": [
-                {"chi": ch, "chi_vi": CHI_VI[i], "danh_gia": "UNKNOWN"}
-                for i, ch in enumerate(CHI)
-            ],
+            "gio_trong_ngay": _gio_tham_khao(kq),
         }
 
 
@@ -207,6 +228,52 @@ def tai_sao(v: DayRequest):
     with _conn() as c:
         kq = hop_luu(c, hs, ngay=d)
         return {"chuyen_sau": tang_2(kq), "truy_nguoc": truy_nguoc_day_du(c, kq)}
+
+
+@app.post("/api/stateless/lich-thang")
+def lich_thang(v: CalendarMonthRequest):
+    """Trả trạng thái cho từng ngày trong đúng một tháng để PWA tô lịch.
+
+    Không có việc: dùng quan hệ Địa Chi cá nhân ở lớp V1-basic.
+    Có việc: dùng kết luận sự kiện (12 Trực Hiệp Kỷ + quan hệ cá nhân).
+    """
+    hs = _ho_so(v.profile)
+    if not 1900 <= v.year <= 2100 or not 1 <= v.month <= 12:
+        raise HTTPException(400, "Tháng cần xem không hợp lệ.")
+    first = date(v.year, v.month, 1)
+    next_month = date(v.year + (1 if v.month == 12 else 0), 1 if v.month == 12 else v.month + 1, 1)
+    last = next_month - timedelta(days=1)
+    with _conn() as c:
+        out = []
+        cur = first
+        while cur <= last:
+            kq = hop_luu(c, hs, ngay=cur, event_code=v.viec or None)
+            if v.viec:
+                ev = kq.event_state
+                label = ev.get("label", kq.label)
+                state = ev.get("event_state", "NEUTRAL")
+                detail = {
+                    "truc": ev.get("truc_vi"),
+                    "personal_relation": ev.get("personal_relation", {}),
+                    "coverage": ev.get("coverage"),
+                }
+            else:
+                dg = kq.day_state.get("danh_gia", {})
+                label = dg.get("label", kq.label)
+                state = dg.get("state", "TRUNG_TINH")
+                detail = {"personal_relation": dg.get("relation", {})}
+            out.append({
+                "ngay": cur.isoformat(),
+                "label": label,
+                "state": state,
+                "detail": detail,
+            })
+            cur += timedelta(days=1)
+    return {
+        "year": v.year, "month": v.month, "viec": v.viec,
+        "scoring_status": "ORDINAL_V1_BASIC",
+        "days": out,
+    }
 
 
 @app.post("/api/stateless/tim-ngay")
@@ -221,30 +288,37 @@ def tim_ngay(v: WorkRequest):
     if (b - a).days > 92:
         raise HTTPException(400, "Khoảng ngày tối đa là ba tháng.")
     with _conn() as c:
-        ds = []
-        cur = a
+        ds=[]
+        cur=a
         while cur <= b:
-            kq = hop_luu(c, hs, ngay=cur, event_code=v.viec)
+            kq=hop_luu(c,hs,ngay=cur,event_code=v.viec)
+            ev=kq.event_state
             ds.append({
-                "ngay": cur.isoformat(),
-                "tru_ngay": kq.day_state["tru_ngay"],
-                "quan_he_voi_ban": kq.day_state["quan_he_voi_nhat_chu"],
-                "score": kq.score,
-                "label": kq.label,
-                "scoring_status": kq.scoring_status,
+                "ngay":cur.isoformat(),
+                "tru_ngay":kq.day_state["tru_ngay"],
+                "label":ev.get("label",kq.label),
+                "rank_group":ev.get("rank_group",9),
+                "truc":ev.get("truc_vi"),
+                "event_state":ev.get("event_state"),
+                "personal_relation":ev.get("personal_relation",{}),
+                "reasons":ev.get("reasons",[]),
+                "mapping_status":ev.get("mapping_status"),
+                "coverage":ev.get("coverage"),
+                "event_note":ev.get("event_note"),
+                "score":None,
+                "scoring_status":"ORDINAL_V1_BASIC",
             })
             cur += timedelta(days=1)
-        mau = hop_luu(c, hs, ngay=a, event_code=v.viec)
+        ranked=xep_hang(ds)
         return {
-            "viec": v.viec,
-            "so_ngay_da_quet": len(ds),
-            "co_xep_hang_duoc_khong": False,
-            "ly_do_khong_xep_hang": (
-                "Bộ quy tắc chọn ngày theo việc và hệ chấm điểm chưa đủ căn cứ để sử dụng. "
-                "Hệ thống đã tính cấu trúc từng ngày nhưng không tự xếp hạng khi chưa được phép kết luận."
-            ),
-            "cac_ngay": ds,
-            "chua_du_can_cu": [x.to_dict() for x in mau.uncertainties],
+            "viec":v.viec,
+            "so_ngay_da_quet":len(ds),
+            "co_xep_hang_duoc_khong":True,
+            "xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE",
+            "ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và quan hệ Địa Chi cá nhân. Không dùng điểm 0-10 chưa hiệu chỉnh.",
+            "canh_bao_an_toan": ("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec == "DIEU_TRI" else None),
+            "top":ranked[:3],
+            "cac_ngay":ranked,
         }
 
 

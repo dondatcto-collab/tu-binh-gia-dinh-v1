@@ -3,23 +3,14 @@
 Mọi kết quả tính toán phải ghi kèm ENGINE_VERSION và RULESET_VERSION.
 Đổi một trong hai thì kết quả cũ không còn so sánh trực tiếp được.
 """
-
 from __future__ import annotations
-
 from pathlib import Path
 import os
 
-# Phiên bản của phần tính toán. Tăng khi logic thay đổi.
-ENGINE_VERSION = "0.1.0-phase1"
-
-# Phiên bản của bộ quy tắc đang hoạt động.
-RULESET_VERSION = "RS-2026.08-P1"
-
-# Phiên bản lược đồ cơ sở dữ liệu do bộ chuyển đổi quản lý.
+ENGINE_VERSION = "0.2.1-v1-basic-decision"
+RULESET_VERSION = "RS-2026.08-V1BASIC.1"
 SCHEMA_MIGRATIONS_TABLE = "schema_migrations"
-
 GOC_DU_AN = Path(__file__).resolve().parents[2]
-
 DUONG_DAN = {
     "goc": GOC_DU_AN,
     "migrations": GOC_DU_AN / "loi" / "kho_du_lieu" / "migrations",
@@ -29,5 +20,4 @@ DUONG_DAN = {
     "lich_phap": GOC_DU_AN / "cau_hinh" / "lich_phap",
     "cham_diem": GOC_DU_AN / "cau_hinh" / "cham_diem",
 }
-
 DB_MAC_DINH = Path(os.environ.get("XEMNGAY_DB_PATH", str(DUONG_DAN["kho"] / "xemngay.sqlite3")))

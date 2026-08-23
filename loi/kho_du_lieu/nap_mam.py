@@ -15,6 +15,7 @@ import yaml
 from loi.kho_du_lieu.nap_tang_can import nap as nap_tang_can
 from loi.kho_du_lieu.nap_quyen_khi import nap as nap_quyen_khi
 from loi.kho_du_lieu.nap_thap_than import nap as nap_thap_than
+from loi.kho_du_lieu.nap_quyet_dinh_v1 import nap as nap_quyet_dinh_v1
 from loi.lich.bo_quy_uoc import dong_bo_vao_db, tai_tat_ca
 from loi.nen.phien_ban import DUONG_DAN
 
@@ -105,6 +106,7 @@ def nap_mam(conn: sqlite3.Connection,
     nap_tang_can(conn, thu_muc_mam)
     nap_thap_than(conn)
     nap_quyen_khi(conn)
+    nap_quyet_dinh_v1(conn)
 
     conn.execute(
         """INSERT INTO known_conflicts
@@ -242,12 +244,12 @@ SO_LUONG_MONG_DOI = {
     "event_types": 13,
     "calendar_rulesets": 2,
     "calendar_ruleset_settings": 20,
-    "sources": 11,
-    "rule_registry": 48,
-    "rule_versions": 48,
-    "rule_version_sources": 71,
-    "source_passages": 9,
-    "rule_version_passages": 29,
+    "sources": 15,
+    "rule_registry": 68,
+    "rule_versions": 68,
+    "rule_version_sources": 91,
+    "source_passages": 27,
+    "rule_version_passages": 47,
     "independence_groups": 7,
     "branch_hidden_stems": 28,
     "hidden_stem_order_variants": 10,

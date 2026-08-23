@@ -14,19 +14,33 @@
 </section>
 
 <section id="screen-calendar" class="screen">
-  <div class="section-title"><h2>Lịch cá nhân</h2><span class="pill">Theo người đang chọn</span></div>
-  <div class="card"><div class="calendar-head"><button class="btn secondary small" onclick="moveMonth(-1)">‹</button><b id="cal-title"></b><button class="btn secondary small" onclick="moveMonth(1)">›</button></div><div class="calendar-grid" id="calendar-grid"></div></div>
-  <div id="calendar-detail" class="card"><div class="muted">Chọn một ngày để xem cấu trúc. Lịch chỉ hiển thị trạng thái khi có đủ căn cứ; không tự tô tốt/xấu.</div></div>
+  <div class="section-title"><h2>Lịch cá nhân</h2><button class="btn secondary small" onclick="goTodayCalendar()">Hôm nay</button></div>
+  <div class="card">
+    <div class="calendar-filters">
+      <div><label>Chọn người</label><select id="calendar-profile" onchange="selectProfileFrom('calendar-profile')"></select></div>
+      <div><label>Chọn việc <span class="muted">(tùy chọn)</span></label><select id="calendar-work" onchange="renderCalendar()"><option value="">Xem nhịp cá nhân</option></select></div>
+    </div>
+    <div class="calendar-head"><button class="btn secondary small" onclick="moveMonth(-1)">‹</button><b id="cal-title"></b><button class="btn secondary small" onclick="moveMonth(1)">›</button></div>
+    <div class="calendar-legend"><span><i class="dot good"></i>Thuận</span><span><i class="dot warn"></i>Cân nhắc</span><span><i class="dot bad"></i>Không ưu tiên</span><span><i class="dot neutral"></i>Trung tính</span></div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+  <div id="calendar-detail" class="card"><div class="muted">Chọn một ngày để xem kết luận và lý do. Nếu chọn một việc, màu ngày sẽ ưu tiên quy tắc của đúng việc đó.</div></div>
 </section>
 
 <section id="screen-work" class="screen">
   <div class="section-title"><h2>Tìm ngày cho một việc</h2><span class="pill">13 nhóm V1</span></div>
-  <div class="card"><label>Việc cần làm</label><select id="work-type"></select><div class="form-grid" style="margin-top:10px"><div><label>Từ ngày</label><input id="work-from" type="date"></div><div><label>Đến ngày</label><input id="work-to" type="date"></div></div><button class="btn" style="margin-top:12px" onclick="findDates()">Quét các ngày</button></div>
+  <div class="card find-date-form">
+    <label>Ai?</label><select id="work-profile" onchange="selectProfileFrom('work-profile')"></select>
+    <label style="margin-top:10px">Việc gì?</label><select id="work-type"></select>
+    <div class="form-grid" style="margin-top:10px"><div><label>Từ ngày</label><input id="work-from" type="date"></div><div><label>Đến ngày</label><input id="work-to" type="date"></div></div>
+    <button class="btn" style="margin-top:12px" onclick="findDates()">Tìm ngày phù hợp</button>
+    <div class="soft-note">Kết quả V1 dùng xếp hạng rời rạc có truy nguồn, không tạo điểm 0–10 khi chưa hiệu chỉnh.</div>
+  </div>
   <div id="work-result"></div>
 </section>
 
 <section id="screen-profile" class="screen">
-  <div class="section-title"><h2>Hồ sơ gia đình</h2><button class="btn" onclick="openAddProfile()">+ Thêm người</button></div><div id="profile-list"></div>
+  <div class="section-title"><h2>Hồ sơ gia đình</h2><button class="btn" onclick="openAddProfile()">+ Thêm người</button></div><div id="profile-list"></div><div id="profile-insight"></div>
 </section>
 
 <section id="screen-settings" class="screen">

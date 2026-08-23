@@ -42,6 +42,8 @@ class VanHienTai:
     tuoi_bat_dau: float
     nam_bat_dau: int
     nam_ket_thuc: int
+    ngay_bat_dau: str
+    ngay_ket_thuc: str
     nam_thu_may: int
     trang_thai_quy_doi: str
     canh_bao: list[str] = field(default_factory=list)
@@ -52,6 +54,8 @@ class VanHienTai:
             "tru": viet_hoa(self.can, self.chi),
             "nam_bat_dau": self.nam_bat_dau,
             "nam_ket_thuc": self.nam_ket_thuc,
+            "ngay_bat_dau": self.ngay_bat_dau,
+            "ngay_ket_thuc": self.ngay_ket_thuc,
             "nam_thu_may": self.nam_thu_may,
             "tong_so_nam": 10,
             "trang_thai_quy_doi": self.trang_thai_quy_doi,
@@ -138,19 +142,34 @@ def dung(conn: sqlite3.Connection, hs: HoSo,
         dv = lich_sinh.dai_van
         nam_sinh = hs.birth_year
         hien = None
+        moc_utc = moc.astimezone(timezone.utc)
         for v in dv.cac_van:
             nam_bd = v.bat_dau_utc.year
             nam_kt = v.ket_thuc_utc.year
-            if nam_bd <= moc.year < nam_kt:
+            if v.bat_dau_utc <= moc_utc < v.ket_thuc_utc:
                 hien = (v, nam_bd, nam_kt)
                 break
         if hien:
             v, nam_bd, nam_kt = hien
+            # Không dùng riêng năm dương lịch. “Năm thứ mấy” đổi đúng vào ngày kỷ niệm
+            # của mốc giao vận đang dùng, thay vì chia thô theo số ngày trung bình/năm.
+            so_nam_da_qua = 0
+            for n in range(1, 11):
+                try:
+                    moc_ky_niem = v.bat_dau_utc.replace(year=v.bat_dau_utc.year + n)
+                except ValueError:  # 29/02 -> 28/02 ở năm không nhuận
+                    moc_ky_niem = v.bat_dau_utc.replace(year=v.bat_dau_utc.year + n, day=28)
+                if moc_utc >= moc_ky_niem:
+                    so_nam_da_qua = n
+                else:
+                    break
             van = VanHienTai(
                 thu_tu=v.thu_tu, can=v.can, chi=v.chi,
                 tuoi_bat_dau=v.tuoi_bat_dau,
                 nam_bat_dau=nam_bd, nam_ket_thuc=nam_kt,
-                nam_thu_may=moc.year - nam_bd + 1,
+                ngay_bat_dau=v.bat_dau_utc.date().isoformat(),
+                ngay_ket_thuc=v.ket_thuc_utc.date().isoformat(),
+                nam_thu_may=max(1, min(10, so_nam_da_qua + 1)),
                 trang_thai_quy_doi=dv.trang_thai_ra_ngay,
                 canh_bao=["Mốc chuyển vận tính theo TIME-0006C, quy tắc này "
                           "CHƯA có nguồn. Sai số có thể tới vài tháng."],

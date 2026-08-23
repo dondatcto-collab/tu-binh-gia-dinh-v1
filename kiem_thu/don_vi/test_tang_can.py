@@ -213,12 +213,24 @@ def test_quyen_khi_lam_o_giai_doan_khac_va_khong_duoc_bat(db_da_nap):
         assert r["is_active"] == 0, f"{r['rule_id']} không được bật"
 
 
-def test_chua_lam_cach_cuc_dung_than(db_da_nap):
-    """Thập Thần làm ở 3B, nguyệt lệnh ở 3C. Cách cục và dụng thần thì chưa."""
-    rows = db_da_nap.execute(
-        "SELECT rule_id FROM rule_registry WHERE namespace IN ('BT-PAT','BT-USE','BT-REL')"
+def test_cach_cuc_dung_than_chua_co_nhung_quan_he_da_co(db_da_nap):
+    """FIX4: BT-REL đã được mở có nguồn; BT-PAT và BT-USE vẫn phải trống."""
+    chua_co = db_da_nap.execute(
+        "SELECT rule_id FROM rule_registry WHERE namespace IN ('BT-PAT','BT-USE')"
     ).fetchall()
-    assert rows == [], "chưa tới phạm vi này"
+    assert chua_co == [], "V1 chưa được phép tự tạo Cách cục/Dụng-Hỷ-Kỵ"
+
+    rel = db_da_nap.execute(
+        "SELECT rr.rule_id, rv.status AS verification_status, rr.is_active "
+        "FROM rule_registry rr JOIN rule_versions rv "
+        "ON rv.rule_id=rr.rule_id AND rv.version=rr.active_version "
+        "WHERE rr.namespace='BT-REL' ORDER BY rr.rule_id"
+    ).fetchall()
+    assert [r["rule_id"] for r in rel] == [
+        "BT-REL-0001", "BT-REL-0002", "BT-REL-0003", "BT-REL-0004"
+    ]
+    assert all(r["verification_status"] == "VERIFIED" for r in rel)
+    assert all(r["is_active"] == 1 for r in rel)
 
 
 def test_tang_can_khong_lan_sang_thap_than(db_da_nap):

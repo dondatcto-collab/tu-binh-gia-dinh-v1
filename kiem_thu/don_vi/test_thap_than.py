@@ -360,13 +360,21 @@ def test_ap_dung_tu_tru_khong_luan_giai(db_da_nap):
 
 # ============ Phạm vi: chưa làm quyền khí ===========================
 
-def test_chua_lam_vuong_suy_cach_cuc(db_da_nap):
-    """Thập Thần không được lấn sang vượng suy, cách cục, dụng thần."""
+def test_chua_lam_vuong_suy_cach_cuc_nhung_bt_rel_da_mo(db_da_nap):
+    """FIX4 không được lấn sang Vượng suy/Cách cục/Dụng thần; BT-REL là ngoại lệ đã mở có nguồn."""
     rows = db_da_nap.execute(
         "SELECT rule_id FROM rule_registry "
-        "WHERE namespace IN ('BT-PAT','BT-USE','BT-REL')").fetchall()
-    assert rows == [], "chưa tới phạm vi này"
-    # Quyền khí có tồn tại nhưng không được bật.
+        "WHERE namespace IN ('BT-PAT','BT-USE')").fetchall()
+    assert rows == [], "V1 chưa được phép tự tạo Cách cục/Dụng-Hỷ-Kỵ"
+
+    rel = db_da_nap.execute(
+        "SELECT COUNT(*) AS n FROM rule_registry rr JOIN rule_versions rv "
+        "ON rv.rule_id=rr.rule_id AND rv.version=rr.active_version "
+        "WHERE rr.namespace='BT-REL' AND rv.status='VERIFIED' AND rr.is_active=1"
+    ).fetchone()
+    assert rel["n"] == 4
+
+    # Quyền khí có tồn tại nhưng vẫn không được bật để suy vượng suy.
     qk = db_da_nap.execute(
         "SELECT is_active FROM rule_registry WHERE namespace='BT-SEASON-POWER'"
     ).fetchall()

@@ -30,6 +30,7 @@ from loi.lich.engine import CalendarEngine
 from loi.lich.quy_uoc_can_chi import viet_hoa
 from loi.van.dong_thoi_gian import DongThoiGian
 from loi.van import dong_thoi_gian as dtg
+from loi.quyet_dinh.v1 import danh_gia_giai_doan, danh_gia_event
 
 UNKNOWN = "UNKNOWN"
 NOT_CALIBRATED = "NOT_CALIBRATED"
@@ -155,19 +156,6 @@ CAC_O_CHUA_CO_CAN_CU = [
         "— cả hai đều chưa xác định được.",
         "Cần giải xong vượng suy và cách cục trước."),
     DieuChuaBiet(
-        "QUAN_HE_CAN_CHI",
-        "Ngày này có va chạm gì với ngày sinh của bạn không",
-        "Hợp, xung, hình, hại, phá",
-        "Nhóm BT-REL chưa có quy tắc nào.",
-        "Cần nguồn cổ cho từng loại quan hệ."),
-    DieuChuaBiet(
-        "HIEP_KY",
-        "Ngày này có hợp với việc bạn định làm không",
-        "Quy tắc chọn ngày theo loại việc",
-        "Kho quy tắc Hiệp Kỷ HOÀN TOÀN RỖNG: 0 quy tắc, 0 bộ quy tắc sự kiện, "
-        "0 loại việc được bật. Chưa có bản Khâm Định Hiệp Kỷ Biện Phương Thư.",
-        "Cần nguyên văn Hiệp Kỷ Biện Phương Thư cho 13 nhóm việc đã khóa."),
-    DieuChuaBiet(
         "THAN_SAT",
         "Ngày này có điểm gì đáng chú ý riêng không",
         "Thần sát",
@@ -247,6 +235,22 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
 
     canh_bao_bien = [c.ma for c in lich_ngay.canh_bao]
 
+    # Lớp quyết định V1-basic: dùng quan hệ Địa Chi đã xác minh để trả lời
+    # nhịp tháng/ngày, không suy Dụng-Hỷ-Kỵ và không chấm điểm số.
+    qd_thang = danh_gia_giai_doan(tl.tu_tru["ngay"].chi, tl.thang_hien_tai.chi, "month")
+    qd_ngay = danh_gia_giai_doan(tl.tu_tru["ngay"].chi, lich_ngay.tru_ngay.chi, "day")
+
+    qh_ngay = qd_ngay["relation"]
+    yt_qh = YeuTo(
+        ma=f"QUAN_HE_NGAY_{qh_ngay['ma']}", mo_ta=qh_ngay["mo_ta"],
+        rule_id=qh_ngay["rule_id"], source_id=qh_ngay["source_id"],
+        verification_status="VERIFIED" if qh_ngay["ma"] != "NONE" else "PROVISIONAL")
+    rule.append(qh_ngay["rule_id"])
+    if qh_ngay["muc"] == "POSITIVE":
+        duong.append(yt_qh)
+    elif qh_ngay["muc"] == "CAUTION":
+        am.append(yt_qh)
+
     day_state = {
         "solar_date": ngay.isoformat(),
         "tru_ngay": viet_hoa(lich_ngay.tru_ngay.can, lich_ngay.tru_ngay.chi),
@@ -254,8 +258,7 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
         "tang_can": list(tc.hidden_stems),
         "boundary_warning": lich_ngay.boundary_warning,
         "canh_bao": canh_bao_bien,
-        # Đánh giá ngày cần Dụng Hỷ Kỵ — chưa có.
-        "danh_gia": _trang_thai_chua_biet("DUNG_HY_KY"),
+        "danh_gia": qd_ngay,
     }
 
     hour_state: dict[str, Any] = {"status": UNKNOWN}
@@ -269,18 +272,30 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
 
     event_state: dict[str, Any] = {"status": "NOT_SELECTED"}
     if event_code:
-        r = conn.execute(
-            "SELECT name_vi, status FROM event_types WHERE code = ?",
-            (event_code,)).fetchone()
-        event_state = {
-            "event_code": event_code,
-            "event_name_vi": r["name_vi"] if r else event_code,
-            "support_level": NO_RULE,
-            **_trang_thai_chua_biet("HIEP_KY"),
-        }
+        event_state = danh_gia_event(
+            tl.thang_hien_tai.chi, lich_ngay.tru_ngay.chi,
+            tl.tu_tru["ngay"].chi, event_code)
+        rule.extend(event_state.get("rule_ids", []))
+        if event_state.get("source_id"):
+            # source_trace chỉ chứa ID; tầng giải thích tra chi tiết từ DB.
+            pass
 
-    chua_biet = [x for x in CAC_O_CHUA_CO_CAN_CU
-                 if x.ma != "HIEP_KY" or event_code]
+    # Quan hệ Can Chi và Hiệp Kỷ V1-basic đã có lớp tối thiểu. Phần chưa có
+    # vẫn giữ rõ: vượng suy/cách cục/dụng hỷ kỵ/thần sát/điểm tuyệt đối.
+    chua_biet = list(CAC_O_CHUA_CO_CAN_CU)
+
+    # Nhãn chính trả lời câu hỏi hiện tại: nếu có việc thì ưu tiên kết luận theo
+    # việc; nếu không có việc thì dùng nhịp ngày. Điểm 0-10 vẫn không bịa.
+    main_label = event_state.get("label") if event_code else qd_ngay["label"]
+    main_conf = ("MEDIUM" if event_code and event_state.get("support_level") == "ACTIVE_BASIC"
+                 else qd_ngay.get("confidence", "LOW"))
+    rec = list(qd_ngay.get("recommended", []))
+    caut = list(qd_ngay.get("caution", []))
+    avoid_list: list[str] = []
+    if event_code and event_state.get("event_state") == "JI":
+        avoid_list.append(f"Không ưu tiên {event_state.get('event_name','việc này')} trong ngày này nếu có thể chọn ngày khác.")
+    elif event_code and event_state.get("event_state") == "YI":
+        rec.append(f"{event_state.get('event_name','Việc này')} có tín hiệu phù hợp ở lớp 12 Trực của Hiệp Kỷ V1-basic.")
 
     return KetQuaHopLuu(
         person=hs.full_name,
@@ -297,11 +312,11 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
                       else {"status": UNKNOWN, "ly_do": "Ngoài mười vận đã tính."}),
         year_state={"tru": tl.nam_hien_tai.to_dict(),
                     "quan_he_voi_nhat_chu": tl.thap_than_nam,
-                    "danh_gia": _trang_thai_chua_biet("DUNG_HY_KY")},
+                    "danh_gia": danh_gia_giai_doan(tl.tu_tru["ngay"].chi, tl.nam_hien_tai.chi, "year")},
         month_state={"tru": tl.thang_hien_tai.to_dict(),
                      "quan_he_voi_nhat_chu": tl.thap_than_thang,
                      "nguyet_lenh": tl.nguyet_lenh_hien_tai,
-                     "danh_gia": _trang_thai_chua_biet("DUNG_HY_KY")},
+                     "danh_gia": qd_thang},
         day_state=day_state,
         hour_state=hour_state,
         event_state=event_state,
@@ -310,14 +325,14 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
         conflicts=[],
         uncertainties=chua_biet,
         score=None,
-        label=UNKNOWN,
-        confidence="LOW",
-        scoring_status=NOT_CALIBRATED,
-        recommended=[],
-        caution=[],
-        avoid=[],
+        label=main_label or UNKNOWN,
+        confidence=main_conf,
+        scoring_status="ORDINAL_V1_BASIC",
+        recommended=rec,
+        caution=caut,
+        avoid=avoid_list,
         rule_trace=rule,
-        source_trace=list(tl.source_trace),
+        source_trace=list(tl.source_trace) + ([event_state.get("source_id")] if event_code and event_state.get("source_id") else []) + [qh_ngay["source_id"]],
     )
 
 
