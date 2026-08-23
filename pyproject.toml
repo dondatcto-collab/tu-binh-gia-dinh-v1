@@ -2,7 +2,7 @@
 name = "xem-ngay"
 version = "0.1.1-review"
 description = "Tử Bình Gia Đình V1 - lịch pháp, hồ sơ và khung đánh giá thời điểm có truy nguồn"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 dependencies = [
   "pyyaml>=6.0",
   "fastapi>=0.110",
