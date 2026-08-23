@@ -9,13 +9,14 @@ import os
 import shutil
 import logging
 import uuid
+import sqlite3
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 # Vercel chỉ cho ghi an toàn vào /tmp. DB này chỉ chứa rule/source, không có hồ sơ thật.
 if os.environ.get("VERCEL"):
-    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules-fix5.sqlite3")
+    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules-fix52.sqlite3")
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -26,26 +27,34 @@ from loi.ho_so.ho_so import HoSo
 from loi.hop_luu.hop_luu import hop_luu
 from loi.kho_du_lieu.ket_noi import chay_migration, mo_ket_noi
 from loi.kho_du_lieu.nap_mam import nap_mam
-from loi.lich.quy_uoc_can_chi import CHI, CHI_VI
+from loi.lich.quy_uoc_can_chi import CHI, CHI_VI, viet_hoa
+from loi.lich.engine import CalendarEngine
+from loi.lich.bo_quy_uoc import tai_tat_ca as tai_bo_lich
+from loi.lich.tiet_khi import TietKhiError
 from loi.nen.phien_ban import DB_MAC_DINH, ENGINE_VERSION, RULESET_VERSION
 from loi.van import dong_thoi_gian as dtg
-from loi.quyet_dinh.v1 import quan_he_chi, xep_hang
+from loi.quyet_dinh.v1 import quan_he_chi, xep_hang, danh_gia_event, danh_gia_giai_doan
 
 app = FastAPI(title="Tử Bình Gia Đình V1 — Stateless API")
 
 logger = logging.getLogger("tubinh.api")
 
+def _phan_loai_loi(exc: Exception) -> str:
+    if isinstance(exc, ModuleNotFoundError): return "DEPENDENCY_MISSING"
+    if isinstance(exc, sqlite3.Error): return "RULE_DB"
+    if isinstance(exc, TietKhiError): return "ASTRONOMY_CALENDAR"
+    if isinstance(exc, (KeyError, IndexError)): return "DATA_CODE_MISMATCH"
+    return "ENGINE_RUNTIME"
+
 @app.exception_handler(Exception)
 async def unhandled_error(request: Request, exc: Exception):
     error_id = uuid.uuid4().hex[:8].upper()
-    logger.exception("API error %s %s %s", error_id, request.url.path, exc)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Hệ thống tạm thời chưa xử lý được yêu cầu. Hãy thử lại sau vài giây.",
-            "error_code": f"API-{error_id}",
-        },
-    )
+    stage = _phan_loai_loi(exc)
+    logger.exception("API error %s stage=%s path=%s: %s", error_id, stage, request.url.path, exc)
+    return JSONResponse(status_code=500, content={
+        "detail":"Hệ thống tạm thời chưa xử lý được yêu cầu. Hãy thử lại sau vài giây.",
+        "error_code":f"API-{error_id}","error_stage":stage,
+    })
 
 
 def _bao_dam_kho_rule() -> None:
@@ -59,11 +68,10 @@ def _bao_dam_kho_rule() -> None:
     if os.environ.get("VERCEL"):
         DB_MAC_DINH.parent.mkdir(parents=True, exist_ok=True)
         if seed.exists():
-            # Đường nhanh: dùng DB seed đã kiểm tra và commit cùng source.
-            if not DB_MAC_DINH.exists() or DB_MAC_DINH.stat().st_size != seed.stat().st_size:
-                tmp = DB_MAC_DINH.with_suffix(".tmp")
-                shutil.copy2(seed, tmp)
-                tmp.replace(DB_MAC_DINH)
+            # Copy atomic mỗi worker; không so bằng kích thước vì DB khác phiên bản có thể cùng size.
+            tmp = DB_MAC_DINH.with_suffix(".tmp")
+            shutil.copy2(seed, tmp)
+            tmp.replace(DB_MAC_DINH)
         else:
             # Đường dự phòng: không để API chết chỉ vì file seed bị thiếu khi deploy.
             # Dựng kho rule/source công khai trong /tmp; không có hồ sơ cá nhân.
@@ -189,13 +197,20 @@ def _gio_tham_khao(kq):
 
 @app.get("/api/health")
 def health():
-    return {
-        "ok": True,
-        "mode": "STATELESS_LOCAL_PROFILE",
-        "engine_version": ENGINE_VERSION,
-        "ruleset_version": RULESET_VERSION,
-        "profile_storage": "DEVICE_ONLY",
-    }
+    checks={"rule_db":False,"astronomy":False,"events":0}
+    try:
+        with _conn() as c:
+            checks["events"]=c.execute("SELECT COUNT(*) n FROM event_types WHERE status != 'DEPRECATED'").fetchone()["n"]
+            checks["rule_db"]=checks["events"]>=13
+    except Exception:
+        logger.exception("Health check rule DB failed")
+    try:
+        import astronomy  # noqa: F401
+        checks["astronomy"]=True
+    except Exception:
+        pass
+    return {"ok":bool(checks["rule_db"] and checks["astronomy"]),"mode":"STATELESS_LOCAL_PROFILE",
+            "engine_version":ENGINE_VERSION,"ruleset_version":RULESET_VERSION,"profile_storage":"DEVICE_ONLY","checks":checks}
 
 
 @app.get("/api/tinh-trang")
@@ -260,6 +275,17 @@ def hom_nay(v: DayRequest):
         }
 
 
+@app.post("/api/stateless/dashboard")
+def dashboard(v: ProfileRequest):
+    hs=_ho_so(v.profile); d=_ngay_ho_so(hs,None)
+    with _conn() as c:
+        kq=hop_luu(c,hs,ngay=d); sau=tang_2(kq)
+        return {"ngay":d.isoformat(),
+                "thang":{"don_gian":tang_1(kq,scope="month"),"chuyen_sau":sau},
+                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq)},
+                "vi_tri":{"dai_van":kq.decade_state,"nam_hien_tai":kq.year_state.get("tru",{}),"thang_hien_tai":kq.month_state.get("tru",{})}}
+
+
 @app.post("/api/stateless/tai-sao")
 def tai_sao(v: DayRequest):
     hs = _ho_so(v.profile)
@@ -271,94 +297,37 @@ def tai_sao(v: DayRequest):
 
 @app.post("/api/stateless/lich-thang")
 def lich_thang(v: CalendarMonthRequest):
-    """Trả trạng thái cho từng ngày trong đúng một tháng để PWA tô lịch.
-
-    Không có việc: dùng quan hệ Địa Chi cá nhân ở lớp V1-basic.
-    Có việc: dùng kết luận sự kiện (12 Trực Hiệp Kỷ + quan hệ cá nhân).
-    """
-    hs = _ho_so(v.profile)
-    if not 1900 <= v.year <= 2100 or not 1 <= v.month <= 12:
-        raise HTTPException(400, "Tháng cần xem không hợp lệ.")
-    first = date(v.year, v.month, 1)
-    next_month = date(v.year + (1 if v.month == 12 else 0), 1 if v.month == 12 else v.month + 1, 1)
-    last = next_month - timedelta(days=1)
-    with _conn() as c:
-        out = []
-        cur = first
-        while cur <= last:
-            kq = hop_luu(c, hs, ngay=cur, event_code=v.viec or None)
-            if v.viec:
-                ev = kq.event_state
-                label = ev.get("label", kq.label)
-                state = ev.get("event_state", "NEUTRAL")
-                detail = {
-                    "truc": ev.get("truc_vi"),
-                    "personal_relation": ev.get("personal_relation", {}),
-                    "coverage": ev.get("coverage"),
-                }
-            else:
-                dg = kq.day_state.get("danh_gia", {})
-                label = dg.get("label", kq.label)
-                state = dg.get("state", "TRUNG_TINH")
-                detail = {"personal_relation": dg.get("relation", {})}
-            out.append({
-                "ngay": cur.isoformat(),
-                "label": label,
-                "state": state,
-                "detail": detail,
-            })
-            cur += timedelta(days=1)
-    return {
-        "year": v.year, "month": v.month, "viec": v.viec,
-        "scoring_status": "ORDINAL_V1_BASIC",
-        "days": out,
-    }
+    hs=_ho_so(v.profile)
+    if not 1900<=v.year<=2100 or not 1<=v.month<=12: raise HTTPException(400,"Tháng cần xem không hợp lệ.")
+    first=date(v.year,v.month,1); next_month=date(v.year+(1 if v.month==12 else 0),1 if v.month==12 else v.month+1,1); last=next_month-timedelta(days=1)
+    e=CalendarEngine(tai_bo_lich()["CAL-V1"])
+    sinh=e.tinh(hs.birth_year,hs.birth_month,hs.birth_day,hs.birth_hour,hs.birth_minute,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+    chi_menh=sinh.tru_ngay.chi; out=[]; cur=first
+    while cur<=last:
+        lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+        if v.viec:
+            ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec); label=ev.get("label","Trung tính"); state=ev.get("event_state","NEUTRAL"); detail={"truc":ev.get("truc_vi"),"personal_relation":ev.get("personal_relation",{}),"coverage":ev.get("coverage")}
+        else:
+            dg=danh_gia_giai_doan(chi_menh,lich.tru_ngay.chi,"day"); label=dg.get("label","Nhịp tương đối trung tính"); state=dg.get("state","TRUNG_TINH"); detail={"personal_relation":dg.get("relation",{})}
+        out.append({"ngay":cur.isoformat(),"label":label,"state":state,"detail":detail}); cur+=timedelta(days=1)
+    return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"ORDINAL_V1_BASIC","days":out}
 
 
 @app.post("/api/stateless/tim-ngay")
 def tim_ngay(v: WorkRequest):
-    hs = _ho_so(v.profile)
-    try:
-        a, b = date.fromisoformat(v.tu_ngay), date.fromisoformat(v.den_ngay)
-    except ValueError as e:
-        raise HTTPException(400, "Khoảng ngày không hợp lệ.") from e
-    if b < a:
-        raise HTTPException(400, "Khoảng ngày không hợp lệ.")
-    if (b - a).days > 92:
-        raise HTTPException(400, "Khoảng ngày tối đa là ba tháng.")
-    with _conn() as c:
-        ds=[]
-        cur=a
-        while cur <= b:
-            kq=hop_luu(c,hs,ngay=cur,event_code=v.viec)
-            ev=kq.event_state
-            ds.append({
-                "ngay":cur.isoformat(),
-                "tru_ngay":kq.day_state["tru_ngay"],
-                "label":ev.get("label",kq.label),
-                "rank_group":ev.get("rank_group",9),
-                "truc":ev.get("truc_vi"),
-                "event_state":ev.get("event_state"),
-                "personal_relation":ev.get("personal_relation",{}),
-                "reasons":ev.get("reasons",[]),
-                "mapping_status":ev.get("mapping_status"),
-                "coverage":ev.get("coverage"),
-                "event_note":ev.get("event_note"),
-                "score":None,
-                "scoring_status":"ORDINAL_V1_BASIC",
-            })
-            cur += timedelta(days=1)
-        ranked=xep_hang(ds)
-        return {
-            "viec":v.viec,
-            "so_ngay_da_quet":len(ds),
-            "co_xep_hang_duoc_khong":True,
-            "xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE",
-            "ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và quan hệ Địa Chi cá nhân. Không dùng điểm 0-10 chưa hiệu chỉnh.",
-            "canh_bao_an_toan": ("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec == "DIEU_TRI" else None),
-            "top":ranked[:3],
-            "cac_ngay":ranked,
-        }
+    hs=_ho_so(v.profile)
+    try: a,b=date.fromisoformat(v.tu_ngay),date.fromisoformat(v.den_ngay)
+    except ValueError as e: raise HTTPException(400,"Khoảng ngày không hợp lệ.") from e
+    if b<a: raise HTTPException(400,"Khoảng ngày không hợp lệ.")
+    if (b-a).days>92: raise HTTPException(400,"Khoảng ngày tối đa là ba tháng.")
+    e=CalendarEngine(tai_bo_lich()["CAL-V1"]); sinh=e.tinh(hs.birth_year,hs.birth_month,hs.birth_day,hs.birth_hour,hs.birth_minute,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False); chi_menh=sinh.tru_ngay.chi
+    ds=[]; cur=a
+    while cur<=b:
+        lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+        ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
+        ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Trung tính"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_BASIC"}); cur+=timedelta(days=1)
+    ranked=xep_hang(ds)
+    return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và quan hệ Địa Chi cá nhân. Không dùng điểm 0-10 chưa hiệu chỉnh.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
 
 
 # Chặn rõ các API hồ sơ cũ để tránh vô tình lưu dữ liệu cá nhân trên server.

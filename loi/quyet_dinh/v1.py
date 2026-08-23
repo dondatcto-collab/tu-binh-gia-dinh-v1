@@ -15,8 +15,23 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-CHI = ["ZI","CHOU","YIN","MAO","CHEN","SI","WU","WEI","SHEN","YOU","XU","HAI"]
-CHI_VI = dict(zip(CHI, ["Tý","Sửu","Dần","Mão","Thìn","Tị","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"]))
+from loi.lich.quy_uoc_can_chi import CHI as CHI_NATIVE, CHI_VI as CHI_VI_NATIVE
+
+# Dùng cùng mã Địa Chi với Calendar Engine. Vẫn nhận pinyin cũ để tương thích dữ liệu/test cũ.
+CHI = list(CHI_NATIVE)
+CHI_VI = dict(zip(CHI, CHI_VI_NATIVE))
+CHI_ALIAS = {
+    "ZI":"TY", "CHOU":"SUU", "YIN":"DAN", "MAO":"MAO",
+    "CHEN":"THIN", "SI":"TI", "WU":"NGO", "WEI":"MUI",
+    "SHEN":"THAN", "YOU":"DAU", "XU":"TUAT", "HAI":"HOI",
+}
+
+def chuan_hoa_chi(code: str) -> str:
+    c = str(code or "").strip().upper()
+    c = CHI_ALIAS.get(c, c)
+    if c not in CHI:
+        raise ValueError(f"CHI_KHONG_HOP_LE: {code}")
+    return c
 TRUC = ["KIEN","TRU","MAN","BINH","DINH","CHAP","PHA","NGUY","THANH","THU","KHAI","BE"]
 TRUC_VI = {
     "KIEN":"Kiến","TRU":"Trừ","MAN":"Mãn","BINH":"Bình","DINH":"Định","CHAP":"Chấp",
@@ -24,11 +39,11 @@ TRUC_VI = {
 }
 
 # 三命通會, quyển 2: 支元六合 / 冲击 / 六害 / 三刑.
-LUC_HOP = {frozenset(x) for x in [("ZI","CHOU"),("YIN","HAI"),("MAO","XU"),("CHEN","YOU"),("SI","SHEN"),("WU","WEI")]}
-LUC_XUNG = {frozenset(x) for x in [("ZI","WU"),("CHOU","WEI"),("YIN","SHEN"),("MAO","YOU"),("CHEN","XU"),("SI","HAI")]}
-LUC_HAI = {frozenset(x) for x in [("ZI","WEI"),("CHOU","WU"),("YIN","SI"),("MAO","CHEN"),("SHEN","HAI"),("YOU","XU")]}
-HINH_CAP = {frozenset(x) for x in [("ZI","MAO"),("YIN","SI"),("SI","SHEN"),("YIN","SHEN"),("CHOU","XU"),("XU","WEI"),("CHOU","WEI")]}
-TU_HINH = {"CHEN","WU","YOU","HAI"}
+LUC_HOP = {frozenset(x) for x in [("TY","SUU"),("DAN","HOI"),("MAO","TUAT"),("THIN","DAU"),("TI","THAN"),("NGO","MUI")]}
+LUC_XUNG = {frozenset(x) for x in [("TY","NGO"),("SUU","MUI"),("DAN","THAN"),("MAO","DAU"),("THIN","TUAT"),("TI","HOI")]}
+LUC_HAI = {frozenset(x) for x in [("TY","MUI"),("SUU","NGO"),("DAN","TI"),("MAO","THIN"),("THAN","HOI"),("DAU","TUAT")]}
+HINH_CAP = {frozenset(x) for x in [("TY","MAO"),("DAN","TI"),("TI","THAN"),("DAN","THAN"),("SUU","TUAT"),("TUAT","MUI"),("SUU","MUI")]}
+TU_HINH = {"THIN","NGO","DAU","HOI"}
 
 SRC_REL = "SRC-TMTH-V02-WIKISOURCE"
 SRC_HK11 = "SRC-HK-QD-V11-WIKISOURCE"
@@ -87,10 +102,13 @@ def chuan_hoa_event(code: str | None) -> str | None:
 
 def tinh_truc(chi_thang: str, chi_ngay: str) -> str:
     """建 đặt tại chi tháng, sau đó thuận 12 chi: 建除滿平定執破危成收開閉."""
+    chi_thang = chuan_hoa_chi(chi_thang)
+    chi_ngay = chuan_hoa_chi(chi_ngay)
     return TRUC[(CHI.index(chi_ngay) - CHI.index(chi_thang)) % 12]
 
 
 def quan_he_chi(a: str, b: str) -> QuanHeChi:
+    a, b = chuan_hoa_chi(a), chuan_hoa_chi(b)
     pair = frozenset((a,b))
     if a == b and a in TU_HINH:
         return QuanHeChi("TU_HINH","Tự hình","CAUTION",f"{CHI_VI[a]} gặp cùng {CHI_VI[b]} thuộc nhóm tự hình; nên thận trọng hơn.","BT-REL-0004",SRC_REL)

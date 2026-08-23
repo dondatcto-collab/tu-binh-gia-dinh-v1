@@ -15,12 +15,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Protocol
+from threading import RLock
 
 from loi.lich.quy_uoc_can_chi import QuyUocCanChi, TietKhiDinhNghia, quy_uoc_mac_dinh
 
 
 class TietKhiError(Exception):
     pass
+
+_NHO_CHUNG: dict[tuple[str, str, int, str], datetime] = {}
+_NHO_LOCK = RLock()
 
 
 class NenThienVan(Protocol):
@@ -136,14 +140,21 @@ class BoTinhTietKhi:
         khoa = (nam, code)
         if khoa in self._nho:
             return self._nho[khoa]
+        kc = (self.nen.ten, self.quy_uoc.ruleset_id, nam, code)
+        with _NHO_LOCK:
+            da_co = _NHO_CHUNG.get(kc)
+        if da_co is not None:
+            self._nho[khoa] = da_co
+            return da_co
         dn = self.quy_uoc.tiet_theo_ma(code)
-        # Bắt đầu dò từ trước thời điểm dự kiến khoảng 25 ngày.
         du_kien = _ngay_du_kien(nam, dn.longitude)
         bat_dau = du_kien - timedelta(days=25)
         kq = self.nen.tim_kinh_do(dn.longitude, bat_dau, 50.0)
         if kq is None:
             raise TietKhiError(f"KHONG_TIM_DUOC_TIET_KHI: {code} năm {nam}")
         self._nho[khoa] = kq
+        with _NHO_LOCK:
+            _NHO_CHUNG[kc] = kq
         return kq
 
     def tat_ca_trong_nam(self, nam: int) -> list[MocTietKhi]:
@@ -153,27 +164,31 @@ class BoTinhTietKhi:
 
     # --- định vị một thời điểm --------------------------------------
     def dinh_vi(self, moc_utc: datetime) -> ViTriTietKhi:
+        # Chỉ tính các tiết gần mốc cần xét. Bản cũ tính 24×3 tiết cho mọi lần gọi.
         nam = moc_utc.year
-        moc = []
+        uoc_luong = []
         for n in (nam - 1, nam, nam + 1):
-            moc.extend(self.tat_ca_trong_nam(n))
-        moc.sort(key=lambda m: m.thoi_diem_utc)
+            for dn in self.quy_uoc.tiet_khi:
+                uoc_luong.append((abs((_ngay_du_kien(n, dn.longitude)-moc_utc).total_seconds()), n, dn))
+        uoc_luong.sort(key=lambda x:x[0])
 
-        truoc = [m for m in moc if m.thoi_diem_utc <= moc_utc]
-        sau = [m for m in moc if m.thoi_diem_utc > moc_utc]
+        def tinh_tu(ds):
+            moc=[MocTietKhi(dn,self.thoi_diem(n,dn.code)) for _,n,dn in ds]
+            moc.sort(key=lambda m:m.thoi_diem_utc)
+            truoc=[m for m in moc if m.thoi_diem_utc<=moc_utc]
+            sau=[m for m in moc if m.thoi_diem_utc>moc_utc]
+            jt=[m for m in truoc if self.quy_uoc.la_mo_thang(m.dinh_nghia)]
+            js=[m for m in sau if self.quy_uoc.la_mo_thang(m.dinh_nghia)]
+            return truoc,sau,jt,js
+
+        truoc,sau,jie_truoc,jie_sau=tinh_tu(uoc_luong[:10])
+        if not (truoc and sau and jie_truoc and jie_sau):
+            truoc,sau,jie_truoc,jie_sau=tinh_tu(uoc_luong)
         if not truoc or not sau:
             raise TietKhiError("NGOAI_KHOANG_TINH_DUOC")
-
-        jie_truoc = [m for m in truoc if self.quy_uoc.la_mo_thang(m.dinh_nghia)]
-        jie_sau = [m for m in sau if self.quy_uoc.la_mo_thang(m.dinh_nghia)]
         if not jie_truoc or not jie_sau:
             raise TietKhiError("KHONG_DU_JIE")
-
-        return ViTriTietKhi(
-            truoc=truoc[-1], sau=sau[0],
-            jie_truoc=jie_truoc[-1], jie_sau=jie_sau[0],
-            nen_thien_van=self.nen.ten,
-        )
+        return ViTriTietKhi(truoc=truoc[-1],sau=sau[0],jie_truoc=jie_truoc[-1],jie_sau=jie_sau[0],nen_thien_van=self.nen.ten)
 
 
 def _ngay_du_kien(nam: int, kinh_do: int) -> datetime:

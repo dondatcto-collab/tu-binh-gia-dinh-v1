@@ -171,30 +171,17 @@ def test_vong_sinh_va_vong_khac_khep_kin(db_da_nap):
     assert len({r["to_element"] for r in khac}) == 5
 
 
-def test_loai_viec_deu_o_trang_thai_de_cho_trong(db_da_nap):
-    n = db_da_nap.execute(
-        "SELECT COUNT(*) AS n FROM event_types WHERE status <> 'PLACEHOLDER'").fetchone()["n"]
-    assert n == 0, "chưa có nguồn Hiệp Kỷ nào được xác minh, không loại việc nào được bật"
+def test_13_loai_viec_v1_da_duoc_bat_dung_pham_vi(db_da_nap):
+    rows=db_da_nap.execute("SELECT code,status FROM event_types ORDER BY code").fetchall(); assert len(rows)==13; assert all(r["status"]=="ACTIVE" for r in rows)
 
+def test_chi_nap_dung_pham_vi_v1_hien_tai(db_da_nap):
+    cho_phep={'TIME','BT-HIDDEN','BT-TG','BT-TG-CONFLICT','BT-ML','BT-SEASON-POWER','BT-REL','HK-GENERAL','HK-EVENT','FUS'}
+    rows=db_da_nap.execute("SELECT rule_id,namespace FROM rule_registry").fetchall(); ngoai=[(r['rule_id'],r['namespace']) for r in rows if r['namespace'] not in cho_phep]; assert ngoai==[]
+    assert db_da_nap.execute("SELECT COUNT(*) n FROM event_rule_packs").fetchone()["n"]==13
+    assert db_da_nap.execute("SELECT COUNT(*) n FROM branch_hidden_stems").fetchone()["n"]==28
+    assert db_da_nap.execute("SELECT COUNT(*) n FROM rule_registry WHERE namespace='BT-REL' AND is_active=1").fetchone()["n"]==4
+    assert db_da_nap.execute("SELECT COUNT(*) n FROM rule_registry WHERE namespace='HK-EVENT' AND is_active=1").fetchone()["n"]==13
 
-def test_chi_nap_dung_pham_vi_da_lam(db_da_nap):
-    """Chỉ được nạp quy tắc thuộc các giai đoạn ĐÃ nghiệm thu.
-
-    Giai đoạn 2: TIME. 3A: BT-HIDDEN. 3B: BT-TG. 3C: BT-ML và BT-SEASON-POWER.
-    Mọi không gian tên khác phải còn trống.
-    """
-    conn = db_da_nap
-    ngoai_pham_vi = conn.execute(
-        "SELECT rule_id, namespace FROM rule_registry "
-        "WHERE namespace NOT IN ('TIME','BT-HIDDEN','BT-TG','BT-TG-CONFLICT',"
-        "'BT-ML','BT-SEASON-POWER')").fetchall()
-    assert ngoai_pham_vi == [], (
-        f"nạp quy tắc ngoài phạm vi: "
-        f"{[(r['rule_id'], r['namespace']) for r in ngoai_pham_vi]}")
-    assert conn.execute("SELECT COUNT(*) AS n FROM event_rule_packs").fetchone()["n"] == 0
-    # Tàng Can nay ĐÃ nạp, đúng 28 bản ghi cho 12 Chi.
-    assert conn.execute(
-        "SELECT COUNT(*) AS n FROM branch_hidden_stems").fetchone()["n"] == 28
 
 
 def test_khong_quy_tac_lich_nao_bi_bien_thanh_verified_am_tham(db_da_nap):

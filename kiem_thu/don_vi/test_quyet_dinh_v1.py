@@ -55,3 +55,20 @@ def test_13_nhom_viec_deu_chay_12_truc_khong_co_diem_gia():
             assert d["support_level"] == "ACTIVE_BASIC"
             assert d["score"] is None
             assert d["label"] in {"Rất phù hợp", "Phù hợp", "Có thể cân nhắc", "Trung tính", "Cân nhắc", "Không ưu tiên"}
+
+
+def test_ma_dia_chi_tu_calendar_engine_duoc_nhan_truc_tiep():
+    from loi.lich.quy_uoc_can_chi import CHI as CHI_ENGINE
+    for a in CHI_ENGINE:
+        for b in CHI_ENGINE: assert quan_he_chi(a,b).ma
+    assert quan_he_chi("DAN","HOI").ma=="LUC_HOP"
+    assert quan_he_chi("DAN","THAN").ma=="LUC_XUNG"
+    assert tinh_truc("DAN","DAN")=="KIEN"
+    assert tinh_truc("DAN","THAN")=="PHA"
+
+def test_13_loai_viec_nhan_ma_chi_native_cua_engine():
+    from loi.lich.quy_uoc_can_chi import CHI as CHI_ENGINE
+    from loi.quyet_dinh.v1 import EVENT_RULES
+    for code in EVENT_RULES:
+        for day_chi in CHI_ENGINE:
+            d=danh_gia_event("DAN",day_chi,"MAO",code); assert d["support_level"]=="ACTIVE_BASIC" and d["label"]
