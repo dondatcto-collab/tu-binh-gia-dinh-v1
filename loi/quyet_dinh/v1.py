@@ -123,27 +123,89 @@ def quan_he_chi(a: str, b: str) -> QuanHeChi:
     return QuanHeChi("NONE","Không có quan hệ trực tiếp","NEUTRAL",f"Không thấy Lục hợp, Lục xung, Lục hại hoặc Hình trực tiếp giữa {CHI_VI[a]} và {CHI_VI[b]} ở lớp V1.","FUS-V1-REL-0001",SRC_PRODUCT)
 
 
-def danh_gia_giai_doan(chi_menh_ngay: str, chi_hien_tai: str, scope: str) -> dict:
-    qh = quan_he_chi(chi_menh_ngay, chi_hien_tai)
-    if qh.muc == "POSITIVE":
-        label, state = "Khá thuận", "THUAN"
-        nen = ["Có thể chủ động các việc thường ngày nếu điều kiện thực tế phù hợp."]
-        can = ["Việc quan trọng vẫn nên kiểm tra theo đúng loại việc ở mục Tìm ngày."]
-    elif qh.muc == "CAUTION":
-        label, state = "Có điểm cần lưu ý", "CAN_NHAC"
-        nen = ["Ưu tiên việc có phương án dự phòng và kiểm tra kỹ trước khi chốt."]
-        can = ["Hạn chế quyết định vội chỉ dựa vào cảm giác thuận lợi trong ngày/tháng."]
-    else:
-        label, state = "Chưa có tín hiệu nổi bật", "TRUNG_TINH"
-        nen = ["Có thể xử lý công việc theo kế hoạch bình thường."]
-        can = ["Nếu là việc lớn, dùng mục Tìm ngày để xét đúng loại việc."]
-    return {
-        "scope": scope, "state": state, "label": label, "relation": qh.__dict__,
-        "recommended": nen, "caution": can,
-        "confidence": "MEDIUM" if qh.ma != "NONE" else "LOW",
-        "basis": "Quan hệ Địa Chi trực tiếp giữa chi ngày sinh và chi của giai đoạn đang xét; không thay thế Dụng/Hỷ/Kỵ.",
+def _dien_giai_ung_dung(qh: QuanHeChi, scope: str) -> dict:
+    """Diễn giải sản phẩm từ QUAN HỆ CẤU TRÚC đã xác minh.
+
+    Đây KHÔNG phải câu nguyên văn cổ thư và KHÔNG được quảng bá như dự báo chắc chắn.
+    Mỗi câu đều giữ giới hạn: quan hệ Chi chỉ là một tín hiệu cấu trúc, không thay
+    Dụng/Hỷ/Kỵ và không tự suy ra tiền bạc/sức khỏe tốt xấu.
+    """
+    is_month = scope == "month"
+    horizon = "tháng" if is_month else "ngày"
+    base = {
+        "interpretation_status": "PRODUCT_INTERPRETATION",
+        "evidence_scope": "VERIFIED_BRANCH_RELATION_ONLY",
+        "khong_suy_dien": "Không dùng riêng quan hệ này để kết luận tài chính, sức khỏe hay thành bại của việc lớn.",
+        "technical_trigger": qh.mo_ta,
+    }
+    if qh.ma == "LUC_HOP":
+        return {**base,
+            "headline": f"{horizon.capitalize()} có nhịp phối hợp thuận hơn",
+            "trigger": "Nhịp hiện tại tạo một quan hệ phối hợp trực tiếp với cấu trúc ngày sinh.",
+            "cong_viec": "Thuận hơn cho việc cần phối hợp, trao đổi hoặc nối lại công việc đang dang dở; việc quan trọng vẫn nên xét đúng loại việc trước khi chốt.",
+            "tai_chinh": "Chưa có căn cứ riêng để gọi là tháng/ngày tài lộc; nếu có giao dịch lớn, dùng mục Tìm ngày và kiểm tra điều kiện thực tế.",
+            "quan_he": "Dễ tìm điểm chung hơn trong trao đổi; phù hợp để nói rõ nhu cầu, thống nhất cách làm hoặc hàn gắn một bất đồng nhỏ.",
+            "viec_lon": "Có thể chủ động chuẩn bị, nhưng không dùng Lục hợp một mình để quyết định thời điểm cuối cùng.",
+            "focus": ["Ưu tiên việc cần phối hợp và thống nhất", "Chốt rõ trách nhiệm, mốc thời gian và điều kiện thực tế"],
+        }
+    if qh.ma == "LUC_XUNG":
+        return {**base,
+            "headline": f"{horizon.capitalize()} có nhịp thay đổi và va chạm trực tiếp",
+            "trigger": "Nhịp hiện tại va chạm trực tiếp với cấu trúc ngày sinh, nên khả năng phải điều chỉnh cao hơn bình thường.",
+            "cong_viec": "Dễ phát sinh đổi lịch, đổi cách làm hoặc việc chen ngang; nên chừa khoảng trống và có phương án B cho việc cần chốt.",
+            "tai_chinh": "Không tự suy ra hao tài. Với khoản lớn, tránh quyết định chỉ vì cảm giác gấp; kiểm tra lại điều kiện, dòng tiền và thời điểm cụ thể.",
+            "quan_he": "Dễ khó đồng bộ quan điểm hoặc nhịp hành động; nên xử lý từng việc cụ thể, tránh đẩy bất đồng nhỏ thành tranh luận lớn.",
+            "viec_lon": "Không đồng nghĩa phải hoãn mọi việc lớn; nếu buộc làm, nên chuẩn bị phương án dự phòng và chọn ngày/giờ theo đúng loại việc.",
+            "focus": ["Rà lại lịch và điểm dễ thay đổi", "Giữ phương án dự phòng cho việc khó đảo ngược"],
+        }
+    if qh.ma == "LUC_HAI":
+        return {**base,
+            "headline": f"{horizon.capitalize()} có điểm vướng cần kiểm tra kỹ",
+            "trigger": "Nhịp hiện tại tạo một điểm vướng trực tiếp với cấu trúc ngày sinh; nên kiểm tra kỹ phần dễ bị hiểu lệch hoặc bỏ sót.",
+            "cong_viec": "Nên làm rõ điều kiện, đầu mối và phần việc dễ bị hiểu khác nhau; tránh dựa vào thỏa thuận miệng ở việc quan trọng.",
+            "tai_chinh": "Chưa có căn cứ để kết luận tiền bạc xấu; ưu tiên kiểm tra phí, điều khoản và phần nghĩa vụ dễ bị bỏ sót.",
+            "quan_he": "Dễ có cảm giác không hiểu nhau hoặc kỳ vọng lệch nhau; nói rõ việc cụ thể và xác nhận lại điều đã thống nhất.",
+            "viec_lon": "Có thể tiến hành khi điều kiện đủ rõ; nên tăng bước kiểm tra trước khi ký, chuyển tiền hoặc cam kết dài hạn.",
+            "focus": ["Làm rõ điều kiện và trách nhiệm", "Kiểm tra phần dễ bị bỏ sót trước khi chốt"],
+        }
+    if qh.ma in {"HINH", "TU_HINH"}:
+        return {**base,
+            "headline": f"{horizon.capitalize()} dễ phát sinh ma sát hoặc tự gây áp lực",
+            "trigger": "Nhịp hiện tại tạo một dạng ma sát trực tiếp với cấu trúc ngày sinh; nên giảm áp lực và xử lý từng điểm nghẽn.",
+            "cong_viec": "Nên giảm việc làm song song quá nhiều, rà quy trình và xử lý một điểm nghẽn mỗi lần.",
+            "tai_chinh": "Không có căn cứ riêng để gọi là xấu về tiền; tránh quyết định khi đang căng thẳng hoặc muốn xử lý quá nhanh.",
+            "quan_he": "Dễ căng vì cách làm hoặc cách nói hơn là vì bản chất vấn đề; nên hạ nhịp và tách người khỏi việc khi trao đổi.",
+            "viec_lon": "Nếu có nhiều ràng buộc chưa rõ, nên hoàn tất checklist trước khi đưa ra cam kết khó đảo ngược.",
+            "focus": ["Giảm quá tải và xử lý từng điểm nghẽn", "Hoàn tất checklist trước quyết định quan trọng"],
+        }
+    return {**base,
+        "headline": f"{horizon.capitalize()} chưa có tín hiệu quan hệ nổi bật",
+        "trigger": "Ở lớp quan hệ trực tiếp hiện dùng, chưa thấy tín hiệu đủ nổi bật để ưu tiên hay cảnh báo riêng.",
+        "cong_viec": "Có thể xử lý theo kế hoạch bình thường; nếu là việc quan trọng, nên xét riêng theo loại việc thay vì dựa vào nhịp chung.",
+        "tai_chinh": "Chưa có tín hiệu riêng để kết luận thuận/nghịch về tài chính.",
+        "quan_he": "Chưa thấy quan hệ Địa Chi trực tiếp đủ mạnh để đưa ra cảnh báo hoặc ưu tiên riêng.",
+        "viec_lon": "Không dùng trạng thái này như một xác nhận rằng mọi việc đều tốt; hãy chọn ngày theo đúng loại việc nếu cần chốt thời điểm.",
+        "focus": ["Giữ kế hoạch bình thường", "Việc lớn: xét riêng theo đúng loại việc"],
     }
 
+
+def danh_gia_giai_doan(chi_menh_ngay: str, chi_hien_tai: str, scope: str) -> dict:
+    qh = quan_he_chi(chi_menh_ngay, chi_hien_tai)
+    dg = _dien_giai_ung_dung(qh, scope)
+    if qh.muc == "POSITIVE":
+        label, state = "Khá thuận", "THUAN"
+    elif qh.muc == "CAUTION":
+        label, state = "Có điểm cần lưu ý", "CAN_NHAC"
+    else:
+        label, state = "Chưa có tín hiệu nổi bật", "TRUNG_TINH"
+    return {
+        "scope": scope, "state": state, "label": label, "relation": qh.__dict__,
+        "recommended": list(dg["focus"]),
+        "caution": [dg["khong_suy_dien"]],
+        "confidence": "MEDIUM" if qh.ma != "NONE" else "LOW",
+        "basis": dg["headline"],
+        "dien_giai": dg,
+    }
 
 def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code: str) -> dict:
     code = chuan_hoa_event(event_code)

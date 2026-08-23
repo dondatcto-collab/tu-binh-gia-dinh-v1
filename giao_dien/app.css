@@ -105,3 +105,13 @@ html[data-theme="dark-blue"]{--hero-deep:#08202c;--hero-mid:#0f3c4b;--hero-text:
  .theme-grid{grid-template-columns:1fr 1fr}.settings-row{padding:12px}.settings-group>h3{padding-left:12px}
 }
 @media(max-width:390px){.home-month-body{grid-template-columns:95px 1fr}.ordinal-meter{width:90px;height:80px}.home-points p{font-size:.72rem}.quick-card small{display:none}.month-dual{grid-template-columns:1fr}.calendar-detail-b .advice-grid{grid-template-columns:1fr}.work-stepper i{display:none}.work-stepper{justify-content:space-between}.profile-hero-inner .avatar-img{width:70px;height:76px}}
+
+/* 0.2.7 - diễn giải có ý nghĩa theo lĩnh vực */
+.trigger-line{margin:12px 0;padding:12px 14px;border-radius:14px;background:var(--card-soft,#eef7f4);font-size:.92rem;line-height:1.45}
+.impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.impact-item{padding:14px;border:1px solid var(--border,#d7e2de);border-radius:16px;background:var(--card,#fff);min-height:118px}
+.impact-item b{display:block;margin-bottom:6px;font-size:.95rem}
+.impact-item p{margin:0;line-height:1.48;font-size:.92rem}
+.interpretation-limit{margin:10px 0 14px;padding:11px 13px;border-radius:12px;background:rgba(220,170,60,.10);font-size:.84rem;line-height:1.45}
+.action-summary{margin-top:12px}
+@media(max-width:600px){.impact-grid{grid-template-columns:1fr}.impact-item{min-height:auto}.home-points p{font-size:.86rem;line-height:1.35}}

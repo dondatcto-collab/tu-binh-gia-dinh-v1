@@ -10,7 +10,7 @@
   <title>Tử Bình Gia Đình - V1</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icon-192.png">
-  <link rel="stylesheet" href="/static/app.css?v=0.2.6">
+  <link rel="stylesheet" href="/static/app.css?v=0.2.7">
 </head>
 <body>
 <div class="app">
@@ -103,7 +103,7 @@
     <a class="settings-row" href="/huong-dan.html"><span>ⓘ</span><div><b>Hướng dẫn sử dụng</b><small>Dành cho người không biết Tử Bình</small></div><em>›</em></a>
     <button class="settings-row" onclick="alert('Kết quả luôn đi từ dữ kiện → quan hệ → quy tắc quyết định; phần chưa đủ căn cứ sẽ không được tự kết luận.')"><span>▤</span><div><b>Cách app tính kết quả</b><small>Nguyên tắc hợp lưu và giới hạn V1</small></div><em>›</em></button>
     <button class="settings-row" onclick="alert('Nguồn và trạng thái quy tắc được hiển thị ở tầng Tại sao? / Xem chuyên sâu của từng kết quả.')"><span>▦</span><div><b>Nguồn & phương pháp</b><small>Rule · Source · Version · trạng thái xác minh</small></div><em>›</em></button>
-    <div class="settings-row static"><span>ⓥ</span><div><b>Phiên bản ứng dụng</b><small id="connection-state">Đang kiểm tra kết nối Engine…</small></div><em>0.2.6</em></div>
+    <div class="settings-row static"><span>ⓥ</span><div><b>Phiên bản ứng dụng</b><small id="connection-state">Đang kiểm tra kết nối Engine…</small></div><em>0.2.7</em></div>
   </div>
 
   <div class="settings-group install-group"><h3>CÀI TRÊN THIẾT BỊ</h3><div id="install-state" class="muted">Mở app bằng HTTPS để cài lên màn hình chính.</div><button id="install-button" class="btn full-btn" style="display:none" onclick="installPWA()">Cài ứng dụng</button><div class="soft-note">iPhone: Safari → Chia sẻ → Thêm vào Màn hình chính. Android: Chrome → menu ⋮ → Cài ứng dụng.</div></div>
@@ -123,5 +123,5 @@
 </div>
 
 <div id="profile-modal" class="modal"><div class="modal-box"><div class="section-title"><h2 id="profile-form-title">Thêm người</h2><button class="btn secondary small" onclick="closeProfileModal()">Đóng</button></div><div id="avatar-area"><h3>Chọn hình đại diện</h3><div class="avatar-grid" id="avatar-grid"></div></div><div class="form-grid" style="margin-top:14px"><div class="full"><label>Tên</label><input id="p-name" placeholder="Ví dụ: Mẹ"></div><div><label>Giới tính</label><select id="p-gender"><option value="NAM">Nam</option><option value="NU">Nữ</option></select></div><div><label>Ngày sinh <b>(Dương lịch)</b></label><input id="p-date" type="date"><div class="muted form-help">Nhập ngày Dương lịch. V1 chưa nhận ngày Âm lịch trực tiếp.</div></div><div><label>Giờ sinh</label><input id="p-time" type="time"></div><div><label>Nơi sinh</label><input id="p-place" placeholder="Ví dụ: Cần Thơ"></div><div class="full"><label>Múi giờ nơi sinh</label><select id="p-timezone"></select><div class="muted form-help">Việt Nam mặc định Asia/Ho_Chi_Minh (GMT+7).</div></div></div><div class="notice">Nên nhập đúng giờ sinh theo giấy tờ hoặc thông tin gia đình. Sai giờ có thể làm thay đổi Tứ Trụ; V1 không tự đoán giờ sinh.</div><div id="profile-error" class="form-error"></div><button class="btn full-btn" onclick="saveProfile()">Lưu hồ sơ</button></div></div>
-<script src="/static/app.js?v=0.2.6"></script>
+<script src="/static/app.js?v=0.2.7"></script>
 </body></html>

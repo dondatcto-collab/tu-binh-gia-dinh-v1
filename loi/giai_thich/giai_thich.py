@@ -91,6 +91,7 @@ def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
         "tom_tat": danh_gia.get("label", d["label"]),
         "co_ket_luan_co_ban": True,
         "vi_sao": basis,
+        "dien_giai": danh_gia.get("dien_giai", {}),
         "vi_sao_chua_cham_diem": "Điểm số 0–10 chưa hiệu chỉnh; app dùng nhãn rời rạc có truy nguồn thay vì tạo số giả.",
         "he_thong_biet_gi": quan_sat,
         "he_thong_chua_biet_gi": chua,
@@ -101,7 +102,7 @@ def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
         "khong_uu_tien": khong,
         "confidence": d["confidence"],
         "scoring_status": d["scoring_status"],
-        "canh_bao_trung_thuc": "Kết luận V1-basic chỉ dùng lớp quy tắc đã ghi rõ; không suy rộng thành dự báo chắc chắn.",
+        "canh_bao_trung_thuc": "Kết luận V1-basic chỉ dùng lớp quy tắc đã ghi rõ; phần chưa tra được hoặc chưa đủ nguồn không được suy rộng thành dự báo chắc chắn.",
     }
 
 

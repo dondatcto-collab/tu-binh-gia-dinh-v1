@@ -20,7 +20,7 @@ def test_gio_khong_bi_trinh_bay_nhu_gio_tot_theo_ngay():
     assert 'Giờ tham khảo theo hồ sơ' in ui
     assert 'GIỜ PHÙ HỢP TRONG NGÀY' not in ui
 
-def test_phien_ban_pwa_dong_bo_026():
-    assert 'version = "0.2.6"' in (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
-    assert '0.2.6' in (ROOT / 'public' / 'service-worker.js').read_text(encoding='utf-8')
-    assert "APP_VERSION='0.2.6'" in (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')
+def test_phien_ban_pwa_dong_bo_027():
+    assert 'version = "0.2.7"' in (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
+    assert '0.2.7' in (ROOT / 'public' / 'service-worker.js').read_text(encoding='utf-8')
+    assert "APP_VERSION='0.2.7'" in (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')
