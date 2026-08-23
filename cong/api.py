@@ -57,18 +57,27 @@ def _bao_dam_kho_rule() -> None:
     """
     seed = Path(__file__).resolve().parents[1] / "du_lieu" / "kho" / "xemngay-rules-seed.sqlite3"
     if os.environ.get("VERCEL"):
-        if not seed.exists():
-            raise RuntimeError("RULE_DB_SEED_MISSING")
         DB_MAC_DINH.parent.mkdir(parents=True, exist_ok=True)
-        if not DB_MAC_DINH.exists() or DB_MAC_DINH.stat().st_size != seed.stat().st_size:
-            tmp = DB_MAC_DINH.with_suffix(".tmp")
-            shutil.copy2(seed, tmp)
-            tmp.replace(DB_MAC_DINH)
+        if seed.exists():
+            # Đường nhanh: dùng DB seed đã kiểm tra và commit cùng source.
+            if not DB_MAC_DINH.exists() or DB_MAC_DINH.stat().st_size != seed.stat().st_size:
+                tmp = DB_MAC_DINH.with_suffix(".tmp")
+                shutil.copy2(seed, tmp)
+                tmp.replace(DB_MAC_DINH)
+        else:
+            # Đường dự phòng: không để API chết chỉ vì file seed bị thiếu khi deploy.
+            # Dựng kho rule/source công khai trong /tmp; không có hồ sơ cá nhân.
+            if DB_MAC_DINH.exists():
+                DB_MAC_DINH.unlink()
+            with mo_ket_noi() as c:
+                chay_migration(c)
+                nap_mam(c)
+
         with mo_ket_noi() as c:
             required = {"rule_registry", "rule_versions", "event_types", "sources"}
             found = {r["name"] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             if not required.issubset(found):
-                raise RuntimeError("RULE_DB_SEED_INVALID")
+                raise RuntimeError("RULE_DB_INVALID")
             if c.execute("SELECT COUNT(*) n FROM event_types WHERE status != 'DEPRECATED'").fetchone()["n"] < 13:
                 raise RuntimeError("RULE_DB_EVENT_COVERAGE_INVALID")
         return

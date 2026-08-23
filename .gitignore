@@ -3,9 +3,16 @@ __pycache__/
 .pytest_cache/
 *.pyc
 *.pyo
+
+# Không commit database phát sinh khi chạy hoặc dữ liệu người dùng.
 *.sqlite3
 *.sqlite3-wal
 *.sqlite3-shm
+
+# NGOẠI LỆ BẮT BUỘC: DB seed chỉ chứa rule/source công khai cho Vercel.
+# Không có hồ sơ cá nhân trong file này.
+!du_lieu/kho/xemngay-rules-seed.sqlite3
+
 sao-luu/
 .env
 .DS_Store

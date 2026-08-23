@@ -1,59 +1,118 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f766e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Tử Bình Gia Đình"><title>Tử Bình Gia Đình - V1</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-192.png"><link rel="stylesheet" href="/static/app.css?v=0.2.2"></head><body>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Tử Bình Gia Đình">
+  <title>Tử Bình Gia Đình - V1</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="/static/app.css?v=0.2.4">
+</head>
+<body>
 <div class="app">
 <header class="topbar"><div class="brand"><div class="brand-mark">命</div><div><h1>Tử Bình Gia Đình</h1><small>Hiểu thời vận - chọn thời điểm có căn cứ</small></div></div></header>
 <main>
-<section id="screen-home" class="screen active">
-  <div class="hero"><h2 id="home-title">Chào gia đình</h2><div class="muted">Chọn một người để xem dữ liệu cá nhân.</div><div class="profile-picker"><select id="profile-select"></select><button class="btn secondary" onclick="openAddProfile()">+ Thêm</button></div></div>
-  <div id="status-banner"></div>
-  <div class="grid4">
-    <button class="action-card" onclick="openQuestion('month')"><span class="ico"><svg viewBox="0 0 24 24"><path d="M6 2v3M18 2v3M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg></span><b>Tháng này của tôi</b><span>Xem giai đoạn hiện tại theo Đại vận → năm → tháng</span></button>
-    <button class="action-card" onclick="openQuestion('today')"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg></span><b>Hôm nay thế nào?</b><span>Xem hợp lưu ngày hiện tại và phần đã xác định</span></button>
-    <button class="action-card" onclick="navTo('work')"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><b>Tìm ngày cho một việc</b><span>Chọn việc và khoảng thời gian; app chỉ xếp hạng khi đủ căn cứ</span></button>
-    <button class="action-card" onclick="openQuestion('long')"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-5 2 2-5 5-2Z"/></svg></span><b>Xem vận dài hạn</b><span>Giai đoạn 10 năm, năm hiện tại và tháng hiện tại</span></button>
-  </div>
-</section>
 
-<section id="screen-calendar" class="screen">
-  <div class="section-title"><h2>Lịch cá nhân</h2><button class="btn secondary small" onclick="goTodayCalendar()">Hôm nay</button></div>
-  <div class="card">
-    <div class="calendar-filters">
-      <div><label>Chọn người</label><select id="calendar-profile" onchange="selectProfileFrom('calendar-profile')"></select></div>
-      <div><label>Chọn việc <span class="muted">(tùy chọn)</span></label><select id="calendar-work" onchange="renderCalendar()"><option value="">Xem nhịp cá nhân</option></select></div>
+<!-- 1. TRANG CHỦ — Bố cục B đã chốt -->
+<section id="screen-home" class="screen active home-b">
+  <div class="home-welcome">
+    <div id="home-avatar" class="home-avatar"></div>
+    <div class="grow"><small>Xin chào,</small><h2 id="home-title">gia đình</h2><div id="home-cycle" class="home-cycle">Chọn một người để bắt đầu</div></div>
+    <button class="icon-btn" aria-label="Thêm người" onclick="openAddProfile()">＋</button>
+  </div>
+
+  <div id="home-month-summary" class="home-summary-card month-card loading-card">Đang tải tổng quan tháng…</div>
+  <div id="home-today-summary" class="home-today-card loading-card">Đang tải hôm nay…</div>
+
+  <div class="quick-section">
+    <div class="section-mini-title">TRUY CẬP NHANH</div>
+    <div class="quick-grid">
+      <button class="quick-card" onclick="navTo('work')"><span class="quick-icon">⌕</span><div><b>Tìm ngày cho một việc</b><small>Chọn ngày phù hợp cho việc quan trọng</small></div><span>›</span></button>
+      <button class="quick-card" onclick="openQuestion('long')"><span class="quick-icon">◉</span><div><b>Vận dài hạn</b><small>Xem giai đoạn 10 năm hiện tại</small></div><span>›</span></button>
     </div>
-    <div class="calendar-head"><button class="btn secondary small" onclick="moveMonth(-1)">‹</button><b id="cal-title"></b><button class="btn secondary small" onclick="moveMonth(1)">›</button></div>
-    <div class="calendar-legend"><span><i class="dot good"></i>Thuận</span><span><i class="dot warn"></i>Cân nhắc</span><span><i class="dot bad"></i>Không ưu tiên</span><span><i class="dot neutral"></i>Trung tính</span></div>
-    <div class="calendar-grid" id="calendar-grid"></div>
   </div>
-  <div id="calendar-detail" class="card"><div class="muted">Chọn một ngày để xem kết luận và lý do. Nếu chọn một việc, màu ngày sẽ ưu tiên quy tắc của đúng việc đó.</div></div>
+
+  <div class="family-strip-card"><div class="section-mini-title">GIA ĐÌNH</div><div id="home-family-strip" class="family-strip"></div></div>
+  <div id="status-banner" class="home-trust"></div>
 </section>
 
-<section id="screen-work" class="screen">
+<!-- 4. LỊCH — Bố cục B đã chốt -->
+<section id="screen-calendar" class="screen calendar-b">
+  <div class="section-title"><h2>Lịch</h2><button class="btn secondary small" onclick="goTodayCalendar()">Hôm nay</button></div>
+  <div class="card calendar-shell">
+    <div class="calendar-view-tabs"><button id="cal-tab-month" class="active" onclick="setCalendarView('month')">Tháng</button><button id="cal-tab-list" onclick="setCalendarView('list')">Danh sách</button></div>
+    <div class="calendar-head"><button class="plain-arrow" onclick="moveMonth(-1)">‹</button><b id="cal-title"></b><button class="plain-arrow" onclick="moveMonth(1)">›</button></div>
+    <div class="calendar-filters compact">
+      <div><select id="calendar-profile" onchange="selectProfileFrom('calendar-profile')"></select></div>
+      <div><select id="calendar-work" onchange="renderCalendar()"><option value="">Tất cả việc</option></select></div>
+    </div>
+    <div id="calendar-month-view">
+      <div class="calendar-grid" id="calendar-grid"></div>
+      <div class="calendar-legend"><span><i class="dot good"></i>Thuận</span><span><i class="dot warn"></i>Cân nhắc</span><span><i class="dot bad"></i>Không ưu tiên</span><span><i class="dot neutral"></i>Trung tính</span></div>
+    </div>
+    <div id="calendar-list-view" class="calendar-list-view" hidden></div>
+  </div>
+  <div id="calendar-detail" class="card calendar-detail-b"><div class="muted">Chọn một ngày để xem chi tiết. Nếu chọn một việc, kết quả ưu tiên đúng nhóm việc đó.</div></div>
+</section>
+
+<!-- 5. TÌM NGÀY — Bố cục B đã chốt -->
+<section id="screen-work" class="screen work-b">
   <div class="section-title"><h2>Tìm ngày cho một việc</h2><span class="pill">13 nhóm V1</span></div>
-  <div class="card find-date-form">
-    <label>Ai?</label><select id="work-profile" onchange="selectProfileFrom('work-profile')"></select>
-    <label style="margin-top:10px">Việc gì?</label><select id="work-type"></select>
-    <div class="form-grid" style="margin-top:10px"><div><label>Từ ngày</label><input id="work-from" type="date"></div><div><label>Đến ngày</label><input id="work-to" type="date"></div></div>
-    <button class="btn" style="margin-top:12px" onclick="findDates()">Tìm ngày phù hợp</button>
-    <div class="soft-note">Kết quả V1 dùng xếp hạng rời rạc có truy nguồn, không tạo điểm 0–10 khi chưa hiệu chỉnh.</div>
+  <div class="work-stepper"><div class="done"><span>1</span>Chọn người</div><i>→</i><div class="done"><span>2</span>Chọn việc</div><i>→</i><div class="done"><span>3</span>Chọn thời gian</div><i>→</i><div><span>4</span>Kết quả</div></div>
+  <div class="card work-search-card">
+    <div class="work-inline"><div><label>Người</label><select id="work-profile" onchange="selectProfileFrom('work-profile')"></select></div><div><label>Việc</label><select id="work-type"></select></div></div>
+    <div class="work-range"><div><label>Từ ngày</label><input id="work-from" type="date"></div><span>→</span><div><label>Đến ngày</label><input id="work-to" type="date"></div></div>
+    <button class="btn full-btn" onclick="findDates()">Tìm ngày phù hợp</button>
   </div>
-  <div id="work-result"></div>
+  <div id="work-result"><div class="soft-note">Chọn người, việc và khoảng thời gian. App xếp hạng theo lớp V1-basic có truy nguồn; không tạo điểm 0–10 giả.</div></div>
 </section>
 
-<section id="screen-profile" class="screen">
-  <div class="section-title"><h2>Hồ sơ gia đình</h2><button class="btn" onclick="openAddProfile()">+ Thêm người</button></div><div id="profile-list"></div><div id="profile-insight"></div>
+<!-- 6. HỒ SƠ — Bố cục A đã chốt -->
+<section id="screen-profile" class="screen profile-a">
+  <div class="section-title"><h2>Hồ sơ</h2><button class="btn" onclick="openAddProfile()">+ Thêm người</button></div>
+  <div id="profile-list" class="profile-family-tabs"></div>
+  <div id="profile-insight"></div>
 </section>
 
-<section id="screen-settings" class="screen">
-  <div class="section-title"><h2>Cài đặt</h2><span class="pill">Chỉ thay cách hiển thị</span></div>
-  <div class="card"><h3>Phong cách hiển thị</h3><div class="theme-grid" id="theme-grid"></div><p class="muted">Đổi phong cách không làm thay đổi dữ liệu, quy tắc hay kết quả.</p></div>
-  <div class="card"><h3>Hiển thị</h3><label>Cỡ chữ</label><select id="font-size" onchange="saveSettings()"><option value="normal">Bình thường</option><option value="large">Lớn</option></select><label style="margin-top:12px">Ngày âm</label><select disabled><option>Chưa có bộ tính trong V1 hiện tại</option></select></div>
-  <div class="card"><h3>Cài ứng dụng trên điện thoại</h3><div id="install-state" class="muted">Mở app bằng HTTPS để cài lên màn hình chính.</div><button id="install-button" class="btn" style="width:100%;margin-top:10px;display:none" onclick="installPWA()">Cài ứng dụng</button><div class="notice" style="margin-top:10px"><b>iPhone/iPad</b>Safari → Chia sẻ → Thêm vào Màn hình chính → bật “Mở dưới dạng ứng dụng web”.<br><br><b>Android</b>Chrome → menu ⋮ → Cài ứng dụng / Thêm vào màn hình chính.</div></div>
-  <div class="card"><h3>Dữ liệu trên thiết bị</h3><div class="notice good"><b>Riêng tư theo từng máy</b>Hồ sơ gia đình được lưu trong trình duyệt/PWA trên chính thiết bị này. Máy chủ chỉ nhận dữ liệu tạm thời khi tính và không lưu hồ sơ.</div><div id="backup-state" class="muted" style="margin:10px 0"></div><button class="btn" style="width:100%" onclick="exportBackup()">Xuất bản sao lưu</button><button class="btn secondary" style="width:100%;margin-top:8px" onclick="chooseRestoreFile()">Khôi phục từ bản sao lưu</button><input id="restore-file" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackup(this)"><button class="btn danger" style="width:100%;margin-top:8px" onclick="deleteAllLocal()">Xóa dữ liệu trên thiết bị</button><p class="muted">Nên sao lưu sau khi tạo/sửa hồ sơ và tối thiểu mỗi 30 ngày. File sao lưu có thể dùng để chuyển sang điện thoại hoặc laptop khác.</p></div>
-  <div class="card"><h3>Phiên bản</h3><div class="app-version-row"><b>FIX5 · 0.2.2</b><span class="muted">Beta gia đình ổn định</span></div><div id="connection-state" class="muted">Đang kiểm tra kết nối Engine…</div></div><div class="card"><h3>Hỗ trợ</h3><a class="btn secondary" href="/huong-dan.html" style="display:block;text-decoration:none;text-align:center">Hướng dẫn sử dụng</a><p class="muted">Không đưa file sao lưu lên GitHub hoặc chia sẻ công khai vì file có ngày, giờ và nơi sinh của gia đình.</p></div>
+<!-- 7. CÀI ĐẶT — Bố cục A đã chốt -->
+<section id="screen-settings" class="screen settings-a">
+  <div class="section-title"><h2>Cài đặt</h2></div>
+  <div class="settings-group">
+    <h3>PHONG CÁCH HIỂN THỊ</h3>
+    <button class="settings-row" onclick="toggleThemePanel()"><span>◉</span><div><b>Phong cách hiển thị</b><small id="theme-current">Hiện đại sáng</small></div><em>›</em></button>
+    <div id="theme-panel" class="theme-panel" hidden><div class="theme-grid" id="theme-grid"></div><p class="muted">Đổi phong cách chỉ thay giao diện, không thay dữ liệu hay kết quả.</p></div>
+    <div class="settings-row static"><span>Aa</span><div><b>Cỡ chữ</b><select id="font-size" onchange="saveSettings()"><option value="normal">Bình thường</option><option value="large">Lớn</option></select></div></div>
+    <div class="settings-row static disabled"><span>◫</span><div><b>Hiển thị ngày âm</b><small>Chưa bật trong V1 hiện tại</small></div><em>—</em></div>
+    <div class="settings-row static"><span>◎</span><div><b>Múi giờ</b><small>Ưu tiên múi giờ theo từng hồ sơ</small></div><em>›</em></div>
+  </div>
+
+  <div class="settings-group">
+    <h3>SAO LƯU & DỮ LIỆU</h3>
+    <button class="settings-row" onclick="exportBackup()"><span>☁</span><div><b>Sao lưu dữ liệu gia đình</b><small id="backup-state">Chưa có bản sao lưu</small></div><em>›</em></button>
+    <button class="settings-row" onclick="chooseRestoreFile()"><span>↶</span><div><b>Khôi phục dữ liệu</b><small>Nhập file sao lưu từ thiết bị khác</small></div><em>›</em></button>
+    <input id="restore-file" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackup(this)">
+    <button class="settings-row danger-row" onclick="deleteAllLocal()"><span>⌫</span><div><b>Xóa toàn bộ dữ liệu</b><small>Chỉ xóa dữ liệu trên thiết bị này</small></div><em>›</em></button>
+  </div>
+
+  <div class="settings-group">
+    <h3>THÔNG TIN ỨNG DỤNG</h3>
+    <a class="settings-row" href="/huong-dan.html"><span>ⓘ</span><div><b>Hướng dẫn sử dụng</b><small>Dành cho người không biết Tử Bình</small></div><em>›</em></a>
+    <button class="settings-row" onclick="alert('Kết quả luôn đi từ dữ kiện → quan hệ → quy tắc quyết định; phần chưa đủ căn cứ sẽ không được tự kết luận.')"><span>▤</span><div><b>Cách app tính kết quả</b><small>Nguyên tắc hợp lưu và giới hạn V1</small></div><em>›</em></button>
+    <button class="settings-row" onclick="alert('Nguồn và trạng thái quy tắc được hiển thị ở tầng Tại sao? / Xem chuyên sâu của từng kết quả.')"><span>▦</span><div><b>Nguồn & phương pháp</b><small>Rule · Source · Version · trạng thái xác minh</small></div><em>›</em></button>
+    <div class="settings-row static"><span>ⓥ</span><div><b>Phiên bản ứng dụng</b><small id="connection-state">Đang kiểm tra kết nối Engine…</small></div><em>0.2.4</em></div>
+  </div>
+
+  <div class="settings-group install-group"><h3>CÀI TRÊN THIẾT BỊ</h3><div id="install-state" class="muted">Mở app bằng HTTPS để cài lên màn hình chính.</div><button id="install-button" class="btn full-btn" style="display:none" onclick="installPWA()">Cài ứng dụng</button><div class="soft-note">iPhone: Safari → Chia sẻ → Thêm vào Màn hình chính. Android: Chrome → menu ⋮ → Cài ứng dụng.</div></div>
 </section>
 
-<section id="screen-result" class="screen"><div class="section-title"><h2 id="result-title">Kết quả</h2><button class="btn secondary small" onclick="navTo('home')">Về trang chủ</button></div><div id="result-body"></div></section>
+<!-- 2 + 3 + Vận dài hạn dùng màn kết quả riêng -->
+<section id="screen-result" class="screen"><div class="section-title result-screen-title"><h2 id="result-title">Kết quả</h2><button class="btn secondary small" onclick="navTo('home')">Về trang chủ</button></div><div id="result-body"></div></section>
 </main>
+
 <nav class="bottom-nav"><div class="inner">
 <button class="nav-btn active" data-nav="home" onclick="navTo('home')"><span class="nicon"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg></span>Trang chủ</button>
 <button class="nav-btn" data-nav="calendar" onclick="navTo('calendar')"><span class="nicon"><svg viewBox="0 0 24 24"><path d="M6 2v3M18 2v3M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg></span>Lịch</button>
@@ -63,5 +122,6 @@
 </div></nav>
 </div>
 
-<div id="profile-modal" class="modal"><div class="modal-box"><div class="section-title"><h2 id="profile-form-title">Thêm người</h2><button class="btn secondary small" onclick="closeProfileModal()">Đóng</button></div><div id="avatar-area"><h3>Chọn hình đại diện</h3><div class="avatar-grid" id="avatar-grid"></div></div><div class="form-grid" style="margin-top:14px"><div class="full"><label>Tên</label><input id="p-name" placeholder="Ví dụ: Mẹ"></div><div><label>Giới tính</label><select id="p-gender"><option value="NAM">Nam</option><option value="NU">Nữ</option></select></div><div><label>Ngày sinh <b>(Dương lịch)</b></label><input id="p-date" type="date"><div class="muted" style="font-size:.8rem;margin-top:4px">Nhập ngày Dương lịch. V1 chưa nhận ngày Âm lịch trực tiếp.</div></div><div><label>Giờ sinh</label><input id="p-time" type="time"></div><div><label>Nơi sinh</label><input id="p-place" placeholder="Ví dụ: Cần Thơ"></div><div class="full"><label>Múi giờ nơi sinh</label><select id="p-timezone"></select><div class="muted" style="font-size:.82rem;margin-top:4px">Gia đình ở Việt Nam giữ mặc định Asia/Ho_Chi_Minh. Nếu sinh ở nước khác, hãy chọn đúng múi giờ.</div></div></div><div class="notice">Nên nhập đúng giờ sinh theo giấy tờ hoặc thông tin gia đình. Sai giờ có thể làm thay đổi Tứ Trụ; V1 không tự đoán giờ sinh.</div><div id="profile-error" style="color:var(--danger);font-weight:700"></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveProfile()">Lưu hồ sơ</button></div></div>
-<script src="/static/app.js?v=0.2.2"></script></body></html>
+<div id="profile-modal" class="modal"><div class="modal-box"><div class="section-title"><h2 id="profile-form-title">Thêm người</h2><button class="btn secondary small" onclick="closeProfileModal()">Đóng</button></div><div id="avatar-area"><h3>Chọn hình đại diện</h3><div class="avatar-grid" id="avatar-grid"></div></div><div class="form-grid" style="margin-top:14px"><div class="full"><label>Tên</label><input id="p-name" placeholder="Ví dụ: Mẹ"></div><div><label>Giới tính</label><select id="p-gender"><option value="NAM">Nam</option><option value="NU">Nữ</option></select></div><div><label>Ngày sinh <b>(Dương lịch)</b></label><input id="p-date" type="date"><div class="muted form-help">Nhập ngày Dương lịch. V1 chưa nhận ngày Âm lịch trực tiếp.</div></div><div><label>Giờ sinh</label><input id="p-time" type="time"></div><div><label>Nơi sinh</label><input id="p-place" placeholder="Ví dụ: Cần Thơ"></div><div class="full"><label>Múi giờ nơi sinh</label><select id="p-timezone"></select><div class="muted form-help">Việt Nam mặc định Asia/Ho_Chi_Minh (GMT+7).</div></div></div><div class="notice">Nên nhập đúng giờ sinh theo giấy tờ hoặc thông tin gia đình. Sai giờ có thể làm thay đổi Tứ Trụ; V1 không tự đoán giờ sinh.</div><div id="profile-error" class="form-error"></div><button class="btn full-btn" onclick="saveProfile()">Lưu hồ sơ</button></div></div>
+<script src="/static/app.js?v=0.2.4"></script>
+</body></html>

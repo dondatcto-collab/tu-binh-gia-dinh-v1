@@ -1,6 +1,6 @@
 [project]
 name = "xem-ngay"
-version = "0.2.2"
+version = "0.2.4"
 description = "Tử Bình Gia Đình V1 - lịch pháp, hồ sơ và khung đánh giá thời điểm có truy nguồn"
 requires-python = ">=3.12,<3.13"
 dependencies = [

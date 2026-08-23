@@ -1,5 +1,5 @@
-const CACHE = 'tubinh-v1-fix5-0.2.2';
-const SHELL = ['/', '/static/app.css?v=0.2.2', '/static/app.js?v=0.2.2', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
+const CACHE = 'tubinh-v1-ui-0.2.4';
+const SHELL = ['/', '/static/app.css?v=0.2.4', '/static/app.js?v=0.2.4', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
