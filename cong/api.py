@@ -151,7 +151,10 @@ def tinh_trang():
             "quy_tac_hiep_ky": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace LIKE 'HK-%'"),
             "cham_diem": "NOT_CALIBRATED",
             "profile_storage": "DEVICE_ONLY",
-            "canh_bao": "Phần đánh giá tốt xấu CHƯA có nguồn. Hệ thống chỉ trả lời phần lịch pháp và cấu trúc đã có căn cứ.",
+            "canh_bao": (
+                "Lõi tính toán đã chạy. Các kết luận thuận/nghịch, xếp hạng hoặc điểm số "
+                "chỉ được hiển thị khi nhóm quy tắc quyết định tương ứng đã đủ căn cứ xác minh."
+            ),
         }
 
 
@@ -177,7 +180,7 @@ def thang_nay(v: ProfileRequest):
     hs = _ho_so(v.profile)
     with _conn() as c:
         kq = hop_luu(c, hs)
-        return {"don_gian": tang_1(kq), "chuyen_sau": tang_2(kq)}
+        return {"don_gian": tang_1(kq, scope="month"), "chuyen_sau": tang_2(kq)}
 
 
 @app.post("/api/stateless/hom-nay")
@@ -188,7 +191,7 @@ def hom_nay(v: DayRequest):
         kq = hop_luu(c, hs, ngay=d)
         return {
             "ngay": d.isoformat(),
-            "don_gian": tang_1(kq),
+            "don_gian": tang_1(kq, scope="day"),
             "chuyen_sau": tang_2(kq),
             "gio_trong_ngay": [
                 {"chi": ch, "chi_vi": CHI_VI[i], "danh_gia": "UNKNOWN"}
@@ -236,7 +239,10 @@ def tim_ngay(v: WorkRequest):
             "viec": v.viec,
             "so_ngay_da_quet": len(ds),
             "co_xep_hang_duoc_khong": False,
-            "ly_do_khong_xep_hang": "Chưa có quy tắc Hiệp Kỷ nào và chưa có hệ chấm điểm đã hiệu chỉnh. Hệ thống không xếp hạng ngày khi chưa có căn cứ.",
+            "ly_do_khong_xep_hang": (
+                "Bộ quy tắc chọn ngày theo việc và hệ chấm điểm chưa đủ căn cứ để sử dụng. "
+                "Hệ thống đã tính cấu trúc từng ngày nhưng không tự xếp hạng khi chưa được phép kết luận."
+            ),
             "cac_ngay": ds,
             "chua_du_can_cu": [x.to_dict() for x in mau.uncertainties],
         }

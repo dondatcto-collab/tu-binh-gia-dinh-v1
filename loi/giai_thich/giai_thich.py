@@ -3,69 +3,99 @@
 LUẬT CỨNG: tầng này CHỈ ĐỌC kết quả hợp lưu. Nó KHÔNG được tự tính,
 KHÔNG được thêm luận điểm không có trong Engine, KHÔNG được đoán.
 
-Khi Engine trả UNKNOWN thì lời giải thích phải NÓI RÕ LÀ CHƯA BIẾT,
-không được lấp bằng câu chữ mơ hồ nghe như một kết luận.
+Tầng 1 dùng lời thường cho gia đình. Tầng 2 giữ thuật ngữ và truy nguồn.
+Một kết quả UNKNOWN phải được trình bày là "chưa đủ căn cứ để kết luận",
+không được mô tả chung chung là "Engine chưa hoàn thiện".
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from loi.hop_luu.hop_luu import NOT_CALIBRATED, UNKNOWN, KetQuaHopLuu
+from loi.hop_luu.hop_luu import UNKNOWN, KetQuaHopLuu
 
 NHAN_VI = {
-    UNKNOWN: "Chưa đủ căn cứ để chấm",
+    UNKNOWN: "Chưa đủ căn cứ để kết luận",
 }
 
 
-def tang_1(kq: KetQuaHopLuu) -> dict[str, Any]:
-    """Tầng cho người bình thường. Câu ngắn, không thuật ngữ."""
+def _noi_dung_chua_du_can_cu(scope: str) -> list[str]:
+    """Các câu tầng 1 theo đúng câu hỏi của màn hình, không lộ thuật ngữ."""
+    if scope == "month":
+        return [
+            "Xu hướng tổng thể của tháng đang nghiêng thuận hay nghịch với bạn",
+            "Lĩnh vực nào trong tháng nên ưu tiên hoặc nên thận trọng",
+            "Việc lớn trong tháng nên chủ động hay nên chờ thêm",
+            "Mức đánh giá tổng hợp của tháng",
+        ]
+    if scope == "day":
+        return [
+            "Ngày này thuận hay nghịch với bạn ở mức nào",
+            "Ngày này có va chạm đáng chú ý với cấu trúc sinh của bạn hay không",
+            "Việc nào trong ngày nên ưu tiên, cân nhắc hoặc không ưu tiên",
+            "Mức đánh giá tổng hợp của ngày",
+        ]
+    return [
+        "Mức thuận/nghịch tổng hợp của giai đoạn hiện tại",
+        "Điều nên ưu tiên và điều nên thận trọng",
+    ]
+
+
+def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
+    """Tầng cho người bình thường: ngắn, đúng phạm vi, không thuật ngữ."""
     d = kq.to_dict()
-    chua_biet = [x["loi_thuong"] for x in d["uncertainties"]]
 
     if d["score"] is None:
-        cau_dau = (
-            f"Hệ thống CHƯA thể chấm điểm ngày {d['period']} cho {d['person']}."
-        )
+        if scope == "month":
+            cau_dau = f"Tháng hiện tại của {d['person']}: chưa đủ căn cứ để chấm mức thuận/nghịch."
+            doi_tuong = "tháng này"
+        elif scope == "day":
+            cau_dau = f"Ngày {d['period']} của {d['person']}: chưa đủ căn cứ để chấm mức thuận/nghịch."
+            doi_tuong = "ngày này"
+        else:
+            cau_dau = "Chưa đủ căn cứ để chấm mức thuận/nghịch."
+            doi_tuong = "giai đoạn này"
         vi_sao = (
-            "Lý do: phần đánh giá tốt xấu của hệ thống chưa có đủ sách gốc. "
-            "Hệ thống đã tính xong phần lịch pháp và phần cấu trúc lá số, "
-            "nhưng chưa có căn cứ để nói ngày này thuận hay nghịch với bạn."
+            "Lõi tính toán đã xác định lịch pháp, cấu trúc sinh và các tầng thời gian liên quan. "
+            f"Phần kết luận {doi_tuong} chưa được phép chấm khi các quy tắc quyết định cần thiết "
+            "chưa đạt mức xác minh để sử dụng."
         )
     else:
-        cau_dau = f"Ngày {d['period']}: {d['label']}."
+        cau_dau = f"{d['period']}: {d['label']}."
         vi_sao = ""
 
-    quan_sat = []
+    quan_sat: list[str] = []
     b = d["base_state"]
     quan_sat.append(
-        "Bốn trụ của bạn: "
-        + ", ".join(v["vi"] for v in b["tu_tru"].values()) + ".")
+        "Bốn trụ của bạn: " + ", ".join(v["vi"] for v in b["tu_tru"].values()) + "."
+    )
     if d["decade_state"].get("tru"):
         dv = d["decade_state"]
         quan_sat.append(
             f"Bạn đang ở giai đoạn mười năm {dv['tru']}, "
             f"năm thứ {dv['nam_thu_may']} trên {dv['tong_so_nam']}, "
-            f"từ {dv['nam_bat_dau']} đến {dv['nam_ket_thuc']}.")
+            f"từ {dv['nam_bat_dau']} đến {dv['nam_ket_thuc']}."
+        )
     quan_sat.append(
-        f"Năm nay là {d['year_state']['tru']['vi']}, "
-        f"tháng này là {d['month_state']['tru']['vi']}.")
-    if d["day_state"].get("tru_ngay"):
-        quan_sat.append(f"Ngày này là {d['day_state']['tru_ngay']}.")
+        f"Năm hiện tại là {d['year_state']['tru']['vi']}, "
+        f"tháng hiện tại là {d['month_state']['tru']['vi']}."
+    )
+    if scope == "day" and d["day_state"].get("tru_ngay"):
+        quan_sat.append(f"Ngày đang xem là {d['day_state']['tru_ngay']}.")
 
     return {
         "tieu_de": cau_dau,
         "vi_sao_chua_cham_diem": vi_sao,
         "he_thong_biet_gi": quan_sat,
-        "he_thong_chua_biet_gi": chua_biet,
+        "he_thong_chua_biet_gi": _noi_dung_chua_du_can_cu(scope),
         "diem_thuan_loi": [x["mo_ta"] for x in d["positive_factors"]],
         "diem_can_luu_y": [x["mo_ta"] for x in d["negative_factors"]],
         "nen_lam": d["recommended"],
         "can_nhac": d["caution"],
         "khong_uu_tien": d["avoid"],
         "canh_bao_trung_thuc": (
-            "Đây KHÔNG phải lời khuyên chắc chắn. Hệ thống chỉ nói được "
-            "những gì tra được từ sách gốc, và nói rõ chỗ nào chưa tra được."
+            "Kết luận chỉ được hiển thị khi có đủ quy tắc và trạng thái xác minh cần thiết. "
+            "Phần chưa đủ căn cứ được giữ ở trạng thái chưa kết luận."
         ),
     }
 
