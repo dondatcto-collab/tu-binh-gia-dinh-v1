@@ -10,3 +10,17 @@ def test_seed_rule_db_ton_tai_va_khong_bi_gitignore_chan():
 def test_api_co_fallback_neu_seed_thieu():
     api = (ROOT / 'cong' / 'api.py').read_text(encoding='utf-8')
     assert 'chay_migration(c)' in api and 'nap_mam(c)' in api
+
+
+def test_gio_khong_bi_trinh_bay_nhu_gio_tot_theo_ngay():
+    api = (ROOT / 'cong' / 'api.py').read_text(encoding='utf-8')
+    ui = (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')
+    assert 'PROFILE_REFERENCE_ONLY' in api
+    assert 'PROFILE_BRANCH_RELATION_ONLY' in api
+    assert 'Giờ tham khảo theo hồ sơ' in ui
+    assert 'GIỜ PHÙ HỢP TRONG NGÀY' not in ui
+
+def test_phien_ban_pwa_dong_bo_026():
+    assert 'version = "0.2.6"' in (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
+    assert '0.2.6' in (ROOT / 'public' / 'service-worker.js').read_text(encoding='utf-8')
+    assert "APP_VERSION='0.2.6'" in (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')

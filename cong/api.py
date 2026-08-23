@@ -187,12 +187,18 @@ GIO_KHOANG = [
 ]
 
 def _gio_tham_khao(kq):
+    """Giờ tham khảo theo hồ sơ, KHÔNG phải giờ tốt đã hợp lưu với ngày.
+
+    V1 hiện chỉ có quy tắc quan hệ Địa Chi trực tiếp giữa Chi ngày sinh và Chi giờ.
+    Vì vậy kết quả có thể lặp lại giữa nhiều ngày; API phải nói rõ phạm vi này để
+    giao diện không diễn đạt sai thành “giờ tốt của ngày”.
+    """
     natal = kq.base_state["tu_tru"]["ngay"]["chi"]
     out=[]
     for i,ch in enumerate(CHI):
         qh=quan_he_chi(natal,ch)
-        nhan = "Phù hợp tham khảo" if qh.muc=="POSITIVE" else ("Nên cân nhắc" if qh.muc=="CAUTION" else "Trung tính")
-        out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,"relation":qh.ma,"ly_do":qh.mo_ta})
+        nhan = "Tham khảo thuận" if qh.muc=="POSITIVE" else ("Cần cân nhắc" if qh.muc=="CAUTION" else "Chưa có tín hiệu nổi bật")
+        out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,"relation":qh.ma,"relation_level":qh.muc,"ly_do":qh.mo_ta,"scope":"PROFILE_BRANCH_RELATION_ONLY"})
     return out
 
 @app.get("/api/health")
@@ -272,6 +278,8 @@ def hom_nay(v: DayRequest):
             "don_gian": tang_1(kq, scope="day"),
             "chuyen_sau": tang_2(kq),
             "gio_trong_ngay": _gio_tham_khao(kq),
+            "gio_status": "PROFILE_REFERENCE_ONLY",
+            "gio_note": "Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem.",
         }
 
 
@@ -282,7 +290,7 @@ def dashboard(v: ProfileRequest):
         kq=hop_luu(c,hs,ngay=d); sau=tang_2(kq)
         return {"ngay":d.isoformat(),
                 "thang":{"don_gian":tang_1(kq,scope="month"),"chuyen_sau":sau},
-                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq)},
+                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq),"gio_status":"PROFILE_REFERENCE_ONLY","gio_note":"Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem."},
                 "vi_tri":{"dai_van":kq.decade_state,"nam_hien_tai":kq.year_state.get("tru",{}),"thang_hien_tai":kq.month_state.get("tru",{})}}
 
 
@@ -306,9 +314,9 @@ def lich_thang(v: CalendarMonthRequest):
     while cur<=last:
         lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
         if v.viec:
-            ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec); label=ev.get("label","Trung tính"); state=ev.get("event_state","NEUTRAL"); detail={"truc":ev.get("truc_vi"),"personal_relation":ev.get("personal_relation",{}),"coverage":ev.get("coverage")}
+            ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec); label=ev.get("label","Chưa có tín hiệu nổi bật"); state=ev.get("event_state","NEUTRAL"); detail={"truc":ev.get("truc_vi"),"personal_relation":ev.get("personal_relation",{}),"coverage":ev.get("coverage")}
         else:
-            dg=danh_gia_giai_doan(chi_menh,lich.tru_ngay.chi,"day"); label=dg.get("label","Nhịp tương đối trung tính"); state=dg.get("state","TRUNG_TINH"); detail={"personal_relation":dg.get("relation",{})}
+            dg=danh_gia_giai_doan(chi_menh,lich.tru_ngay.chi,"day"); label=dg.get("label","Chưa có tín hiệu nổi bật"); state=dg.get("state","TRUNG_TINH"); detail={"personal_relation":dg.get("relation",{})}
         out.append({"ngay":cur.isoformat(),"label":label,"state":state,"detail":detail}); cur+=timedelta(days=1)
     return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"ORDINAL_V1_BASIC","days":out}
 
@@ -325,7 +333,7 @@ def tim_ngay(v: WorkRequest):
     while cur<=b:
         lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
         ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
-        ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Trung tính"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_BASIC"}); cur+=timedelta(days=1)
+        ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Chưa có tín hiệu nổi bật"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_BASIC"}); cur+=timedelta(days=1)
     ranked=xep_hang(ds)
     return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và quan hệ Địa Chi cá nhân. Không dùng điểm 0-10 chưa hiệu chỉnh.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
 

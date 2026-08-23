@@ -39,4 +39,4 @@ event_types:
   - { event_type_id: EVT-NHAM-CHUC, code: NHAM_CHUC, name_vi: "Bắt đầu công việc mới / nhận chức", name_original: "上官赴任" }
   - { event_type_id: EVT-THI-CU, code: THI_CU, name_vi: "Thi cử / phỏng vấn", name_original: "入學" }
   - { event_type_id: EVT-CAU-TAI, code: CAU_TAI, name_vi: "Cầu tài / thu hồi tiền / giao dịch", name_original: "納財" }
-  - { event_type_id: EVT-AN-TANG, code: AN_TANG, name_vi: "An táng / tang sự", name_original: "安葬" }
+  - { event_type_id: EVT-AN-TANG, code: AN_TANG, name_vi: "Tang lễ / an táng", name_original: "安葬" }

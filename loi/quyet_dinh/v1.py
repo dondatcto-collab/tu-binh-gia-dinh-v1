@@ -85,7 +85,7 @@ EVENT_RULES = {
     "NHAM_CHUC": EventRule("NHAM_CHUC","Bắt đầu công việc mới / nhận chức","上官赴任",frozenset({"KIEN","KHAI"}),frozenset({"PHA","BINH","THU","MAN","BE"}),"VERIFIED","卷十一 · 上官赴任"),
     "THI_CU": EventRule("THI_CU","Thi cử / phỏng vấn","入學",frozenset({"THANH","KHAI"}),frozenset(),"PROVISIONAL","卷十一 · 入學","Thi cử/phỏng vấn là nhóm hiện đại; 入學 là ánh xạ gần nhất cho lớp học hành."),
     "CAU_TAI": EventRule("CAU_TAI","Cầu tài / thu hồi tiền / giao dịch","納財",frozenset({"MAN","THU"}),frozenset({"PHA","BINH"}),"VERIFIED","卷十一 · 納財"),
-    "AN_TANG": EventRule("AN_TANG","An táng / tang sự","安葬",frozenset(),frozenset({"KIEN","PHA","BINH","THU"}),"VERIFIED","卷十一 · 安葬","Các cát thần chuyên biệt cho an táng chưa tính trong V1-basic."),
+    "AN_TANG": EventRule("AN_TANG","Tang lễ / an táng","安葬",frozenset(),frozenset({"KIEN","PHA","BINH","THU"}),"VERIFIED","卷十一 · 安葬","Các cát thần chuyên biệt cho an táng chưa tính trong V1-basic."),
 }
 
 # Alias để không làm gãy hồ sơ/URL cũ.
@@ -126,15 +126,15 @@ def quan_he_chi(a: str, b: str) -> QuanHeChi:
 def danh_gia_giai_doan(chi_menh_ngay: str, chi_hien_tai: str, scope: str) -> dict:
     qh = quan_he_chi(chi_menh_ngay, chi_hien_tai)
     if qh.muc == "POSITIVE":
-        label, state = "Có nhịp hòa hợp", "THUAN"
+        label, state = "Khá thuận", "THUAN"
         nen = ["Có thể chủ động các việc thường ngày nếu điều kiện thực tế phù hợp."]
         can = ["Việc quan trọng vẫn nên kiểm tra theo đúng loại việc ở mục Tìm ngày."]
     elif qh.muc == "CAUTION":
-        label, state = "Có xung động cần lưu ý", "CAN_NHAC"
+        label, state = "Có điểm cần lưu ý", "CAN_NHAC"
         nen = ["Ưu tiên việc có phương án dự phòng và kiểm tra kỹ trước khi chốt."]
         can = ["Hạn chế quyết định vội chỉ dựa vào cảm giác thuận lợi trong ngày/tháng."]
     else:
-        label, state = "Nhịp tương đối trung tính", "TRUNG_TINH"
+        label, state = "Chưa có tín hiệu nổi bật", "TRUNG_TINH"
         nen = ["Có thể xử lý công việc theo kế hoạch bình thường."]
         can = ["Nếu là việc lớn, dùng mục Tìm ngày để xét đúng loại việc."]
     return {
@@ -164,9 +164,12 @@ def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code
     if event_state == "JI":
         group, label = 5, "Không ưu tiên"
     elif event_state == "YI" and qh.muc == "POSITIVE" and rule.mapping_status == "VERIFIED":
-        group, label = 0, "Rất phù hợp"
-    elif event_state == "YI":
+        group, label = 0, "Ưu tiên"
+    elif event_state == "YI" and rule.mapping_status == "VERIFIED":
         group, label = 1, "Phù hợp"
+    elif event_state == "YI":
+        # Ánh xạ hiện đại còn PROVISIONAL: không được nâng thành “Phù hợp” mạnh.
+        group, label = 2, "Có thể cân nhắc"
     elif qh.muc == "POSITIVE":
         # Quan hệ cá nhân chỉ phá hòa trong lớp sự kiện trung tính; không được
         # nâng thành “ngày tốt cho việc” khi Hiệp Kỷ chưa nêu Trực này là 宜.
@@ -174,7 +177,7 @@ def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code
     elif qh.muc == "CAUTION":
         group, label = 4, "Cân nhắc"
     else:
-        group, label = 3, "Trung tính"
+        group, label = 3, "Chưa có tín hiệu nổi bật"
 
     reasons = [f"Ngày thuộc Trực {TRUC_VI[truc]} trong tháng hiện tại."]
     if event_state == "YI": reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm được nêu là phù hợp cho {rule.ten} ở lớp quy tắc V1-basic.")
