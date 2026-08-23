@@ -21,7 +21,7 @@ function avatarHtml(code){const [label,src]=avatarDefs[code]||avatarDefs['adult-
 // ----- Kho hồ sơ cục bộ: IndexedDB -----
 const DB_NAME='tu-binh-gia-dinh-v1';
 const DB_VERSION=2;
-const APP_VERSION='0.2.7';
+const APP_VERSION='0.3.0';
 const STORE='profiles';
 function openLocalDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'profile_id'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
 async function dbAll(){const db=await openLocalDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly');const req=tx.objectStore(STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);tx.oncomplete=()=>db.close()})}

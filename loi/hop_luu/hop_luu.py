@@ -31,6 +31,7 @@ from loi.lich.quy_uoc_can_chi import viet_hoa
 from loi.van.dong_thoi_gian import DongThoiGian
 from loi.van import dong_thoi_gian as dtg
 from loi.quyet_dinh.v1 import danh_gia_giai_doan, danh_gia_event
+from loi.quyet_dinh.ca_nhan import phan_tich_ca_nhan, bo_sung_event_ca_nhan
 
 UNKNOWN = "UNKNOWN"
 NOT_CALIBRATED = "NOT_CALIBRATED"
@@ -235,10 +236,49 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
 
     canh_bao_bien = [c.ma for c in lich_ngay.canh_bao]
 
-    # Lớp quyết định V1-basic: dùng quan hệ Địa Chi đã xác minh để trả lời
-    # nhịp tháng/ngày, không suy Dụng-Hỷ-Kỵ và không chấm điểm số.
-    qd_thang = danh_gia_giai_doan(tl.tu_tru["ngay"].chi, tl.thang_hien_tai.chi, "month")
-    qd_ngay = danh_gia_giai_doan(tl.tu_tru["ngay"].chi, lich_ngay.tru_ngay.chi, "day")
+    # Lớp quyết định cá nhân hóa V1.1: không chỉ so Chi ngày sinh.
+    # Hợp lưu Thập Thần của Can đang xét + quan hệ Chi với CẢ BỐN trụ gốc,
+    # đồng thời đưa bối cảnh Đại vận → Năm → Tháng vào diễn giải.
+    context_common = []
+    qd_dai_van = None
+    if tl.dai_van is not None:
+        tt_dv = tinh_thap_than(conn, tl.nhat_chu, tl.dai_van.can)
+        qd_dai_van = phan_tich_ca_nhan(
+            conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
+            can_hien_tai=tl.dai_van.can, chi_hien_tai=tl.dai_van.chi,
+            scope="decade", context=[])
+        context_common.append({
+            "label": "Đại vận",
+            "tru": viet_hoa(tl.dai_van.can, tl.dai_van.chi),
+            "ten_god_vi": tt_dv.ten_god_vi,
+        })
+        rule.append(tt_dv.rule_id)
+        rule.extend(qd_dai_van.get("rule_ids", []))
+    qd_nam = phan_tich_ca_nhan(
+        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
+        can_hien_tai=tl.nam_hien_tai.can, chi_hien_tai=tl.nam_hien_tai.chi,
+        scope="year", context=context_common)
+    rule.extend(qd_nam.get("rule_ids", []))
+    context_year = context_common + [{
+        "label": "Năm",
+        "tru": tl.nam_hien_tai.vi,
+        "ten_god_vi": tl.thap_than_nam,
+    }]
+    qd_thang = phan_tich_ca_nhan(
+        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
+        can_hien_tai=tl.thang_hien_tai.can, chi_hien_tai=tl.thang_hien_tai.chi,
+        scope="month", context=context_year)
+    context_day = context_year + [{
+        "label": "Tháng",
+        "tru": tl.thang_hien_tai.vi,
+        "ten_god_vi": tl.thap_than_thang,
+    }]
+    qd_ngay = phan_tich_ca_nhan(
+        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
+        can_hien_tai=lich_ngay.tru_ngay.can, chi_hien_tai=lich_ngay.tru_ngay.chi,
+        scope="day", context=context_day)
+    rule.extend(qd_thang.get("rule_ids", []))
+    rule.extend(qd_ngay.get("rule_ids", []))
 
     qh_ngay = qd_ngay["relation"]
     yt_qh = YeuTo(
@@ -275,6 +315,8 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
         event_state = danh_gia_event(
             tl.thang_hien_tai.chi, lich_ngay.tru_ngay.chi,
             tl.tu_tru["ngay"].chi, event_code)
+        # Cá nhân hóa theo cả 4 trụ gốc. Không được đảo ngược một Trực đang Kỵ.
+        event_state = bo_sung_event_ca_nhan(event_state, qd_ngay)
         rule.extend(event_state.get("rule_ids", []))
         if event_state.get("source_id"):
             # source_trace chỉ chứa ID; tầng giải thích tra chi tiết từ DB.
@@ -308,11 +350,12 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
             "cach_cuc": _trang_thai_chua_biet("CACH_CUC"),
             "dung_hy_ky": _trang_thai_chua_biet("DUNG_HY_KY"),
         },
-        decade_state=(tl.dai_van.to_dict() if tl.dai_van
+        decade_state=({**tl.dai_van.to_dict(), "danh_gia": qd_dai_van}
+                      if tl.dai_van
                       else {"status": UNKNOWN, "ly_do": "Ngoài mười vận đã tính."}),
         year_state={"tru": tl.nam_hien_tai.to_dict(),
                     "quan_he_voi_nhat_chu": tl.thap_than_nam,
-                    "danh_gia": danh_gia_giai_doan(tl.tu_tru["ngay"].chi, tl.nam_hien_tai.chi, "year")},
+                    "danh_gia": qd_nam},
         month_state={"tru": tl.thang_hien_tai.to_dict(),
                      "quan_he_voi_nhat_chu": tl.thap_than_thang,
                      "nguyet_lenh": tl.nguyet_lenh_hien_tai,
@@ -332,7 +375,11 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
         caution=caut,
         avoid=avoid_list,
         rule_trace=rule,
-        source_trace=list(tl.source_trace) + ([event_state.get("source_id")] if event_code and event_state.get("source_id") else []) + [qh_ngay["source_id"]],
+        source_trace=list(tl.source_trace)
+        + ([event_state.get("source_id")] if event_code and event_state.get("source_id") else [])
+        + (list(qd_dai_van.get("source_ids", [])) if qd_dai_van else [])
+        + list(qd_nam.get("source_ids", []))
+        + list(qd_thang.get("source_ids", [])) + list(qd_ngay.get("source_ids", [])),
     )
 
 

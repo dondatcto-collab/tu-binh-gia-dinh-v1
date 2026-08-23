@@ -34,6 +34,7 @@ from loi.lich.tiet_khi import TietKhiError
 from loi.nen.phien_ban import DB_MAC_DINH, ENGINE_VERSION, RULESET_VERSION
 from loi.van import dong_thoi_gian as dtg
 from loi.quyet_dinh.v1 import quan_he_chi, xep_hang, danh_gia_event, danh_gia_giai_doan
+from loi.quyet_dinh.ca_nhan import phan_tich_ca_nhan, bo_sung_event_ca_nhan
 
 app = FastAPI(title="Tử Bình Gia Đình V1 — Stateless API")
 
@@ -310,15 +311,29 @@ def lich_thang(v: CalendarMonthRequest):
     first=date(v.year,v.month,1); next_month=date(v.year+(1 if v.month==12 else 0),1 if v.month==12 else v.month+1,1); last=next_month-timedelta(days=1)
     e=CalendarEngine(tai_bo_lich()["CAL-V1"])
     sinh=e.tinh(hs.birth_year,hs.birth_month,hs.birth_day,hs.birth_hour,hs.birth_minute,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
-    chi_menh=sinh.tru_ngay.chi; out=[]; cur=first
-    while cur<=last:
-        lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
-        if v.viec:
-            ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec); label=ev.get("label","Chưa có tín hiệu nổi bật"); state=ev.get("event_state","NEUTRAL"); detail={"truc":ev.get("truc_vi"),"personal_relation":ev.get("personal_relation",{}),"coverage":ev.get("coverage")}
-        else:
-            dg=danh_gia_giai_doan(chi_menh,lich.tru_ngay.chi,"day"); label=dg.get("label","Chưa có tín hiệu nổi bật"); state=dg.get("state","TRUNG_TINH"); detail={"personal_relation":dg.get("relation",{})}
-        out.append({"ngay":cur.isoformat(),"label":label,"state":state,"detail":detail}); cur+=timedelta(days=1)
-    return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"ORDINAL_V1_BASIC","days":out}
+    chi_menh=sinh.tru_ngay.chi
+    nhat_chu=sinh.tru_ngay.can
+    tu_tru={
+        "nam":dtg.TruVi(sinh.tru_nam.can,sinh.tru_nam.chi),
+        "thang":dtg.TruVi(sinh.tru_thang.can,sinh.tru_thang.chi),
+        "ngay":dtg.TruVi(sinh.tru_ngay.can,sinh.tru_ngay.chi),
+        "gio":dtg.TruVi(sinh.tru_gio.can,sinh.tru_gio.chi),
+    }
+    out=[]; cur=first
+    with _conn() as c:
+        while cur<=last:
+            lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+            personal=phan_tich_ca_nhan(c,tu_tru=tu_tru,nhat_chu=nhat_chu,can_hien_tai=lich.tru_ngay.can,chi_hien_tai=lich.tru_ngay.chi,scope="day",context=[])
+            if v.viec:
+                ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
+                ev=bo_sung_event_ca_nhan(ev,personal)
+                label=ev.get("label","Chưa có tín hiệu nổi bật"); state=ev.get("event_state","NEUTRAL")
+                detail={"truc":ev.get("truc_vi"),"personal_v1_1":ev.get("personal_v1_1",{}),"coverage":ev.get("coverage")}
+            else:
+                dg=personal; label=dg.get("label","Chưa có tín hiệu nổi bật"); state=dg.get("state","THEME_ONLY")
+                detail={"theme":dg.get("theme",{}),"branch_impacts":dg.get("branch_impacts",[])}
+            out.append({"ngay":cur.isoformat(),"label":label,"state":state,"detail":detail}); cur+=timedelta(days=1)
+    return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"ORDINAL_V1_1_PERSONAL","days":out}
 
 
 @app.post("/api/stateless/tim-ngay")
@@ -329,13 +344,23 @@ def tim_ngay(v: WorkRequest):
     if b<a: raise HTTPException(400,"Khoảng ngày không hợp lệ.")
     if (b-a).days>92: raise HTTPException(400,"Khoảng ngày tối đa là ba tháng.")
     e=CalendarEngine(tai_bo_lich()["CAL-V1"]); sinh=e.tinh(hs.birth_year,hs.birth_month,hs.birth_day,hs.birth_hour,hs.birth_minute,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False); chi_menh=sinh.tru_ngay.chi
+    nhat_chu=sinh.tru_ngay.can
+    tu_tru={
+        "nam":dtg.TruVi(sinh.tru_nam.can,sinh.tru_nam.chi),
+        "thang":dtg.TruVi(sinh.tru_thang.can,sinh.tru_thang.chi),
+        "ngay":dtg.TruVi(sinh.tru_ngay.can,sinh.tru_ngay.chi),
+        "gio":dtg.TruVi(sinh.tru_gio.can,sinh.tru_gio.chi),
+    }
     ds=[]; cur=a
-    while cur<=b:
-        lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
-        ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
-        ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Chưa có tín hiệu nổi bật"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_BASIC"}); cur+=timedelta(days=1)
+    with _conn() as c:
+        while cur<=b:
+            lich=e.tinh(cur.year,cur.month,cur.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+            personal=phan_tich_ca_nhan(c,tu_tru=tu_tru,nhat_chu=nhat_chu,can_hien_tai=lich.tru_ngay.can,chi_hien_tai=lich.tru_ngay.chi,scope="day",context=[])
+            ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
+            ev=bo_sung_event_ca_nhan(ev,personal)
+            ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Chưa có tín hiệu nổi bật"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"personal_v1_1":ev.get("personal_v1_1",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_1_PERSONAL"}); cur+=timedelta(days=1)
     ranked=xep_hang(ds)
-    return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và quan hệ Địa Chi cá nhân. Không dùng điểm 0-10 chưa hiệu chỉnh.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
+    return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và lớp cá nhân hóa Thập Thần + quan hệ với cả bốn trụ gốc. Không dùng điểm 0-10 chưa hiệu chỉnh.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
 
 
 # Chặn rõ các API hồ sơ cũ để tránh vô tình lưu dữ liệu cá nhân trên server.
