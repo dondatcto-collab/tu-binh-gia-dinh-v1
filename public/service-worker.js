@@ -1,5 +1,38 @@
-const CACHE='tubinh-v1-shell-7';
-const SHELL=['/','/static/app.css','/static/app.js','/manifest.webmanifest','/icon-192.png','/icon-512.png','/avatars/old-male.png','/avatars/old-female.png','/avatars/adult-male.png','/avatars/adult-female.png','/avatars/youth-male.png','/avatars/youth-female.png'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.pathname.startsWith('/api/'))return;e.respondWith(fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r;}).catch(()=>caches.match(e.request).then(r=>r||caches.match('/'))));});
+const CACHE = 'tubinh-v1-fix5-0.2.2';
+const SHELL = ['/', '/static/app.css?v=0.2.2', '/static/app.js?v=0.2.2', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
+});
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  const url = new URL(req.url);
+  if (req.method !== 'GET') return;
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(req, {cache: 'no-store'}));
+    return;
+  }
+  if (req.mode === 'navigate') {
+    event.respondWith(fetch(req, {cache: 'no-store'}).then(res => {
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put('/', copy)); return res;
+    }).catch(() => caches.match('/')));
+    return;
+  }
+  event.respondWith(fetch(req).then(res => {
+    if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+    return res;
+  }).catch(() => caches.match(req)));
+});

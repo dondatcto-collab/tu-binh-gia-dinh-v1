@@ -14,9 +14,10 @@ def mo_ket_noi(duong_dan: Path | str | None = None) -> sqlite3.Connection:
     dich = Path(duong_dan) if duong_dan else DB_MAC_DINH
     if dich != Path(":memory:"):
         dich.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(dich))
+    conn = sqlite3.connect(str(dich), timeout=15)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA busy_timeout = 15000")
     conn.execute("PRAGMA journal_mode = WAL")
     return conn
 

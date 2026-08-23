@@ -7,15 +7,18 @@ from __future__ import annotations
 
 import os
 import shutil
+import logging
+import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 # Vercel chỉ cho ghi an toàn vào /tmp. DB này chỉ chứa rule/source, không có hồ sơ thật.
 if os.environ.get("VERCEL"):
-    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules.sqlite3")
+    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules-fix5.sqlite3")
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from loi.giai_thich.giai_thich import tang_1, tang_2, truy_nguoc_day_du
@@ -30,20 +33,47 @@ from loi.quyet_dinh.v1 import quan_he_chi, xep_hang
 
 app = FastAPI(title="Tử Bình Gia Đình V1 — Stateless API")
 
+logger = logging.getLogger("tubinh.api")
+
+@app.exception_handler(Exception)
+async def unhandled_error(request: Request, exc: Exception):
+    error_id = uuid.uuid4().hex[:8].upper()
+    logger.exception("API error %s %s %s", error_id, request.url.path, exc)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Hệ thống tạm thời chưa xử lý được yêu cầu. Hãy thử lại sau vài giây.",
+            "error_code": f"API-{error_id}",
+        },
+    )
+
 
 def _bao_dam_kho_rule() -> None:
-    """Dựng kho rule/source idempotent. Không nạp hồ sơ người dùng.
+    """Chuẩn bị kho rule/source; không lưu hồ sơ người dùng.
 
-    Trên Vercel, sao chép DB seed công khai sang /tmp để tránh ghi vào filesystem
-    chỉ đọc và giảm thời gian cold start.
+    Trên Vercel dùng DB seed đã kiểm tra và copy một lần sang /tmp. Không chạy
+    migration/seed ở mỗi cold start để giảm thời gian khởi động và tránh tranh chấp
+    ghi SQLite giữa các request. Local/dev vẫn migration + seed idempotent.
     """
     seed = Path(__file__).resolve().parents[1] / "du_lieu" / "kho" / "xemngay-rules-seed.sqlite3"
-    if os.environ.get("VERCEL") and not DB_MAC_DINH.exists() and seed.exists():
+    if os.environ.get("VERCEL"):
+        if not seed.exists():
+            raise RuntimeError("RULE_DB_SEED_MISSING")
         DB_MAC_DINH.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(seed, DB_MAC_DINH)
+        if not DB_MAC_DINH.exists() or DB_MAC_DINH.stat().st_size != seed.stat().st_size:
+            tmp = DB_MAC_DINH.with_suffix(".tmp")
+            shutil.copy2(seed, tmp)
+            tmp.replace(DB_MAC_DINH)
+        with mo_ket_noi() as c:
+            required = {"rule_registry", "rule_versions", "event_types", "sources"}
+            found = {r["name"] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if not required.issubset(found):
+                raise RuntimeError("RULE_DB_SEED_INVALID")
+            if c.execute("SELECT COUNT(*) n FROM event_types WHERE status != 'DEPRECATED'").fetchone()["n"] < 13:
+                raise RuntimeError("RULE_DB_EVENT_COVERAGE_INVALID")
+        return
     with mo_ket_noi() as c:
         chay_migration(c)
-        # Seed lại idempotent để bảo đảm tương thích khi source/rule được cập nhật.
         nap_mam(c)
 
 
