@@ -19,4 +19,5 @@
 
   styles();
   window.addEventListener('load',()=>setTimeout(()=>{try{refreshHomeFinance()}catch{}},1500));
+  if(!document.querySelector('script[data-v23-relationship]')){const s=document.createElement('script');s.src='/static/ui-relationship-v23.js?v=2.3-alpha.1';s.dataset.v23Relationship='1';document.head.appendChild(s)}
 })();

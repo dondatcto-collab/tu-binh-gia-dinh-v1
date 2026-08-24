@@ -6,19 +6,24 @@ from loi.ket_qua.v2 import (
     event_search,
     finance_result,
     personal_result,
+    relationship_result,
     schema_status,
     work_result,
 )
 
 
-def test_schema_status_locks_v2_2_finance_scope():
+def test_schema_status_locks_v2_3_relationship_scope():
     s = schema_status()
-    assert s["schema_version"] == SCHEMA_VERSION == "2.2-alpha.1"
+    assert s["schema_version"] == SCHEMA_VERSION == "2.3-alpha.1"
     assert s["numeric_score"] == NUMERIC_SCORE_STATUS == "LOCKED_OFF"
-    assert s["status"] == "V2_2_FINANCE_ALPHA"
-    for scope in ("day", "month", "decade", "event_search", "work_domain_day", "work_domain_month", "finance_domain_day", "finance_domain_month"):
+    assert s["status"] == "V2_3_RELATIONSHIP_ALPHA"
+    for scope in (
+        "day", "month", "decade", "event_search",
+        "work_domain_day", "work_domain_month",
+        "finance_domain_day", "finance_domain_month",
+        "relationship_domain_day", "relationship_domain_month",
+    ):
         assert scope in s["implemented_scopes"]
-    assert "relationship_domain" in s["pending_scopes"]
     assert "personal_hour" in s["pending_scopes"]
     assert "UI không tự suy quyết định từ dữ liệu kỹ thuật" in s["principles"]
 
@@ -67,6 +72,23 @@ def test_finance_result_uses_same_canonical_schema_and_no_score():
     assert out["domain"] == "finance"
     assert out["scope"] == "month"
     assert out["rules"] == ["V2-FIN-001"]
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
+
+
+def test_relationship_result_uses_same_canonical_schema_and_no_score():
+    decision = {
+        "ruleset_version": "V2.3-RELATIONSHIP.1", "scope": "day", "state": "SUPPORT",
+        "label": "Hỗ trợ tương tác và phối hợp", "title": "Thuận hơn cho trao đổi và phối hợp",
+        "plain_explanation": "Có căn cứ riêng trong phạm vi tương tác xã hội.",
+        "recommended_actions": ["Trao đổi rõ vai trò."], "cautions": ["Không suy thành tình cảm/hôn nhân."],
+        "confidence_state": "Căn cứ vừa", "evidence": [{"type": "TEN_GOD_THEME"}],
+        "rule_ids": ["V2-REL-001"], "source_ids": ["SRC-ZPZQ"], "technical": {"theme_group": "PEER"},
+    }
+    out = relationship_result(decision)
+    assert out["domain"] == "relationship"
+    assert out["scope"] == "day"
+    assert out["rules"] == ["V2-REL-001"]
     assert out["numeric_score"] is None
     assert out["numeric_score_status"] == "LOCKED_OFF"
 

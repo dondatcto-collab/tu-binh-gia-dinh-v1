@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-SCHEMA_VERSION = "2.2-alpha.1"
+SCHEMA_VERSION = "2.3-alpha.1"
 NUMERIC_SCORE_STATUS = "LOCKED_OFF"
 
 
@@ -80,8 +80,12 @@ def work_result(decision: dict[str, Any]) -> dict[str, Any]:
 
 
 def finance_result(decision: dict[str, Any]) -> dict[str, Any]:
-    """Chuẩn hóa kết quả Tiền bạc V2.2; không tạo dự đoán lợi nhuận."""
     return _domain_result(decision, domain="finance", label_fallback="Chưa đủ căn cứ riêng về tiền bạc", title_fallback="Chưa có tín hiệu tiền bạc đủ rõ để kết luận riêng", context_key="finance_ruleset_version")
+
+
+def relationship_result(decision: dict[str, Any]) -> dict[str, Any]:
+    """Chuẩn hóa Quan hệ V2.3; phạm vi chỉ social/collaboration, không dự báo tình cảm/hôn nhân."""
+    return _domain_result(decision, domain="relationship", label_fallback="Chưa đủ căn cứ riêng về quan hệ", title_fallback="Chưa có tín hiệu quan hệ đủ rõ để kết luận riêng", context_key="relationship_ruleset_version")
 
 
 def decade_result(raw: dict[str, Any]) -> dict[str, Any]:
@@ -122,8 +126,14 @@ def event_search(raw: dict[str, Any]) -> dict[str, Any]:
 
 def schema_status() -> dict[str, Any]:
     return {
-        "schema_version": SCHEMA_VERSION, "status": "V2_2_FINANCE_ALPHA", "numeric_score": NUMERIC_SCORE_STATUS,
-        "principles": ["Người dùng phổ thông hiểu trước", "Không đủ căn cứ thì không kết luận", "HARD_BLOCK luôn thắng", "Mọi kết luận phải truy ngược được", "UI không tự suy quyết định từ dữ liệu kỹ thuật", "Domain Công việc không được suy thăng chức, tăng lương hay mất việc từ một tín hiệu đơn lẻ", "Domain Tiền bạc không được suy có tiền, tăng thu nhập hay sinh lời từ một Tài tinh đơn lẻ"],
-        "implemented_scopes": ["day", "month", "decade", "event_search", "work_domain_day", "work_domain_month", "finance_domain_day", "finance_domain_month"],
-        "pending_scopes": ["relationship_domain", "personal_hour"],
+        "schema_version": SCHEMA_VERSION, "status": "V2_3_RELATIONSHIP_ALPHA", "numeric_score": NUMERIC_SCORE_STATUS,
+        "principles": [
+            "Người dùng phổ thông hiểu trước", "Không đủ căn cứ thì không kết luận", "HARD_BLOCK luôn thắng",
+            "Mọi kết luận phải truy ngược được", "UI không tự suy quyết định từ dữ liệu kỹ thuật",
+            "Domain Công việc không được suy thăng chức, tăng lương hay mất việc từ một tín hiệu đơn lẻ",
+            "Domain Tiền bạc không được suy có tiền, tăng thu nhập hay sinh lời từ một Tài tinh đơn lẻ",
+            "Domain Quan hệ V2.3 chỉ nói về tương tác/phối hợp; không suy tình cảm, hôn nhân, chia tay hay ngoại tình từ một tín hiệu đơn lẻ",
+        ],
+        "implemented_scopes": ["day", "month", "decade", "event_search", "work_domain_day", "work_domain_month", "finance_domain_day", "finance_domain_month", "relationship_domain_day", "relationship_domain_month"],
+        "pending_scopes": ["personal_hour"],
     }
