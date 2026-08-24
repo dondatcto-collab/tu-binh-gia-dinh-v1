@@ -8,13 +8,14 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay, toi_dang_o_dau
-from loi.ket_qua.v2 import decade_result, event_search, personal_result, schema_status, work_result
+from loi.ket_qua.v2 import decade_result, event_search, finance_result, personal_result, schema_status, work_result
 from loi.linh_vuc.cong_viec import danh_gia_cong_viec
+from loi.linh_vuc.tai_chinh import danh_gia_tai_chinh
 
 router = APIRouter(prefix="/api/v2", tags=["v2"])
 
 
-class WorkDomainRequest(ProfileRequest):
+class DomainRequest(ProfileRequest):
     scope: str = "day"
     ngay: str | None = None
 
@@ -44,17 +45,28 @@ def v2_dai_van(v: ProfileRequest):
     return decade_result(raw)
 
 
-@router.post("/cong-viec")
-def v2_cong_viec(v: WorkDomainRequest):
-    """V2.1 Công việc: hỗ trợ scope day/month, không chấm điểm."""
+def _domain_raw(v: DomainRequest):
     if v.scope == "day":
-        raw = hom_nay(DayRequest(profile=v.profile, ngay=v.ngay))
-    elif v.scope == "month":
-        raw = thang_nay(ProfileRequest(profile=v.profile))
-    else:
-        raise HTTPException(status_code=400, detail="Công việc V2.1 hiện chỉ hỗ trợ scope day hoặc month.")
-    decision = danh_gia_cong_viec(raw, scope=v.scope)
-    out = work_result(decision)
+        return hom_nay(DayRequest(profile=v.profile, ngay=v.ngay))
+    if v.scope == "month":
+        return thang_nay(ProfileRequest(profile=v.profile))
+    raise HTTPException(status_code=400, detail="Domain V2 hiện chỉ hỗ trợ scope day hoặc month.")
+
+
+@router.post("/cong-viec")
+def v2_cong_viec(v: DomainRequest):
+    raw = _domain_raw(v)
+    out = work_result(danh_gia_cong_viec(raw, scope=v.scope))
+    if v.scope == "day":
+        out["date"] = raw.get("ngay")
+    return out
+
+
+@router.post("/tai-chinh")
+def v2_tai_chinh(v: DomainRequest):
+    """V2.2 Tiền bạc: chỉ day/month, không chấm điểm và không dự báo lợi nhuận."""
+    raw = _domain_raw(v)
+    out = finance_result(danh_gia_tai_chinh(raw, scope=v.scope))
     if v.scope == "day":
         out["date"] = raw.get("ngay")
     return out
