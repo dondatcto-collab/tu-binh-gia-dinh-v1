@@ -1,0 +1,63 @@
+from pathlib import Path
+
+from loi.bat_tu.phuong_phap_tu_binh import cho_phep_ket_luan_gio_ca_nhan, trang_thai_hien_tai
+from loi.ket_qua.gio_v24 import HOUR_SCHEMA_VERSION, HOUR_STATUS, hour_reference_result, v24_schema_overlay
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def sample_raw():
+    return {
+        "ngay": "2026-08-24",
+        "gio_trong_ngay": [
+            {"chi": "TY", "chi_vi": "Tý", "khoang_gio": "23:00–01:00", "nhan": "Lục hợp", "relation": "LUC_HOP", "relation_nature": "POSITIVE", "ly_do": "Quan hệ cấu trúc."}
+        ],
+    }
+
+
+def test_hour_method_gate_no_longer_claims_full_fusion():
+    s = trang_thai_hien_tai()
+    assert s.hour_structure_ready is True
+    assert s.hour_fusion_ready is False
+    assert s.personal_hour_decision_ready is False
+    assert cho_phep_ket_luan_gio_ca_nhan() is False
+
+
+def test_hour_reference_never_turns_structure_into_good_bad_hour():
+    out = hour_reference_result(sample_raw())
+    assert out["schema_version"] == HOUR_SCHEMA_VERSION == "2.4-alpha.1"
+    assert out["status"] == HOUR_STATUS
+    assert out["conclusion"]["state"] == "DESCRIPTIVE_ONLY"
+    assert out["hours"][0]["is_personal_good_hour"] is None
+    assert out["hours"][0]["is_personal_bad_hour"] is None
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
+
+
+def test_hour_overlay_keeps_personal_hour_decision_pending():
+    out = v24_schema_overlay({"implemented_scopes": ["day"], "pending_scopes": ["personal_hour"], "principles": []})
+    assert out["schema_version"] == "2.4-alpha.1"
+    assert "personal_hour_reference" in out["implemented_scopes"]
+    assert "personal_hour_decision" in out["pending_scopes"]
+    assert out["hour_readiness"]["hour_fusion_ready"] is False
+
+
+def test_v2_api_exposes_hour_reference_only():
+    text = (ROOT / "cong/api_v2.py").read_text(encoding="utf-8")
+    assert '"/gio-ca-nhan"' in text
+    assert "hour_reference_result" in text
+    assert "hom_nay(v)" in text
+
+
+def test_hour_ui_reads_only_v2_and_mirrors_are_identical():
+    pub = (ROOT / "public/static/ui-hour-v24.js").read_text(encoding="utf-8")
+    mirror = (ROOT / "giao_dien/ui-hour-v24.js").read_text(encoding="utf-8")
+    assert pub == mirror
+    assert "/api/v2/gio-ca-nhan" in pub
+    assert "/api/stateless/" not in pub
+    assert "Chưa phải giờ tốt/xấu cá nhân" in pub
+
+
+def test_hour_can_never_rescue_hard_block_in_copy_contract():
+    text = (ROOT / "loi/ket_qua/gio_v24.py").read_text(encoding="utf-8")
+    assert "Không dùng giờ để cứu một ngày đã bị chặn" in text

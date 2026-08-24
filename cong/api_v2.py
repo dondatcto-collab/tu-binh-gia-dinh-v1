@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException
 
 from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay, toi_dang_o_dau
 from loi.ket_qua.v2 import decade_result, event_search, finance_result, personal_result, relationship_result, schema_status, work_result
+from loi.ket_qua.gio_v24 import hour_reference_result, v24_schema_overlay
 from loi.linh_vuc.cong_viec import danh_gia_cong_viec
 from loi.linh_vuc.quan_he import danh_gia_quan_he
 from loi.linh_vuc.tai_chinh import danh_gia_tai_chinh
@@ -23,7 +24,7 @@ class DomainRequest(ProfileRequest):
 
 @router.get("/schema-status")
 def v2_schema_status():
-    return schema_status()
+    return v24_schema_overlay(schema_status())
 
 
 @router.post("/hom-nay")
@@ -72,11 +73,17 @@ def v2_tai_chinh(v: DomainRequest):
 
 @router.post("/quan-he")
 def v2_quan_he(v: DomainRequest):
-    """V2.3 Quan hệ: social/collaboration only; không dự báo tình cảm/hôn nhân."""
     raw = _domain_raw(v)
     out = relationship_result(danh_gia_quan_he(raw, scope=v.scope))
     if v.scope == "day": out["date"] = raw.get("ngay")
     return out
+
+
+@router.post("/gio-ca-nhan")
+def v2_gio_ca_nhan(v: DayRequest):
+    """V2.4: chỉ tham khảo cấu trúc 12 giờ; chưa sinh nhãn tốt/xấu cá nhân."""
+    raw = hom_nay(v)
+    return hour_reference_result(raw)
 
 
 @router.post("/tim-ngay")
