@@ -11,4 +11,5 @@
   const previousHome=loadHomeDashboard;loadHomeDashboard=async function(){await previousHome();await refreshHomeRelationship()};
   const previousQuestion=openQuestion;openQuestion=async function(kind){await previousQuestion(kind);if(kind!=='today'&&kind!=='month')return;try{const scope=kind==='month'?'month':'day',r=await fetchRelationship(scope),body=$('result-body');if(body)body.insertAdjacentHTML('beforeend',card(r,scope))}catch{}}
   styles();window.addEventListener('load',()=>setTimeout(()=>{try{refreshHomeRelationship()}catch{}},1800));
+  if(!document.querySelector('script[data-v24-hour]')){const s=document.createElement('script');s.src='/static/ui-hour-v24.js?v=2.4-alpha.1';s.dataset.v24Hour='1';document.head.appendChild(s)}
 })();
