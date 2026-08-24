@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay
-from loi.ket_qua.v2 import event_search, personal_result, schema_status
+from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay, toi_dang_o_dau
+from loi.ket_qua.v2 import decade_result, event_search, personal_result, schema_status
 
 router = APIRouter(prefix="/api/v2", tags=["v2"])
 
@@ -30,6 +30,12 @@ def v2_hom_nay(v: DayRequest):
 def v2_thang_nay(v: ProfileRequest):
     raw = thang_nay(v)
     return personal_result(raw, scope="month")
+
+
+@router.post("/dai-van")
+def v2_dai_van(v: ProfileRequest):
+    raw = toi_dang_o_dau(v)
+    return decade_result(raw)
 
 
 @router.post("/tim-ngay")
