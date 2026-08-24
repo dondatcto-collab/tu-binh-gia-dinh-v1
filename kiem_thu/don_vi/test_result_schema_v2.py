@@ -6,17 +6,19 @@ from loi.ket_qua.v2 import (
     event_search,
     personal_result,
     schema_status,
+    work_result,
 )
 
 
-def test_schema_status_locks_core_flow_principles():
+def test_schema_status_locks_v2_1_work_scope():
     s = schema_status()
-    assert s["schema_version"] == SCHEMA_VERSION == "2.0-alpha.2"
+    assert s["schema_version"] == SCHEMA_VERSION == "2.1-alpha.1"
     assert s["numeric_score"] == NUMERIC_SCORE_STATUS == "LOCKED_OFF"
-    assert s["status"] == "ALPHA_CORE_FLOWS"
-    for scope in ("day", "month", "decade", "event_search"):
+    assert s["status"] == "V2_1_WORK_ALPHA"
+    for scope in ("day", "month", "decade", "event_search", "work_domain_day", "work_domain_month"):
         assert scope in s["implemented_scopes"]
     assert "finance_domain" in s["pending_scopes"]
+    assert "relationship_domain" in s["pending_scopes"]
     assert "UI không tự suy quyết định từ dữ liệu kỹ thuật" in s["principles"]
 
 
@@ -30,6 +32,32 @@ def test_personal_day_plain_language_does_not_fake_domains():
     assert out["numeric_score_status"] == "LOCKED_OFF"
     assert out["confidence_state"] == "Căn cứ vừa"
     assert out["technical"] == {"foo": "bar"}
+
+
+def test_work_result_uses_same_canonical_schema_and_no_score():
+    decision = {
+        "ruleset_version": "V2.1-WORK.1",
+        "scope": "day",
+        "state": "SUPPORT",
+        "label": "Hỗ trợ công việc",
+        "title": "Thời điểm này hỗ trợ hơn cho công việc",
+        "plain_explanation": "Có căn cứ riêng trong phạm vi công việc.",
+        "recommended_actions": ["Làm việc đã chuẩn bị rõ."],
+        "cautions": ["Không suy thành thăng chức."],
+        "confidence_state": "Căn cứ vừa",
+        "evidence": [{"type": "TEN_GOD_THEME"}],
+        "rule_ids": ["V2-WORK-001"],
+        "source_ids": ["SRC-ZPZQ"],
+        "technical": {"theme_group": "AUTHORITY"},
+    }
+    out = work_result(decision)
+    assert out["kind"] == "domain_period"
+    assert out["domain"] == "work"
+    assert out["conclusion"]["state"] == "SUPPORT"
+    assert out["rules"] == ["V2-WORK-001"]
+    assert out["sources"] == ["SRC-ZPZQ"]
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
 
 
 def test_personal_caution_is_not_rendered_as_bad_absolute_day():
