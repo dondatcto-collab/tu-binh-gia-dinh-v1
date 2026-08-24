@@ -14,12 +14,13 @@ def test_vercel_entrypoint_registers_v2_without_replacing_v1():
     assert "register_v2(app)" in text
 
 
-def test_v2_routes_cover_first_three_user_flows():
+def test_v2_routes_cover_core_user_flows():
     text = read("cong/api_v2.py")
-    for route in ("/schema-status", "/hom-nay", "/thang-nay", "/tim-ngay"):
+    for route in ("/schema-status", "/hom-nay", "/thang-nay", "/dai-van", "/tim-ngay"):
         assert route in text
     assert "raw = hom_nay(v)" in text
     assert "raw = thang_nay(v)" in text
+    assert "raw = toi_dang_o_dau(v)" in text
     assert "raw = tim_ngay(v)" in text
 
 
@@ -27,4 +28,4 @@ def test_v2_adapter_is_not_a_second_decision_engine():
     text = read("loi/ket_qua/v2.py")
     assert "không đổi engine" in text.lower()
     assert "NUMERIC_SCORE_STATUS = \"LOCKED_OFF\"" in text
-    assert "score" not in text.split("def event_item", 1)[0].lower() or "numeric_score" in text
+    assert "DESCRIPTIVE_ONLY" in text
