@@ -17,7 +17,12 @@ def test_schema_status_locks_v2_3_relationship_scope():
     assert s["schema_version"] == SCHEMA_VERSION == "2.3-alpha.1"
     assert s["numeric_score"] == NUMERIC_SCORE_STATUS == "LOCKED_OFF"
     assert s["status"] == "V2_3_RELATIONSHIP_ALPHA"
-    for scope in ("day", "month", "decade", "event_search", "work_domain_day", "work_domain_month", "finance_domain_day", "finance_domain_month", "relationship_domain_day", "relationship_domain_month"):
+    for scope in (
+        "day", "month", "decade", "event_search",
+        "work_domain_day", "work_domain_month",
+        "finance_domain_day", "finance_domain_month",
+        "relationship_domain_day", "relationship_domain_month",
+    ):
         assert scope in s["implemented_scopes"]
     assert "personal_hour" in s["pending_scopes"]
     assert "UI không tự suy quyết định từ dữ liệu kỹ thuật" in s["principles"]
@@ -35,19 +40,57 @@ def test_personal_day_plain_language_does_not_fake_domains():
     assert out["technical"] == {"foo": "bar"}
 
 
-def test_domain_results_use_same_canonical_schema_and_no_score():
-    base = {"scope": "day", "state": "SUPPORT", "plain_explanation": "Có căn cứ riêng.", "recommended_actions": ["Làm rõ."], "cautions": ["Không suy rộng."], "confidence_state": "Căn cứ vừa", "evidence": [{"type": "TEN_GOD_THEME"}], "source_ids": ["SRC-ZPZQ"]}
-    cases = [
-        (work_result, {**base, "ruleset_version": "V2.1-WORK.1", "label": "Hỗ trợ công việc", "title": "Hỗ trợ công việc", "rule_ids": ["V2-WORK-001"]}, "work"),
-        (finance_result, {**base, "ruleset_version": "V2.2-FINANCE.1", "label": "Hỗ trợ quản lý tiền bạc", "title": "Hỗ trợ tiền bạc", "rule_ids": ["V2-FIN-001"]}, "finance"),
-        (relationship_result, {**base, "ruleset_version": "V2.3-RELATIONSHIP.1", "label": "Hỗ trợ tương tác", "title": "Hỗ trợ tương tác", "rule_ids": ["V2-REL-001"]}, "relationship"),
-    ]
-    for fn, decision, domain in cases:
-        out = fn(decision)
-        assert out["kind"] == "domain_period"
-        assert out["domain"] == domain
-        assert out["numeric_score"] is None
-        assert out["numeric_score_status"] == "LOCKED_OFF"
+def test_work_result_uses_same_canonical_schema_and_no_score():
+    decision = {
+        "ruleset_version": "V2.1-WORK.1", "scope": "day", "state": "SUPPORT",
+        "label": "Hỗ trợ công việc", "title": "Thời điểm này hỗ trợ hơn cho công việc",
+        "plain_explanation": "Có căn cứ riêng trong phạm vi công việc.",
+        "recommended_actions": ["Làm việc đã chuẩn bị rõ."], "cautions": ["Không suy thành thăng chức."],
+        "confidence_state": "Căn cứ vừa", "evidence": [{"type": "TEN_GOD_THEME"}],
+        "rule_ids": ["V2-WORK-001"], "source_ids": ["SRC-ZPZQ"], "technical": {"theme_group": "AUTHORITY"},
+    }
+    out = work_result(decision)
+    assert out["kind"] == "domain_period"
+    assert out["domain"] == "work"
+    assert out["conclusion"]["state"] == "SUPPORT"
+    assert out["rules"] == ["V2-WORK-001"]
+    assert out["sources"] == ["SRC-ZPZQ"]
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
+
+
+def test_finance_result_uses_same_canonical_schema_and_no_score():
+    decision = {
+        "ruleset_version": "V2.2-FINANCE.1", "scope": "month", "state": "CAUTION",
+        "label": "Nên thận trọng về tiền bạc", "title": "Nên kiểm kỹ trước quyết định tiền bạc",
+        "plain_explanation": "Có căn cứ riêng trong phạm vi tiền bạc.",
+        "recommended_actions": ["Kiểm số liệu."], "cautions": ["Không suy thành chắc chắn mất tiền."],
+        "confidence_state": "Căn cứ vừa", "evidence": [{"type": "TEN_GOD_THEME"}],
+        "rule_ids": ["V2-FIN-001"], "source_ids": ["SRC-ZPZQ"], "technical": {"theme_group": "WEALTH"},
+    }
+    out = finance_result(decision)
+    assert out["domain"] == "finance"
+    assert out["scope"] == "month"
+    assert out["rules"] == ["V2-FIN-001"]
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
+
+
+def test_relationship_result_uses_same_canonical_schema_and_no_score():
+    decision = {
+        "ruleset_version": "V2.3-RELATIONSHIP.1", "scope": "day", "state": "SUPPORT",
+        "label": "Hỗ trợ tương tác và phối hợp", "title": "Thuận hơn cho trao đổi và phối hợp",
+        "plain_explanation": "Có căn cứ riêng trong phạm vi tương tác xã hội.",
+        "recommended_actions": ["Trao đổi rõ vai trò."], "cautions": ["Không suy thành tình cảm/hôn nhân."],
+        "confidence_state": "Căn cứ vừa", "evidence": [{"type": "TEN_GOD_THEME"}],
+        "rule_ids": ["V2-REL-001"], "source_ids": ["SRC-ZPZQ"], "technical": {"theme_group": "PEER"},
+    }
+    out = relationship_result(decision)
+    assert out["domain"] == "relationship"
+    assert out["scope"] == "day"
+    assert out["rules"] == ["V2-REL-001"]
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
 
 
 def test_personal_caution_is_not_rendered_as_bad_absolute_day():
@@ -63,7 +106,9 @@ def test_decade_is_descriptive_context_not_fake_domain_prediction():
     assert out["scope"] == "decade"
     assert out["conclusion"]["state"] == "DESCRIPTIVE_ONLY"
     assert "giai đoạn giữa" in out["conclusion"]["title"].lower()
+    assert "tiền bạc" in out["plain_explanation"].lower()
     assert out["numeric_score"] is None
+    assert out["personal_context"]["decade_pillar"] == "Canh Tý"
 
 
 def test_hard_block_always_wins_in_v2_event_item():
@@ -71,14 +116,19 @@ def test_hard_block_always_wins_in_v2_event_item():
     out = event_item(item, event_code="KY_HOP_DONG")
     assert out["conclusion"]["label"] == "Bị chặn"
     assert out["event_context"]["hard_block"] is True
+    assert out["confidence_state"] == "Căn cứ rõ"
     assert out["numeric_score"] is None
 
 
 def test_event_search_keeps_ordinal_ranking_and_no_score():
-    raw = {"viec": "KY_HOP_DONG", "so_ngay_da_quet": 3, "xep_hang_status": "ORDINAL_V1_1_PERSONAL", "top": [{"ngay": "2026-09-01", "label": "Ưu tiên", "decision_state": "PRIORITY", "hard_block": False, "rank_group": 1}]}
+    raw = {"viec": "KY_HOP_DONG", "so_ngay_da_quet": 3, "xep_hang_status": "ORDINAL_V1_1_PERSONAL", "top": [
+        {"ngay": "2026-09-01", "label": "Ưu tiên", "decision_state": "PRIORITY", "hard_block": False, "rank_group": 1},
+        {"ngay": "2026-09-02", "label": "Có thể cân nhắc", "decision_state": "CONSIDER", "hard_block": False, "rank_group": 2},
+    ]}
     out = event_search(raw)
     assert out["ranking_mode"] == "ORDINAL_HARD_BLOCK_EVENT_PERSONAL"
     assert out["numeric_score"] is None
+    assert [x["conclusion"]["label"] for x in out["results"]] == ["Ưu tiên", "Có thể cân nhắc"]
 
 
 def test_required_v2_result_fields_are_stable():
