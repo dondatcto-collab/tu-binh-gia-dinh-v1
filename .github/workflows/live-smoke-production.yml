@@ -29,6 +29,7 @@ jobs:
           import urllib.request
 
           base = os.environ["BASE_URL"].rstrip("/")
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
           profile = {
               "profile_id": "SMOKE-050",
               "full_name": "Ho So Kiem Thu",
@@ -40,7 +41,7 @@ jobs:
               "note": "Automated production smoke test",
           }
 
-          def request_json(path, payload=None, attempts=3):
+          def request_json(path, payload=None, attempts=3, pause=5):
               body = None if payload is None else json.dumps(payload).encode("utf-8")
               headers = {"Accept": "application/json"}
               if body is not None:
@@ -61,7 +62,7 @@ jobs:
                   except Exception as exc:
                       last = exc
                       if attempt < attempts:
-                          time.sleep(5 * attempt)
+                          time.sleep(pause)
               raise AssertionError(f"{path}: request failed: {last}")
 
           health = request_json("/api/health")
@@ -109,29 +110,39 @@ jobs:
           assert len(search.get("cac_ngay", [])) == 8, search
           assert all(row.get("score") is None for row in search["cac_ngay"]), search["cac_ngay"]
 
-          schema = request_json("/api/v2/schema-status")
-          assert schema.get("schema_version") == "2.4-alpha.1", schema
-          assert schema.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", schema
-          assert schema.get("numeric_score") == "LOCKED_OFF", schema
-          readiness = schema.get("hour_readiness", {})
-          assert readiness.get("hour_structure_ready") is True, readiness
-          assert readiness.get("hour_fusion_ready") is False, readiness
-          assert readiness.get("personal_hour_decision_ready") is False, readiness
+          # Production V2.4 is mandatory only after merge/push main. A PR cannot
+          # require production to contain its own unmerged code.
+          if event_name != "pull_request":
+              schema = None
+              for _ in range(12):
+                  schema = request_json("/api/v2/schema-status")
+                  if schema.get("schema_version") == "2.4-alpha.1":
+                      break
+                  time.sleep(10)
+              assert schema.get("schema_version") == "2.4-alpha.1", schema
+              assert schema.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", schema
+              assert schema.get("numeric_score") == "LOCKED_OFF", schema
+              readiness = schema.get("hour_readiness", {})
+              assert readiness.get("hour_structure_ready") is True, readiness
+              assert readiness.get("hour_fusion_ready") is False, readiness
+              assert readiness.get("personal_hour_decision_ready") is False, readiness
 
-          hours = request_json(
-              "/api/v2/gio-ca-nhan",
-              {"profile": profile, "ngay": "2026-08-24"},
-          )
-          assert hours.get("schema_version") == "2.4-alpha.1", hours
-          assert hours.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", hours
-          assert hours.get("conclusion", {}).get("state") == "DESCRIPTIVE_ONLY", hours
-          assert hours.get("numeric_score") is None, hours
-          assert hours.get("numeric_score_status") == "LOCKED_OFF", hours
-          assert len(hours.get("hours", [])) == 12, len(hours.get("hours", []))
-          assert all(x.get("decision_state") == "DESCRIPTIVE_ONLY" for x in hours["hours"]), hours["hours"]
-          assert all(x.get("is_personal_good_hour") is None for x in hours["hours"]), hours["hours"]
-          assert all(x.get("is_personal_bad_hour") is None for x in hours["hours"]), hours["hours"]
+              hours = request_json(
+                  "/api/v2/gio-ca-nhan",
+                  {"profile": profile, "ngay": "2026-08-24"},
+                  attempts=6,
+                  pause=10,
+              )
+              assert hours.get("schema_version") == "2.4-alpha.1", hours
+              assert hours.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", hours
+              assert hours.get("conclusion", {}).get("state") == "DESCRIPTIVE_ONLY", hours
+              assert hours.get("numeric_score") is None, hours
+              assert hours.get("numeric_score_status") == "LOCKED_OFF", hours
+              assert len(hours.get("hours", [])) == 12, len(hours.get("hours", []))
+              assert all(x.get("decision_state") == "DESCRIPTIVE_ONLY" for x in hours["hours"]), hours["hours"]
+              assert all(x.get("is_personal_good_hour") is None for x in hours["hours"]), hours["hours"]
+              assert all(x.get("is_personal_bad_hour") is None for x in hours["hours"]), hours["hours"]
 
           print("LIVE_SMOKE_PRODUCTION = PASS")
-          print("health=PASS V1_flows=PASS schema_v24=PASS gio_ca_nhan_v24=PASS")
+          print("health=PASS V1_flows=PASS" + (" schema_v24=PASS gio_ca_nhan_v24=PASS" if event_name != "pull_request" else ""))
           PY
