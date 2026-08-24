@@ -1,0 +1,64 @@
+name: Apply final 0.5.0 UI copy
+
+on:
+  push:
+    branches:
+      - ui-copy-0.5.0-final
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui-copy-0.5.0-final
+      - name: Update mirrored UI files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          paths = [Path('public/static/app.js'), Path('giao_dien/app.js')]
+          replacements = [
+              ("Giờ tốt/xấu cá nhân chưa được kết luận ở 0.4.0.",
+               "Giờ hiện chỉ là tham khảo cấu trúc; chưa kết luận tốt/xấu cá nhân."),
+              ('<div class="destiny-row"><span>Cách cục / Hỷ-Kỵ</span><b class="muted">Đang hoàn thiện theo Tử Bình Chân Thuyên</b></div>',
+               '<div class="destiny-row"><span>Cách cục / Hỷ-Kỵ</span><b>Đã bật theo Tử Bình Chân Thuyên<small>Trường hợp chưa đủ rõ sẽ không ép kết luận</small></b></div>'),
+              ('<b>Đồng thời gian</b>', '<b>Dòng thời gian</b>'),
+              ('<small>NGÀY XẾP HẠNG #1 THEO HIỆP KỶ</small>',
+               '<small>XẾP HẠNG #1 · 12 TRỰC V1 + CÁ NHÂN</small>'),
+              ('<div class="decision-seal">V1<br><b>BASIC</b></div>',
+               '<div class="decision-seal">V1<br><b>0.5</b></div>'),
+              ('<span class="ordinal-badge">V1<br>BASIC</span>',
+               '<span class="ordinal-badge">V1<br>0.5</span>'),
+              ('Kết luận theo lớp quy tắc V1-basic có truy nguồn.',
+               'Kết luận theo các lớp V1 đã nghiệm thu, có truy nguồn.'),
+              ('Chuỗi Đại vận → Năm → Tháng → Ngày đang được đọc theo cấu trúc. Chưa phán thuận/nghịch cá nhân khi nền Cách cục/Hỷ-Kỵ chưa đủ.',
+               'Chuỗi Đại vận → Năm → Tháng → Ngày được hợp lưu theo cấu trúc. Trường hợp Cách cục/Hỷ-Kỵ chưa đủ rõ sẽ tự hạ về mô tả, không ép kết luận.'),
+              ("Quan hệ cấu trúc: ${esc(x.personal_relation?.nhan||'chưa có')}",
+               "Nền cá nhân: ${esc(x.personal_v1_1?.headline||'chưa có tín hiệu nổi bật')}")
+          ]
+
+          for path in paths:
+              text = path.read_text(encoding='utf-8')
+              for old, new in replacements:
+                  count = text.count(old)
+                  if count == 0:
+                      raise SystemExit(f'Missing expected text in {path}: {old[:100]}')
+                  text = text.replace(old, new)
+                  print(f'{path}: replaced {count} x {old[:45]}')
+              path.write_text(text, encoding='utf-8')
+
+          if paths[0].read_bytes() != paths[1].read_bytes():
+              raise SystemExit('Mirrored app.js files are no longer identical')
+          PY
+      - name: Commit fixes and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/apply-ui-copy-final.yml
+          git add public/static/app.js giao_dien/app.js
+          git commit -m "ui: finish 0.5.0 wording cleanup"
+          git push origin HEAD:ui-copy-0.5.0-final
