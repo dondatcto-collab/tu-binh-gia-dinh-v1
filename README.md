@@ -97,7 +97,7 @@ Bản chạy cục bộ có thể dùng kho SQLite theo cấu hình của ứng 
 
 - Nên nhập đúng ngày và giờ sinh; V1 không tự đoán giờ sinh.
 - Hồ sơ sinh tại Việt Nam dùng `Asia/Ho_Chi_Minh` mặc định.
-- Nếu sinh ở nước khác, chọn đúng mú́i giờ nơi sinh trong màn hình Hồ sơ.
+- Nếu sinh ở nước khác, chọn đúng múi giờ nơi sinh trong màn hình Hồ sơ.
 
 ## Y tế
 
