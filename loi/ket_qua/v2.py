@@ -7,26 +7,19 @@ from __future__ import annotations
 
 from typing import Any
 
-SCHEMA_VERSION = "2.1-alpha.1"
+SCHEMA_VERSION = "2.2-alpha.1"
 NUMERIC_SCORE_STATUS = "LOCKED_OFF"
 
 
 def _label(raw: str | None) -> str:
     x = (raw or "").strip()
-    if "Bị chặn" in x or "HARD_BLOCK" in x:
-        return "Bị chặn"
-    if x == "Ưu tiên":
-        return "Ưu tiên"
-    if "Không ưu tiên" in x:
-        return "Không ưu tiên"
-    if "Có thể cân nhắc" in x or x == "Cân nhắc":
-        return "Có thể cân nhắc"
-    if "Cần thận trọng" in x or "CAUTION" in x:
-        return "Nên thận trọng"
-    if "Thuận nền mệnh" in x or "SUPPORT" in x:
-        return "Khá thuận"
-    if "Trung tính" in x or "Cân bằng" in x:
-        return "Cân bằng"
+    if "Bị chặn" in x or "HARD_BLOCK" in x: return "Bị chặn"
+    if x == "Ưu tiên": return "Ưu tiên"
+    if "Không ưu tiên" in x: return "Không ưu tiên"
+    if "Có thể cân nhắc" in x or x == "Cân nhắc": return "Có thể cân nhắc"
+    if "Cần thận trọng" in x or "CAUTION" in x: return "Nên thận trọng"
+    if "Thuận nền mệnh" in x or "SUPPORT" in x: return "Khá thuận"
+    if "Trung tính" in x or "Cân bằng" in x: return "Cân bằng"
     return "Chưa đủ căn cứ"
 
 
@@ -51,10 +44,8 @@ def _plain(label: str, scope: str) -> tuple[str, str, list[str], list[str]]:
 
 
 def _confidence(label: str, *, hard_block: bool = False) -> str:
-    if hard_block or label in {"Bị chặn", "Ưu tiên"}:
-        return "Căn cứ rõ"
-    if label == "Chưa đủ căn cứ":
-        return "Chưa đủ căn cứ"
+    if hard_block or label in {"Bị chặn", "Ưu tiên"}: return "Căn cứ rõ"
+    if label == "Chưa đủ căn cứ": return "Chưa đủ căn cứ"
     return "Căn cứ vừa"
 
 
@@ -63,102 +54,76 @@ def personal_result(raw: dict[str, Any], *, scope: str, domain: str = "general")
     raw_label = simple.get("tom_tat") or simple.get("label") or ""
     label = _label(raw_label)
     title, explanation, yes, caution = _plain(label, scope)
-    return {
-        "schema_version": SCHEMA_VERSION, "kind": "personal_period", "scope": scope, "domain": domain,
+    return {"schema_version": SCHEMA_VERSION, "kind": "personal_period", "scope": scope, "domain": domain,
         "conclusion": {"state": label.upper().replace(" ", "_"), "label": label, "title": title},
         "plain_explanation": explanation, "recommended_actions": yes, "cautions": caution,
         "confidence_state": _confidence(label), "event_context": None,
         "personal_context": {"source_label": raw_label}, "evidence": [], "rules": [], "sources": [],
-        "technical": raw.get("chuyen_sau"), "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS,
+        "technical": raw.get("chuyen_sau"), "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS}
+
+
+def _domain_result(decision: dict[str, Any], *, domain: str, label_fallback: str, title_fallback: str, context_key: str) -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION, "kind": "domain_period", "scope": decision.get("scope") or "day", "domain": domain,
+        "conclusion": {"state": decision.get("state") or "INSUFFICIENT", "label": decision.get("label") or label_fallback, "title": decision.get("title") or title_fallback},
+        "plain_explanation": decision.get("plain_explanation") or label_fallback,
+        "recommended_actions": list(decision.get("recommended_actions") or []), "cautions": list(decision.get("cautions") or []),
+        "confidence_state": decision.get("confidence_state") or "Chưa đủ căn cứ", "event_context": None,
+        "personal_context": {context_key: decision.get("ruleset_version")}, "evidence": list(decision.get("evidence") or []),
+        "rules": list(decision.get("rule_ids") or []), "sources": list(decision.get("source_ids") or []),
+        "technical": decision.get("technical") or {}, "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS,
     }
 
 
 def work_result(decision: dict[str, Any]) -> dict[str, Any]:
-    """Chuẩn hóa kết quả domain Công việc V2.1 sang Result Schema V2."""
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "kind": "domain_period",
-        "scope": decision.get("scope") or "day",
-        "domain": "work",
-        "conclusion": {
-            "state": decision.get("state") or "INSUFFICIENT",
-            "label": decision.get("label") or "Chưa đủ căn cứ riêng về công việc",
-            "title": decision.get("title") or "Chưa có tín hiệu công việc đủ rõ để kết luận riêng",
-        },
-        "plain_explanation": decision.get("plain_explanation") or "Chưa đủ căn cứ riêng về công việc.",
-        "recommended_actions": list(decision.get("recommended_actions") or []),
-        "cautions": list(decision.get("cautions") or []),
-        "confidence_state": decision.get("confidence_state") or "Chưa đủ căn cứ",
-        "event_context": None,
-        "personal_context": {"work_ruleset_version": decision.get("ruleset_version")},
-        "evidence": list(decision.get("evidence") or []),
-        "rules": list(decision.get("rule_ids") or []),
-        "sources": list(decision.get("source_ids") or []),
-        "technical": decision.get("technical") or {},
-        "numeric_score": None,
-        "numeric_score_status": NUMERIC_SCORE_STATUS,
-    }
+    return _domain_result(decision, domain="work", label_fallback="Chưa đủ căn cứ riêng về công việc", title_fallback="Chưa có tín hiệu công việc đủ rõ để kết luận riêng", context_key="work_ruleset_version")
+
+
+def finance_result(decision: dict[str, Any]) -> dict[str, Any]:
+    """Chuẩn hóa kết quả Tiền bạc V2.2; không tạo dự đoán lợi nhuận."""
+    return _domain_result(decision, domain="finance", label_fallback="Chưa đủ căn cứ riêng về tiền bạc", title_fallback="Chưa có tín hiệu tiền bạc đủ rõ để kết luận riêng", context_key="finance_ruleset_version")
 
 
 def decade_result(raw: dict[str, Any]) -> dict[str, Any]:
-    dv = raw.get("dai_van") or {}
-    pillar = dv.get("tru") or "Chưa xác định"; year_no = dv.get("nam_thu_may"); start = dv.get("nam_bat_dau"); end = dv.get("nam_ket_thuc")
+    dv = raw.get("dai_van") or {}; pillar = dv.get("tru") or "Chưa xác định"; year_no = dv.get("nam_thu_may"); start = dv.get("nam_bat_dau"); end = dv.get("nam_ket_thuc")
     if isinstance(year_no, int) and year_no > 0:
         stage = "đầu" if year_no <= 3 else ("giữa" if year_no <= 7 else "cuối")
-        title = f"Bạn đang ở giai đoạn {stage} của vận 10 năm hiện tại"
-        explanation = f"Đây là bối cảnh dài hạn của khoảng {start or '—'}–{end or '—'}. Nó không quyết định từng ngày và chưa đủ căn cứ để kết luận riêng về công việc, tiền bạc hay quan hệ."
+        title = f"Bạn đang ở giai đoạn {stage} của vận 10 năm hiện tại"; explanation = f"Đây là bối cảnh dài hạn của khoảng {start or '—'}–{end or '—'}. Nó không quyết định từng ngày và chưa đủ căn cứ để kết luận riêng về công việc, tiền bạc hay quan hệ."
     else:
-        title = "Đã xác định vận 10 năm hiện tại"
-        explanation = "Đại vận là bối cảnh dài hạn. Từng năm, tháng và ngày vẫn cần được xét riêng; app không suy lĩnh vực đời sống chỉ từ tên Đại vận."
-    return {
-        "schema_version": SCHEMA_VERSION, "kind": "personal_period", "scope": "decade", "domain": "general",
-        "conclusion": {"state": "DESCRIPTIVE_ONLY", "label": "Bối cảnh dài hạn", "title": title},
-        "plain_explanation": explanation,
+        title = "Đã xác định vận 10 năm hiện tại"; explanation = "Đại vận là bối cảnh dài hạn. Từng năm, tháng và ngày vẫn cần được xét riêng; app không suy lĩnh vực đời sống chỉ từ tên Đại vận."
+    return {"schema_version": SCHEMA_VERSION, "kind": "personal_period", "scope": "decade", "domain": "general",
+        "conclusion": {"state": "DESCRIPTIVE_ONLY", "label": "Bối cảnh dài hạn", "title": title}, "plain_explanation": explanation,
         "recommended_actions": ["Dùng Đại vận để hiểu bối cảnh dài hạn, rồi xem năm, tháng và ngày cho quyết định cụ thể."],
-        "cautions": ["Không hiểu một Đại vận là tốt hoặc xấu tuyệt đối cho cả 10 năm."],
-        "confidence_state": "Căn cứ vừa" if pillar != "Chưa xác định" else "Chưa đủ căn cứ",
+        "cautions": ["Không hiểu một Đại vận là tốt hoặc xấu tuyệt đối cho cả 10 năm."], "confidence_state": "Căn cứ vừa" if pillar != "Chưa xác định" else "Chưa đủ căn cứ",
         "event_context": None, "personal_context": {"decade_pillar": pillar, "year_in_decade": year_no, "start_year": start, "end_year": end},
-        "evidence": [], "rules": [], "sources": [], "technical": raw, "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS,
-    }
+        "evidence": [], "rules": [], "sources": [], "technical": raw, "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS}
 
 
 def event_item(item: dict[str, Any], *, event_code: str) -> dict[str, Any]:
     raw_label = item.get("label") or item.get("decision_state") or ""; label = _label(raw_label); hard_block = bool(item.get("hard_block"))
     if hard_block: label = "Bị chặn"
     title, explanation, yes, caution = _plain(label, "event")
-    return {
-        "schema_version": SCHEMA_VERSION, "kind": "event_day", "scope": "day", "domain": "event", "date": item.get("ngay"),
+    return {"schema_version": SCHEMA_VERSION, "kind": "event_day", "scope": "day", "domain": "event", "date": item.get("ngay"),
         "conclusion": {"state": item.get("decision_state") or label.upper().replace(" ", "_"), "label": label, "title": title},
-        "plain_explanation": explanation, "recommended_actions": yes, "cautions": caution,
-        "confidence_state": _confidence(label, hard_block=hard_block),
+        "plain_explanation": explanation, "recommended_actions": yes, "cautions": caution, "confidence_state": _confidence(label, hard_block=hard_block),
         "event_context": {"event_code": event_code, "hard_block": hard_block, "event_state": item.get("event_state"), "rank_group": item.get("rank_group")},
         "personal_context": item.get("personal_v1_1") or {}, "evidence": item.get("reasons") or [], "rules": [], "sources": [],
         "technical": {"truc": item.get("truc"), "coverage": item.get("coverage"), "mapping_status": item.get("mapping_status")},
-        "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS,
-    }
+        "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS}
 
 
 def event_search(raw: dict[str, Any]) -> dict[str, Any]:
     event_code = raw.get("viec") or ""; items = [event_item(x, event_code=event_code) for x in (raw.get("top") or [])]
-    return {
-        "schema_version": SCHEMA_VERSION, "kind": "event_search", "event_code": event_code,
-        "scanned_days": raw.get("so_ngay_da_quet"), "ranking_mode": "ORDINAL_HARD_BLOCK_EVENT_PERSONAL",
-        "numeric_score": None, "numeric_score_status": NUMERIC_SCORE_STATUS, "results": items,
-        "safety_note": raw.get("canh_bao_an_toan"),
-        "technical": {"legacy_status": raw.get("xep_hang_status"), "legacy_note": raw.get("ghi_chu")},
-    }
+    return {"schema_version": SCHEMA_VERSION, "kind": "event_search", "event_code": event_code,
+        "scanned_days": raw.get("so_ngay_da_quet"), "ranking_mode": "ORDINAL_HARD_BLOCK_EVENT_PERSONAL", "numeric_score": None,
+        "numeric_score_status": NUMERIC_SCORE_STATUS, "results": items, "safety_note": raw.get("canh_bao_an_toan"),
+        "technical": {"legacy_status": raw.get("xep_hang_status"), "legacy_note": raw.get("ghi_chu")}}
 
 
 def schema_status() -> dict[str, Any]:
     return {
-        "schema_version": SCHEMA_VERSION,
-        "status": "V2_1_WORK_ALPHA",
-        "numeric_score": NUMERIC_SCORE_STATUS,
-        "principles": [
-            "Người dùng phổ thông hiểu trước", "Không đủ căn cứ thì không kết luận", "HARD_BLOCK luôn thắng",
-            "Mọi kết luận phải truy ngược được", "UI không tự suy quyết định từ dữ liệu kỹ thuật",
-            "Domain Công việc không được suy thăng chức, tăng lương hay mất việc từ một tín hiệu đơn lẻ",
-        ],
-        "implemented_scopes": ["day", "month", "decade", "event_search", "work_domain_day", "work_domain_month"],
-        "pending_scopes": ["finance_domain", "relationship_domain", "personal_hour"],
+        "schema_version": SCHEMA_VERSION, "status": "V2_2_FINANCE_ALPHA", "numeric_score": NUMERIC_SCORE_STATUS,
+        "principles": ["Người dùng phổ thông hiểu trước", "Không đủ căn cứ thì không kết luận", "HARD_BLOCK luôn thắng", "Mọi kết luận phải truy ngược được", "UI không tự suy quyết định từ dữ liệu kỹ thuật", "Domain Công việc không được suy thăng chức, tăng lương hay mất việc từ một tín hiệu đơn lẻ", "Domain Tiền bạc không được suy có tiền, tăng thu nhập hay sinh lời từ một Tài tinh đơn lẻ"],
+        "implemented_scopes": ["day", "month", "decade", "event_search", "work_domain_day", "work_domain_month", "finance_domain_day", "finance_domain_month"],
+        "pending_scopes": ["relationship_domain", "personal_hour"],
     }
