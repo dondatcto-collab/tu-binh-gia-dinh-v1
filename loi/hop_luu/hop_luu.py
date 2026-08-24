@@ -1,18 +1,8 @@
-"""Hợp lưu — tầng quyết định cuối.
+"""Hợp lưu 0.5.0 — tầng quyết định cuối có truy nguồn.
 
-NGUYÊN TẮC CỦA TỆP NÀY:
-
-Nó dựng ĐẦY ĐỦ cấu trúc kết quả mà sản phẩm cần. Nhưng nó CHỈ điền những ô
-có căn cứ từ quy tắc đã xác minh. Ô nào chưa có căn cứ thì để UNKNOWN kèm
-lý do cụ thể, và đưa vào danh sách `uncertainties`.
-
-Nó KHÔNG tự nghĩ công thức, KHÔNG tự đặt trọng số, KHÔNG tạo điểm giả.
-Điểm số để None và đánh dấu NOT_CALIBRATED cho tới khi có hệ chấm điểm
-được hiệu chỉnh bằng ca vàng đã duyệt.
-
-Tầng giao diện và tầng giải thích KHÔNG được tự tính thêm gì.
+Không tạo điểm số. Cách cục/Hỷ-Kỵ đã được nối vào mệnh gốc; phần chưa có
+căn cứ vẫn để UNKNOWN và ghi rõ cách gỡ.
 """
-
 from __future__ import annotations
 
 import sqlite3
@@ -21,67 +11,45 @@ from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from typing import Any
 
-from loi.bat_tu.nguyet_lenh import tu_ket_qua_lich
+from loi.bat_tu.cach_cuc import phan_tich_menh_goc
 from loi.bat_tu.tang_can import lay_tang_can
 from loi.bat_tu.thap_than import tinh_thap_than
 from loi.ho_so.ho_so import HoSo
 from loi.lich.bo_quy_uoc import tai_tat_ca as tai_bo_lich
 from loi.lich.engine import CalendarEngine
 from loi.lich.quy_uoc_can_chi import viet_hoa
-from loi.van.dong_thoi_gian import DongThoiGian
 from loi.van import dong_thoi_gian as dtg
-from loi.quyet_dinh.v1 import danh_gia_giai_doan, danh_gia_event
+from loi.quyet_dinh.v1 import danh_gia_event
 from loi.quyet_dinh.ca_nhan import phan_tich_ca_nhan, bo_sung_event_ca_nhan
 
 UNKNOWN = "UNKNOWN"
 NOT_CALIBRATED = "NOT_CALIBRATED"
 NO_RULE = "NO_RULE_AVAILABLE"
 
-
 @dataclass
 class YeuTo:
-    """Một yếu tố có thật, truy ngược được tới quy tắc và nguồn."""
     ma: str
     mo_ta: str
     rule_id: str
     source_id: str | None
     verification_status: str
-
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "ma": self.ma, "mo_ta": self.mo_ta,
-            "rule_id": self.rule_id, "source_id": self.source_id,
-            "verification_status": self.verification_status,
-        }
-
+        return {"ma":self.ma,"mo_ta":self.mo_ta,"rule_id":self.rule_id,"source_id":self.source_id,"verification_status":self.verification_status}
 
 @dataclass
 class DieuChuaBiet:
-    """Một ô mà hệ thống CỐ Ý không kết luận, kèm lý do và cách gỡ.
-
-    Có HAI cách diễn đạt cho cùng một điều:
-      loi_thuong  — cho người không biết Tử Bình. Tuyệt đối không thuật ngữ.
-      can_de_tra_loi — tên kỹ thuật, chỉ dùng ở tầng chuyên sâu.
-    """
     ma: str
     loi_thuong: str
     can_de_tra_loi: str
     ly_do: str
     can_gi_de_go: str
-
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "ma": self.ma, "loi_thuong": self.loi_thuong,
-            "can_de_tra_loi": self.can_de_tra_loi,
-            "ly_do": self.ly_do, "can_gi_de_go": self.can_gi_de_go,
-        }
-
+        return {"ma":self.ma,"loi_thuong":self.loi_thuong,"can_de_tra_loi":self.can_de_tra_loi,"ly_do":self.ly_do,"can_gi_de_go":self.can_gi_de_go}
 
 @dataclass
 class KetQuaHopLuu:
     person: str
     period: str
-
     base_state: dict[str, Any]
     decade_state: dict[str, Any]
     year_state: dict[str, Any]
@@ -89,298 +57,116 @@ class KetQuaHopLuu:
     day_state: dict[str, Any]
     hour_state: dict[str, Any]
     event_state: dict[str, Any]
-
     positive_factors: list[YeuTo] = field(default_factory=list)
     negative_factors: list[YeuTo] = field(default_factory=list)
     conflicts: list[dict[str, Any]] = field(default_factory=list)
     uncertainties: list[DieuChuaBiet] = field(default_factory=list)
-
     score: float | None = None
     label: str = UNKNOWN
     confidence: str = "LOW"
     scoring_status: str = NOT_CALIBRATED
-
     recommended: list[str] = field(default_factory=list)
     caution: list[str] = field(default_factory=list)
     avoid: list[str] = field(default_factory=list)
-
     rule_trace: list[str] = field(default_factory=list)
     source_trace: list[str] = field(default_factory=list)
-
     def to_dict(self) -> dict[str, Any]:
         return {
-            "person": self.person, "period": self.period,
-            "base_state": self.base_state, "decade_state": self.decade_state,
-            "year_state": self.year_state, "month_state": self.month_state,
-            "day_state": self.day_state, "hour_state": self.hour_state,
-            "event_state": self.event_state,
-            "positive_factors": [x.to_dict() for x in self.positive_factors],
-            "negative_factors": [x.to_dict() for x in self.negative_factors],
-            "conflicts": list(self.conflicts),
-            "uncertainties": [x.to_dict() for x in self.uncertainties],
-            "score": self.score,
-            "label": self.label,
-            "confidence": self.confidence,
-            "scoring_status": self.scoring_status,
-            "recommended": list(self.recommended),
-            "caution": list(self.caution),
-            "avoid": list(self.avoid),
-            "rule_trace": sorted(set(self.rule_trace)),
-            "source_trace": sorted(set(self.source_trace)),
+            "person":self.person,"period":self.period,"base_state":self.base_state,
+            "decade_state":self.decade_state,"year_state":self.year_state,"month_state":self.month_state,
+            "day_state":self.day_state,"hour_state":self.hour_state,"event_state":self.event_state,
+            "positive_factors":[x.to_dict() for x in self.positive_factors],
+            "negative_factors":[x.to_dict() for x in self.negative_factors],"conflicts":list(self.conflicts),
+            "uncertainties":[x.to_dict() for x in self.uncertainties],"score":self.score,"label":self.label,
+            "confidence":self.confidence,"scoring_status":self.scoring_status,"recommended":list(self.recommended),
+            "caution":list(self.caution),"avoid":list(self.avoid),"rule_trace":sorted(set(self.rule_trace)),
+            "source_trace":sorted(set(self.source_trace)),
         }
-
-
-# ---------------------------------------------------------------
-# Những ô V1 cần nhưng kho quy tắc CHƯA CÓ
-# ---------------------------------------------------------------
 
 CAC_O_CHUA_CO_CAN_CU = [
-    DieuChuaBiet(
-        "VUONG_SUY",
-        "Nhật chủ có đủ lực để gánh cấu trúc đang có hay không",
-        "Mức mạnh/yếu của Nhật chủ trong toàn Tứ Trụ",
-        "Tử Bình Chân Thuyên đã khóa nguyên tắc: nguyệt lệnh là trọng nhưng không được lấy đắc/thất lệnh một mình để phán vượng nhược. Engine chưa cài đủ quy tắc thông căn, trợ/khắc và toàn cục để đưa ra kết luận này.",
-        "Cài bộ quy tắc sức Nhật chủ theo nguyên văn đã kiểm chứng và ca vàng; không dùng bảng điểm tự đặt."),
-    DieuChuaBiet(
-        "CACH_CUC",
-        "Cấu trúc chính của lá số đang vận hành theo kiểu nào",
-        "Dụng thần nguyệt lệnh / cách cục và trạng thái thành-bại-cứu ứng",
-        "Đã có nguồn Tử Bình Chân Thuyên xác nhận phải lấy nguyệt lệnh làm đề cương, nhưng Engine chưa cài đủ các quy tắc định cách, biến hóa, thành bại và cứu ứng.",
-        "Cài lần lượt Luận dụng thần → thành bại cứu ứng → biến hóa → tương thần theo nguồn đã khóa."),
-    DieuChuaBiet(
-        "DUNG_HY_KY",
-        "Yếu tố nào đang hỗ trợ cấu trúc của bạn và yếu tố nào đang phá nó",
-        "Hỷ/Kỵ của mệnh gốc theo cách cục",
-        "Theo Tử Bình Chân Thuyên, Dụng thần của phương pháp lõi lấy từ nguyệt lệnh/cách cục; hỷ/kỵ phải xét trong cấu trúc thành-bại-cứu ứng và toàn Tứ Trụ. Không được thay bằng một ngũ hành cân bằng tự chọn.",
-        "Hoàn thiện Cách cục và quy tắc hỷ/kỵ theo từng cách rồi mới cho vận/năm/tháng/ngày/giờ tham gia quyết định."),
-    DieuChuaBiet(
-        "THAN_SAT",
-        "Ngày này có điểm phụ nào đáng chú ý không",
-        "Thần sát",
-        "Nhóm SS chưa đủ quy tắc nguồn; theo phạm vi V1, Thần sát chỉ là lớp phụ và không được lật kết luận chính.",
-        "Chỉ bổ sung khi có nguồn và công thức khởi rõ ràng."),
-    DieuChuaBiet(
-        "CHAM_DIEM",
-        "Mức độ ưu tiên định lượng",
-        "Điểm số và nhãn",
-        "Chưa có hệ chấm điểm được hiệu chỉnh bằng ca vàng; đặc tả cấm tự đặt trọng số/ngưỡng.",
-        "Chỉ hiệu chỉnh sau khi logic cách cục-hỷ/kỵ và ca vàng đã đủ."),
+    DieuChuaBiet("THAN_SAT","Ngày này có điểm phụ nào đáng chú ý không","Thần sát","Nhóm Thần sát chưa đủ bộ quy tắc nguồn; V1 không dùng lớp này để lật kết luận chính.","Bổ sung từng quy tắc khi có nguồn và công thức khởi rõ ràng."),
+    DieuChuaBiet("CHAM_DIEM","Mức độ ưu tiên định lượng","Điểm số và nhãn số","Chưa có hệ điểm được hiệu chỉnh bằng ca vàng; đặc tả cấm tự đặt trọng số/ngưỡng.","Chỉ mở điểm số sau một vòng hiệu chỉnh độc lập; hiện dùng nhãn thứ bậc."),
 ]
 
-
-def _trang_thai_chua_biet(ma: str) -> dict[str, Any]:
-    d = next(x for x in CAC_O_CHUA_CO_CAN_CU if x.ma == ma)
-    return {"status": UNKNOWN, "ly_do": d.ly_do, "can_gi_de_go": d.can_gi_de_go}
+def _unknown(ma: str, loi: str, ky_thuat: str, ly_do: str, go: str) -> dict[str, Any]:
+    return {"status":UNKNOWN,"ma":ma,"loi_thuong":loi,"can_de_tra_loi":ky_thuat,"ly_do":ly_do,"can_gi_de_go":go}
 
 
-# ---------------------------------------------------------------
-# Hợp lưu
-# ---------------------------------------------------------------
-
-def hop_luu(conn: sqlite3.Connection, hs: HoSo,
-            ngay: date | None = None,
-            gio_chi: str | None = None,
-            event_code: str | None = None,
-            moc: datetime | None = None) -> KetQuaHopLuu:
+def hop_luu(conn: sqlite3.Connection, hs: HoSo, ngay: date | None=None, gio_chi: str | None=None, event_code: str | None=None, moc: datetime | None=None) -> KetQuaHopLuu:
     if moc is None:
-        try:
-            moc = datetime.now(ZoneInfo(hs.timezone_name))
-        except ZoneInfoNotFoundError:
-            moc = datetime.now(timezone.utc)
-    ngay = ngay or moc.date()
-    try:
-        tz_hs = ZoneInfo(hs.timezone_name)
-    except ZoneInfoNotFoundError:
-        tz_hs = timezone.utc
-    tl = dtg.dung(conn, hs, moc=datetime(ngay.year, ngay.month, ngay.day,
-                                         12, 0, tzinfo=tz_hs))
+        try: moc=datetime.now(ZoneInfo(hs.timezone_name))
+        except ZoneInfoNotFoundError: moc=datetime.now(timezone.utc)
+    ngay=ngay or moc.date()
+    try: tz_hs=ZoneInfo(hs.timezone_name)
+    except ZoneInfoNotFoundError: tz_hs=timezone.utc
 
-    e = CalendarEngine(tai_bo_lich()["CAL-V1"])
-    lich_ngay = e.tinh(ngay.year, ngay.month, ngay.day, 12, 0,
-                       timezone_name=hs.timezone_name, gioi_tinh=hs.gender,
-                       tinh_dai_van=False)
+    tl=dtg.dung(conn,hs,moc=datetime(ngay.year,ngay.month,ngay.day,12,0,tzinfo=tz_hs))
+    e=CalendarEngine(tai_bo_lich()["CAL-V1"])
+    lich=e.tinh(ngay.year,ngay.month,ngay.day,12,0,timezone_name=hs.timezone_name,gioi_tinh=hs.gender,tinh_dai_van=False)
+    rule=list(tl.rule_trace); source=list(tl.source_trace)
 
-    duong = []
-    am = []
-    rule = list(tl.rule_trace)
+    natal=phan_tich_menh_goc(conn,tu_tru=tl.tu_tru,nhat_chu=tl.nhat_chu)
+    rule.extend(natal.get("rule_ids",[])); source.extend(natal.get("source_ids",[]))
 
-    # --- Yếu tố CÓ THẬT: quan hệ Thập Thần giữa Nhật chủ và Can ngày ---
-    tt_ngay = tinh_thap_than(conn, tl.nhat_chu, lich_ngay.tru_ngay.can)
-    yt_ngay = YeuTo(
-        ma="THAP_THAN_NGAY",
-        mo_ta=f"Can ngày là {viet_hoa(lich_ngay.tru_ngay.can, lich_ngay.tru_ngay.chi)}, "
-              f"đối với bạn thuộc quan hệ {tt_ngay.ten_god_vi}.",
-        rule_id=tt_ngay.rule_id, source_id=tt_ngay.source_id,
-        verification_status=tt_ngay.status)
-    rule.append(tt_ngay.rule_id)
+    # Evidence cấu trúc của ngày; không tự phân thuận/nghịch ngoài engine Cách cục.
+    tt_ngay=tinh_thap_than(conn,tl.nhat_chu,lich.tru_ngay.can); rule.append(tt_ngay.rule_id)
+    tc=lay_tang_can(conn,lich.tru_ngay.chi); rule.extend(tc.rule_ids)
+    for can in tc.hidden_stems:
+        t=tinh_thap_than(conn,tl.nhat_chu,can); rule.append(t.rule_id)
 
-    # Quan hệ Thập Thần là SỰ KIỆN CẤU TRÚC, chưa phải tốt hay xấu.
-    # Muốn nói thuận hay nghịch phải biết Dụng Hỷ Kỵ — mà cái đó chưa có.
-    trung_lap = [yt_ngay]
-
-    tc = lay_tang_can(conn, lich_ngay.tru_ngay.chi)
-    for thu_tu, can in zip(tc.source_order, tc.hidden_stems):
-        t = tinh_thap_than(conn, tl.nhat_chu, can)
-        trung_lap.append(YeuTo(
-            ma=f"THAP_THAN_TANG_CAN_{thu_tu}",
-            mo_ta=f"Chi ngày chứa {viet_hoa(can, lich_ngay.tru_ngay.chi).split()[0]}, "
-                  f"thuộc quan hệ {t.ten_god_vi}.",
-            rule_id=t.rule_id, source_id=t.source_id,
-            verification_status=t.status))
-        rule.append(t.rule_id)
-    rule.append(tc.rule_ids[0])
-
-    canh_bao_bien = [c.ma for c in lich_ngay.canh_bao]
-
-    # Lớp quyết định cá nhân hóa V1.1: không chỉ so Chi ngày sinh.
-    # Hợp lưu Thập Thần của Can đang xét + quan hệ Chi với CẢ BỐN trụ gốc,
-    # đồng thời đưa bối cảnh Đại vận → Năm → Tháng vào diễn giải.
-    context_common = []
-    qd_dai_van = None
+    context=[]; qd_dai_van=None
     if tl.dai_van is not None:
-        tt_dv = tinh_thap_than(conn, tl.nhat_chu, tl.dai_van.can)
-        qd_dai_van = phan_tich_ca_nhan(
-            conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
-            can_hien_tai=tl.dai_van.can, chi_hien_tai=tl.dai_van.chi,
-            scope="decade", context=[])
-        context_common.append({
-            "label": "Đại vận",
-            "tru": viet_hoa(tl.dai_van.can, tl.dai_van.chi),
-            "ten_god_vi": tt_dv.ten_god_vi,
-        })
-        rule.append(tt_dv.rule_id)
-        rule.extend(qd_dai_van.get("rule_ids", []))
-    qd_nam = phan_tich_ca_nhan(
-        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
-        can_hien_tai=tl.nam_hien_tai.can, chi_hien_tai=tl.nam_hien_tai.chi,
-        scope="year", context=context_common)
-    rule.extend(qd_nam.get("rule_ids", []))
-    context_year = context_common + [{
-        "label": "Năm",
-        "tru": tl.nam_hien_tai.vi,
-        "ten_god_vi": tl.thap_than_nam,
-    }]
-    qd_thang = phan_tich_ca_nhan(
-        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
-        can_hien_tai=tl.thang_hien_tai.can, chi_hien_tai=tl.thang_hien_tai.chi,
-        scope="month", context=context_year)
-    context_day = context_year + [{
-        "label": "Tháng",
-        "tru": tl.thang_hien_tai.vi,
-        "ten_god_vi": tl.thap_than_thang,
-    }]
-    qd_ngay = phan_tich_ca_nhan(
-        conn, tu_tru=tl.tu_tru, nhat_chu=tl.nhat_chu,
-        can_hien_tai=lich_ngay.tru_ngay.can, chi_hien_tai=lich_ngay.tru_ngay.chi,
-        scope="day", context=context_day)
-    rule.extend(qd_thang.get("rule_ids", []))
-    rule.extend(qd_ngay.get("rule_ids", []))
+        qd_dai_van = phan_tich_ca_nhan(conn,tu_tru=tl.tu_tru,nhat_chu=tl.nhat_chu,can_hien_tai=tl.dai_van.can,chi_hien_tai=tl.dai_van.chi,scope="decade",context=[])
+        context.append({"label":"Đại vận","tru":viet_hoa(tl.dai_van.can,tl.dai_van.chi),"ten_god_vi":tinh_thap_than(conn,tl.nhat_chu,tl.dai_van.can).ten_god_vi})
+    qd_nam = phan_tich_ca_nhan(conn,tu_tru=tl.tu_tru,nhat_chu=tl.nhat_chu,can_hien_tai=tl.nam_hien_tai.can,chi_hien_tai=tl.nam_hien_tai.chi,scope="year",context=context)
+    ctx_nam=context+[{"label":"Năm","tru":tl.nam_hien_tai.vi,"ten_god_vi":tl.thap_than_nam}]
+    qd_thang = phan_tich_ca_nhan(conn,tu_tru=tl.tu_tru,nhat_chu=tl.nhat_chu,can_hien_tai=tl.thang_hien_tai.can,chi_hien_tai=tl.thang_hien_tai.chi,scope="month",context=ctx_nam)
+    ctx_ngay=ctx_nam+[{"label":"Tháng","tru":tl.thang_hien_tai.vi,"ten_god_vi":tl.thap_than_thang}]
+    qd_ngay = phan_tich_ca_nhan(conn,tu_tru=tl.tu_tru,nhat_chu=tl.nhat_chu,can_hien_tai=lich.tru_ngay.can,chi_hien_tai=lich.tru_ngay.chi,scope="day",context=ctx_ngay)
+    for q in (qd_dai_van,qd_nam,qd_thang,qd_ngay):
+        if q:
+            rule.extend(q.get("rule_ids",[])); source.extend(q.get("source_ids",[]))
 
-    qh_ngay = qd_ngay["relation"]
-    yt_qh = YeuTo(
-        ma=f"QUAN_HE_NGAY_{qh_ngay['ma']}", mo_ta=qh_ngay["mo_ta"],
-        rule_id=qh_ngay["rule_id"], source_id=qh_ngay["source_id"],
-        verification_status="VERIFIED" if qh_ngay["ma"] != "NONE" else "PROVISIONAL")
-    rule.append(qh_ngay["rule_id"])
-    if qh_ngay["muc"] == "POSITIVE":
-        duong.append(yt_qh)
-    elif qh_ngay["muc"] == "CAUTION":
-        am.append(yt_qh)
+    day_state={"solar_date":ngay.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"quan_he_voi_nhat_chu":tt_ngay.ten_god_vi,"tang_can":list(tc.hidden_stems),"boundary_warning":lich.boundary_warning,"canh_bao":[c.ma for c in lich.canh_bao],"danh_gia":qd_ngay}
 
-    day_state = {
-        "solar_date": ngay.isoformat(),
-        "tru_ngay": viet_hoa(lich_ngay.tru_ngay.can, lich_ngay.tru_ngay.chi),
-        "quan_he_voi_nhat_chu": tt_ngay.ten_god_vi,
-        "tang_can": list(tc.hidden_stems),
-        "boundary_warning": lich_ngay.boundary_warning,
-        "canh_bao": canh_bao_bien,
-        "danh_gia": qd_ngay,
-    }
-
-    hour_state: dict[str, Any] = {"status": UNKNOWN}
+    hour_state={"status":"NOT_SELECTED"}
     if gio_chi:
-        hour_state = {
-            "chi_gio": gio_chi,
-            "danh_gia": _trang_thai_chua_biet("DUNG_HY_KY"),
-            "ghi_chu": "Giờ chỉ được xét trong bối cảnh ngày. "
-                       "Chưa đánh giá được ngày thì chưa đánh giá được giờ.",
-        }
+        hour_state={"chi_gio":gio_chi,"danh_gia":_unknown("GIO_HOP_LUU","Giờ này có phù hợp với ngày và người hay không","Hợp lưu giờ","V1 chưa hoàn tất hợp lưu Can Chi giờ với ngày + nền mệnh.","Chỉ mở kết luận giờ sau khi có ca vàng riêng."),"ghi_chu":"Giờ phải được xét trong bối cảnh ngày; V1 hiện chỉ hiển thị tham khảo cấu trúc."}
 
-    event_state: dict[str, Any] = {"status": "NOT_SELECTED"}
+    event_state={"status":"NOT_SELECTED"}
     if event_code:
-        event_state = danh_gia_event(
-            tl.thang_hien_tai.chi, lich_ngay.tru_ngay.chi,
-            tl.tu_tru["ngay"].chi, event_code)
-        # Cá nhân hóa theo cả 4 trụ gốc. Không được đảo ngược một Trực đang Kỵ.
-        event_state = bo_sung_event_ca_nhan(event_state, qd_ngay)
-        rule.extend(event_state.get("rule_ids", []))
-        if event_state.get("source_id"):
-            # source_trace chỉ chứa ID; tầng giải thích tra chi tiết từ DB.
-            pass
+        event_state=danh_gia_event(tl.thang_hien_tai.chi,lich.tru_ngay.chi,tl.tu_tru["ngay"].chi,event_code)
+        event_state=bo_sung_event_ca_nhan(event_state,qd_ngay)
+        rule.extend(event_state.get("rule_ids",[]))
+        if event_state.get("source_id"): source.append(event_state["source_id"])
 
-    # Quan hệ Can Chi và Hiệp Kỷ V1-basic đã có lớp tối thiểu. Phần chưa có
-    # vẫn giữ rõ: vượng suy/cách cục/dụng hỷ kỵ/thần sát/điểm tuyệt đối.
-    chua_biet = list(CAC_O_CHUA_CO_CAN_CU)
+    main_label=event_state.get("label") if event_code else qd_ngay.get("label",UNKNOWN)
+    main_conf=event_state.get("confidence",qd_ngay.get("confidence","LOW")) if event_code else qd_ngay.get("confidence","LOW")
+    rec=list(qd_ngay.get("recommended",[])); caut=list(qd_ngay.get("caution",[])); avoid=[]
+    if event_code and event_state.get("decision_state")=="HARD_BLOCK": avoid.append(f"Không ưu tiên {event_state.get('event_name','việc này')} trong ngày này nếu có thể chọn ngày khác.")
+    elif event_code and event_state.get("decision_state") in ("PRIORITY","CONSIDER"): rec.append(f"{event_state.get('event_name','Việc này')} có thể được cân nhắc theo lớp quy tắc hiện đã nghiệm thu.")
 
-    # Nhãn chính trả lời câu hỏi hiện tại: nếu có việc thì ưu tiên kết luận theo
-    # việc; nếu không có việc thì dùng nhịp ngày. Điểm 0-10 vẫn không bịa.
-    main_label = event_state.get("label") if event_code else qd_ngay["label"]
-    main_conf = ("MEDIUM" if event_code and event_state.get("support_level") == "ACTIVE_BASIC"
-                 else qd_ngay.get("confidence", "LOW"))
-    rec = list(qd_ngay.get("recommended", []))
-    caut = list(qd_ngay.get("caution", []))
-    avoid_list: list[str] = []
-    if event_code and event_state.get("event_state") == "JI":
-        avoid_list.append(f"Không ưu tiên {event_state.get('event_name','việc này')} trong ngày này nếu có thể chọn ngày khác.")
-    elif event_code and event_state.get("event_state") == "YI":
-        rec.append(f"{event_state.get('event_name','Việc này')} có tín hiệu phù hợp ở lớp 12 Trực của Hiệp Kỷ V1-basic.")
+    if natal.get("status")=="READY":
+        cach_cuc=natal
+        dung_hy={"status":"READY","pattern":natal.get("pattern"),"favorable_factors":natal.get("favorable_factors",[]),"avoid_factors":natal.get("avoid_factors",[]),"xiang_shen":natal.get("xiang_shen",[]),"rule_ids":natal.get("rule_ids",[])}
+        vuong_suy={"status":"STRUCTURAL_CONDITION_ONLY","ghi_chu":"V1 không dùng một điểm mạnh/yếu độc lập để thay Cách cục."}
+    else:
+        cach_cuc=natal
+        dung_hy=_unknown("DUNG_HY_KY","Yếu tố nào hỗ trợ hoặc phá cấu trúc mệnh","Hỷ/Kỵ theo Cách cục","Cách cục đang AMBIGUOUS nên chưa được phép suy Hỷ/Kỵ.","Làm rõ Cách cục bằng quy tắc nguồn đã khóa.")
+        vuong_suy={"status":"STRUCTURAL_CONDITION_ONLY","ghi_chu":"Không dùng mạnh/yếu đơn lẻ để ép chọn Dụng thần."}
 
     return KetQuaHopLuu(
-        person=hs.full_name,
-        period=ngay.isoformat(),
-        base_state={
-            "tu_tru": {k: v.to_dict() for k, v in tl.tu_tru.items()},
-            "nhat_chu": tl.nhat_chu,
-            "nguyet_lenh": tl.nguyet_lenh_menh,
-            "vuong_suy": _trang_thai_chua_biet("VUONG_SUY"),
-            "cach_cuc": _trang_thai_chua_biet("CACH_CUC"),
-            "dung_hy_ky": _trang_thai_chua_biet("DUNG_HY_KY"),
-        },
-        decade_state=({**tl.dai_van.to_dict(), "danh_gia": qd_dai_van}
-                      if tl.dai_van
-                      else {"status": UNKNOWN, "ly_do": "Ngoài mười vận đã tính."}),
-        year_state={"tru": tl.nam_hien_tai.to_dict(),
-                    "quan_he_voi_nhat_chu": tl.thap_than_nam,
-                    "danh_gia": qd_nam},
-        month_state={"tru": tl.thang_hien_tai.to_dict(),
-                     "quan_he_voi_nhat_chu": tl.thap_than_thang,
-                     "nguyet_lenh": tl.nguyet_lenh_hien_tai,
-                     "danh_gia": qd_thang},
-        day_state=day_state,
-        hour_state=hour_state,
-        event_state=event_state,
-        positive_factors=duong,
-        negative_factors=am,
-        conflicts=[],
-        uncertainties=chua_biet,
-        score=None,
-        label=main_label or UNKNOWN,
-        confidence=main_conf,
-        scoring_status="PERSONAL_DESCRIPTIVE_EVENT_ORDINAL",
-        recommended=rec,
-        caution=caut,
-        avoid=avoid_list,
-        rule_trace=rule,
-        source_trace=list(tl.source_trace)
-        + ([event_state.get("source_id")] if event_code and event_state.get("source_id") else [])
-        + (list(qd_dai_van.get("source_ids", [])) if qd_dai_van else [])
-        + list(qd_nam.get("source_ids", []))
-        + list(qd_thang.get("source_ids", [])) + list(qd_ngay.get("source_ids", [])),
-    )
+        person=hs.full_name,period=ngay.isoformat(),
+        base_state={"tu_tru":{k:v.to_dict() for k,v in tl.tu_tru.items()},"nhat_chu":tl.nhat_chu,"nguyet_lenh":tl.nguyet_lenh_menh,"vuong_suy":vuong_suy,"cach_cuc":cach_cuc,"dung_hy_ky":dung_hy},
+        decade_state=({**tl.dai_van.to_dict(),"danh_gia":qd_dai_van} if tl.dai_van else {"status":UNKNOWN,"ly_do":"Ngoài mười vận đã tính."}),
+        year_state={"tru":tl.nam_hien_tai.to_dict(),"quan_he_voi_nhat_chu":tl.thap_than_nam,"danh_gia":qd_nam},
+        month_state={"tru":tl.thang_hien_tai.to_dict(),"quan_he_voi_nhat_chu":tl.thap_than_thang,"nguyet_lenh":tl.nguyet_lenh_hien_tai,"danh_gia":qd_thang},
+        day_state=day_state,hour_state=hour_state,event_state=event_state,
+        positive_factors=[],negative_factors=[],conflicts=[],uncertainties=list(CAC_O_CHUA_CO_CAN_CU),
+        score=None,label=main_label or UNKNOWN,confidence=main_conf,scoring_status="ORDINAL_V1_1_PERSONAL",
+        recommended=rec,caution=caut,avoid=avoid,rule_trace=rule,source_trace=source)
 
 
-def quan_sat_trung_lap(conn: sqlite3.Connection, hs: HoSo,
-                       ngay: date) -> list[YeuTo]:
-    """Những gì hệ thống QUAN SÁT ĐƯỢC về một ngày, chưa đánh giá tốt xấu."""
-    kq = hop_luu(conn, hs, ngay=ngay)
-    return kq.positive_factors + kq.negative_factors
+def quan_sat_trung_lap(conn: sqlite3.Connection, hs: HoSo, ngay: date) -> list[YeuTo]:
+    kq=hop_luu(conn,hs,ngay=ngay)
+    return kq.positive_factors+kq.negative_factors
