@@ -1,625 +1,831 @@
-# Bảng nguồn.
-#
-# ĐỌC KỸ: chỉ hai nguồn dưới đây là nguồn THẬT mà tôi kiểm chứng được.
-# Các quy ước Can Chi hiện KHÔNG có nguồn sách. Tôi không có bản
-# Tử Bình Chân Thuyên hay Hiệp Kỷ Biện Phương Thư trong tay, nên không được
-# ghi tên hai sách đó rồi để trống số quyển số trang. Ghi như vậy chính là
-# thứ mà mục "BỔ SUNG: SOURCE REGISTRY" muốn ngăn.
-#
-# Vì vậy các quy ước đó gắn với một bản ghi nguồn ghi rõ là CHƯA CÓ NGUỒN.
-
 sources:
-  # --- Nguồn thật, kiểm chứng được ---------------------------------
-  - source_id: SRC-VSOP87-AE
-    independence_group: ASTRONOMICAL_EPHEMERIS
-    title: "astronomy-engine — cài đặt VSOP87 cho vị trí biểu kiến Mặt Trời"
-    author: "Don Cross"
-    dynasty_or_year: "2019 tới nay"
-    edition: "bản Python trên PyPI"
-    language: en
-    source_type: DATASET
-    url_or_file_reference: "https://github.com/cosinekitty/astronomy"
-    primary_or_secondary: PRIMARY
-    edition_certainty: NOT_APPLICABLE
-    status: ACTIVE
-    notes: >
-      Dùng để tính thời điểm 24 tiết khí. Đối chiếu với pymeeus lệch 3,6 giây
-      ở Lập Xuân 1990, và với sxtwl lệch dưới 3 giây. Giấy phép MIT.
+- source_id: SRC-VSOP87-AE
+  independence_group: ASTRONOMICAL_EPHEMERIS
+  title: astronomy-engine — cài đặt VSOP87 cho vị trí biểu kiến Mặt Trời
+  author: Don Cross
+  dynasty_or_year: 2019 tới nay
+  edition: bản Python trên PyPI
+  language: en
+  source_type: DATASET
+  url_or_file_reference: https://github.com/cosinekitty/astronomy
+  primary_or_secondary: PRIMARY
+  edition_certainty: NOT_APPLICABLE
+  status: ACTIVE
+  notes: 'Dùng để tính thời điểm 24 tiết khí. Đối chiếu với pymeeus lệch 3,6 giây ở Lập Xuân 1990, và với sxtwl lệch dưới
+    3 giây. Giấy phép MIT.
 
-  - source_id: SRC-MEEUS
-    independence_group: ASTRONOMICAL_EPHEMERIS
-    title: "pymeeus — cài đặt thuật toán thiên văn của Jean Meeus"
-    author: "Jean Meeus (thuật toán), Dagoberto Salazar (cài đặt)"
-    dynasty_or_year: "1991 (sách), 2018 (thư viện)"
-    edition: "Astronomical Algorithms"
-    language: en
-    source_type: MODERN_BOOK
-    url_or_file_reference: "https://github.com/architest/pymeeus"
-    primary_or_secondary: SECONDARY
-    edition_certainty: NOT_APPLICABLE
-    status: ACTIVE
-    notes: "Nền dự phòng và là bên đối chiếu độc lập cho thời điểm tiết khí."
+    '
+- source_id: SRC-MEEUS
+  independence_group: ASTRONOMICAL_EPHEMERIS
+  title: pymeeus — cài đặt thuật toán thiên văn của Jean Meeus
+  author: Jean Meeus (thuật toán), Dagoberto Salazar (cài đặt)
+  dynasty_or_year: 1991 (sách), 2018 (thư viện)
+  edition: Astronomical Algorithms
+  language: en
+  source_type: MODERN_BOOK
+  url_or_file_reference: https://github.com/architest/pymeeus
+  primary_or_secondary: SECONDARY
+  edition_certainty: NOT_APPLICABLE
+  status: ACTIVE
+  notes: Nền dự phòng và là bên đối chiếu độc lập cho thời điểm tiết khí.
+- source_id: SRC-UHTB-CHEP
+  independence_group: CLASSICAL_TEXT
+  title: 淵海子平 — Uyên Hải Tử Bình (bản chép số hóa)
+  author: Từ Đại Thăng (Từ Tử Bình) — truyền thống quy cho
+  dynasty_or_year: Tống, biên tập lại đời Minh
+  edition: CHƯA KHÓA ĐƯỢC BẢN IN CỤ THỂ
+  language: zh-Hant
+  source_type: CLASSICAL_TEXT_TRANSCRIPTION
+  url_or_file_reference: null
+  primary_or_secondary: PRIMARY
+  edition_certainty: TRANSCRIPTION_ONLY
+  provenance_note: 'Nguyên văn do người duyệt cung cấp trong phiên làm việc ngày 2026-08-21. TÔI KHÔNG TỰ KIỂM CHỨNG ĐƯỢC
+    văn bản này với một bản in hay bản chụp nào, vì môi trường chạy không ra được internet mở. Đây là bản chép, KHÔNG phải
+    bản chụp nguyên bản. Chưa khóa được quyển, chương, trang.
 
-  # --- Nguồn cổ ------------------------------------------------------
-  - source_id: SRC-UHTB-CHEP
-    independence_group: CLASSICAL_TEXT
-    title: "淵海子平 — Uyên Hải Tử Bình (bản chép số hóa)"
-    author: "Từ Đại Thăng (Từ Tử Bình) — truyền thống quy cho"
-    dynasty_or_year: "Tống, biên tập lại đời Minh"
-    edition: "CHƯA KHÓA ĐƯỢC BẢN IN CỤ THỂ"
-    language: zh-Hant
-    source_type: CLASSICAL_TEXT_TRANSCRIPTION
-    url_or_file_reference: null
-    primary_or_secondary: PRIMARY
-    edition_certainty: TRANSCRIPTION_ONLY
-    provenance_note: >
-      Nguyên văn do người duyệt cung cấp trong phiên làm việc ngày 2026-08-21.
-      TÔI KHÔNG TỰ KIỂM CHỨNG ĐƯỢC văn bản này với một bản in hay bản chụp nào,
-      vì môi trường chạy không ra được internet mở. Đây là bản chép, KHÔNG phải
-      bản chụp nguyên bản. Chưa khóa được quyển, chương, trang.
-    status: ACTIVE
-    notes: >
-      Dùng cho ba bài phú: Ngũ Hổ Độn, Ngũ Thử Độn, và phần Luận khởi Đại vận pháp.
-      Khi nào có bản in cụ thể thì đổi edition_certainty và ghi số trang.
+    '
+  status: ACTIVE
+  notes: 'Dùng cho ba bài phú: Ngũ Hổ Độn, Ngũ Thử Độn, và phần Luận khởi Đại vận pháp. Khi nào có bản in cụ thể thì đổi edition_certainty
+    và ghi số trang.
 
-  - source_id: SRC-XUANTHU-NHATTHUC
-    independence_group: CLASSICAL_TEXT
-    title: "春秋 — Xuân Thu, Lỗ Ẩn Công năm thứ ba: 己巳，日有食之"
-    author: "truyền thống quy cho Khổng Tử san định"
-    dynasty_or_year: "khoảng thế kỷ 5 trước Công nguyên"
-    edition: "CHƯA KHÓA ĐƯỢC BẢN IN CỤ THỂ"
-    language: zh-Hant
-    source_type: CLASSICAL_TEXT_TRANSCRIPTION
-    url_or_file_reference: "https://www.shidianguji.com/zh/book/CADAL02075120/chapter/1lajdrsjfur61"
-    primary_or_secondary: PRIMARY
-    edition_certainty: TRANSCRIPTION_ONLY
-    provenance_note: >
-      Nguyên văn lấy từ 春秋日食集證 quyển một (Phùng Trừng, Nam Thông Châu),
-      bản số hóa trên Thức Điển Cổ Tịch. Sách này chép lại kinh văn kèm lời bàn
-      của Công Dương, Cốc Lương, Đỗ Dự, Khương Ngập.
-      Chinese Text Project có bản Công Dương Truyện, Ẩn Công năm thứ ba tại
-      https://ctext.org/gongyang-zhuan/yin-gong-san-nian nhưng trang đó CHẶN
-      truy cập tự động, TÔI KHÔNG ĐỌC TRỰC TIẾP ĐƯỢC. Ghi lại để người duyệt tra tay.
-      Bản Wikipedia đã BỎ, không dùng làm nguồn.
-    status: ACTIVE
-    notes: >
-      PHÂN BIỆT BA TẦNG, không được trộn:
-        CLASSICAL_RECORD          — sách chép "ngày Kỷ Tị, mặt trời bị ăn".
-                                    Sách KHÔNG viết "22/02/720 trước Công nguyên".
-        ASTRONOMICAL_CONFIRMATION — thiên văn xác nhận có nhật thực thấy được ở nước Lỗ.
-        MODERN_DATE_IDENTIFICATION— việc gán câu chép vào đúng ngày đó là kết luận
-                                    của nghiên cứu hiện đại, nằm ngoài cả hai tầng trên.
+    '
+- source_id: SRC-XUANTHU-NHATTHUC
+  independence_group: CLASSICAL_TEXT
+  title: '春秋 — Xuân Thu, Lỗ Ẩn Công năm thứ ba: 己巳，日有食之'
+  author: truyền thống quy cho Khổng Tử san định
+  dynasty_or_year: khoảng thế kỷ 5 trước Công nguyên
+  edition: CHƯA KHÓA ĐƯỢC BẢN IN CỤ THỂ
+  language: zh-Hant
+  source_type: CLASSICAL_TEXT_TRANSCRIPTION
+  url_or_file_reference: https://www.shidianguji.com/zh/book/CADAL02075120/chapter/1lajdrsjfur61
+  primary_or_secondary: PRIMARY
+  edition_certainty: TRANSCRIPTION_ONLY
+  provenance_note: 'Nguyên văn lấy từ 春秋日食集證 quyển một (Phùng Trừng, Nam Thông Châu), bản số hóa trên Thức Điển Cổ Tịch. Sách
+    này chép lại kinh văn kèm lời bàn của Công Dương, Cốc Lương, Đỗ Dự, Khương Ngập. Chinese Text Project có bản Công Dương
+    Truyện, Ẩn Công năm thứ ba tại https://ctext.org/gongyang-zhuan/yin-gong-san-nian nhưng trang đó CHẶN truy cập tự động,
+    TÔI KHÔNG ĐỌC TRỰC TIẾP ĐƯỢC. Ghi lại để người duyệt tra tay. Bản Wikipedia đã BỎ, không dùng làm nguồn.
 
-  - source_id: SRC-THIENVAN-NHATTHUC
-    independence_group: ASTRONOMICAL_EPHEMERIS
-    title: "Kiểm chứng thiên văn nhật thực 720 trước Công nguyên"
-    author: "tự chạy bằng astronomy-engine"
-    dynasty_or_year: "chạy ngày 2026-08-21"
-    edition: null
-    language: vi
-    source_type: DATASET
-    url_or_file_reference: "https://github.com/cosinekitty/astronomy"
-    primary_or_secondary: PRIMARY
-    edition_certainty: NOT_APPLICABLE
-    provenance_note: >
-      Dò nhật thực toàn cầu quanh tháng 2 năm 720 trước Công nguyên rồi tính
-      hoàn cảnh quan sát tại nước Lỗ (35,6 độ Bắc, 117 độ Đông).
-      Kết quả: nhật thực một phần, che 35 phần trăm, đỉnh lúc khoảng 6 giờ 26
-      giờ địa phương, rơi vào NGÀY 22 tháng 2 theo lịch địa phương.
-      Đây là bằng chứng ĐỘC LẬP với mọi thư viện lịch pháp Trung Hoa.
-    status: ACTIVE
-    notes: "Nối sách chép với một ngày tuyệt đối trên trục thời gian."
+    '
+  status: ACTIVE
+  notes: "PHÂN BIỆT BA TẦNG, không được trộn:\n  CLASSICAL_RECORD          — sách chép \"ngày Kỷ Tị, mặt trời bị ăn\".\n \
+    \                             Sách KHÔNG viết \"22/02/720 trước Công nguyên\".\n  ASTRONOMICAL_CONFIRMATION — thiên văn\
+    \ xác nhận có nhật thực thấy được ở nước Lỗ.\n  MODERN_DATE_IDENTIFICATION— việc gán câu chép vào đúng ngày đó là kết\
+    \ luận\n                              của nghiên cứu hiện đại, nằm ngoài cả hai tầng trên.\n"
+- source_id: SRC-THIENVAN-NHATTHUC
+  independence_group: ASTRONOMICAL_EPHEMERIS
+  title: Kiểm chứng thiên văn nhật thực 720 trước Công nguyên
+  author: tự chạy bằng astronomy-engine
+  dynasty_or_year: chạy ngày 2026-08-21
+  edition: null
+  language: vi
+  source_type: DATASET
+  url_or_file_reference: https://github.com/cosinekitty/astronomy
+  primary_or_secondary: PRIMARY
+  edition_certainty: NOT_APPLICABLE
+  provenance_note: 'Dò nhật thực toàn cầu quanh tháng 2 năm 720 trước Công nguyên rồi tính hoàn cảnh quan sát tại nước Lỗ
+    (35,6 độ Bắc, 117 độ Đông). Kết quả: nhật thực một phần, che 35 phần trăm, đỉnh lúc khoảng 6 giờ 26 giờ địa phương, rơi
+    vào NGÀY 22 tháng 2 theo lịch địa phương. Đây là bằng chứng ĐỘC LẬP với mọi thư viện lịch pháp Trung Hoa.
 
-  - source_id: SRC-TMTH-CHEP
-    independence_group: CLASSICAL_TEXT
-    title: "三命通會 — Tam Mệnh Thông Hội, quyển hai, Luận Đại vận (bản chép số hóa)"
-    author: "Vạn Dân Anh"
-    dynasty_or_year: "Minh"
-    edition: "đối chiếu bản Tứ Khố Toàn Thư số hóa, CHƯA KHÓA ĐƯỢC BẢN IN"
-    language: zh-Hant
-    source_type: CLASSICAL_TEXT_TRANSCRIPTION
-    url_or_file_reference: "https://www.shidianguji.com/book/SK1610/chapter/1kf5v6ol1vhnp"
-    primary_or_secondary: PRIMARY
-    edition_certainty: TRANSCRIPTION_ONLY
-    provenance_note: >
-      Nguyên văn lấy từ hai bản chép số hóa khác nhau, nội dung phần Luận Đại vận trùng khớp.
-      Chưa khóa được quyển in cụ thể.
-    status: ACTIVE
-    notes: "Nêu thang chiết trừ chi tiết mà Uyên Hải Tử Bình không nói."
+    '
+  status: ACTIVE
+  notes: Nối sách chép với một ngày tuyệt đối trên trục thời gian.
+- source_id: SRC-TMTH-CHEP
+  independence_group: CLASSICAL_TEXT
+  title: 三命通會 — Tam Mệnh Thông Hội, quyển hai, Luận Đại vận (bản chép số hóa)
+  author: Vạn Dân Anh
+  dynasty_or_year: Minh
+  edition: đối chiếu bản Tứ Khố Toàn Thư số hóa, CHƯA KHÓA ĐƯỢC BẢN IN
+  language: zh-Hant
+  source_type: CLASSICAL_TEXT_TRANSCRIPTION
+  url_or_file_reference: https://www.shidianguji.com/book/SK1610/chapter/1kf5v6ol1vhnp
+  primary_or_secondary: PRIMARY
+  edition_certainty: TRANSCRIPTION_ONLY
+  provenance_note: 'Nguyên văn lấy từ hai bản chép số hóa khác nhau, nội dung phần Luận Đại vận trùng khớp. Chưa khóa được
+    quyển in cụ thể.
 
-  - source_id: SRC-NASA-5MCSE
-    independence_group: ASTRONOMICAL_EPHEMERIS
-    title: "NASA Five Millennium Catalog of Solar Eclipses, -1999 tới +3000"
-    author: "Fred Espenak, Jean Meeus"
-    dynasty_or_year: "2009"
-    edition: "NASA/TP-2009-214174"
-    language: en
-    source_type: DATASET
-    url_or_file_reference: "https://eclipse.gsfc.nasa.gov/SEpubs/5MCSE.html"
-    primary_or_secondary: SECONDARY
-    edition_certainty: NOT_APPLICABLE
-    provenance_note: >
-      TÔI CHƯA ĐỌC ĐƯỢC MỤC CỤ THỂ cho ngày -0719 tháng 2. Chỉ xác nhận được
-      danh mục này tồn tại, phủ khoảng thời gian cần, và dùng tinh lịch
-      VSOP87 cùng ELP2000-82.
-      QUAN TRỌNG: vì dùng CÙNG BỘ TINH LỊCH với astronomy-engine, nguồn này
-      KHÔNG phải bằng chứng độc lập với phép tính của tôi. Cùng một nhóm.
-      Ghi vào đây để người duyệt tra tay mục -0719 nếu muốn.
-    status: PENDING
-    notes: "Chờ đọc được mục cụ thể mới chuyển sang ACTIVE."
+    '
+  status: ACTIVE
+  notes: Nêu thang chiết trừ chi tiết mà Uyên Hải Tử Bình không nói.
+- source_id: SRC-NASA-5MCSE
+  independence_group: ASTRONOMICAL_EPHEMERIS
+  title: NASA Five Millennium Catalog of Solar Eclipses, -1999 tới +3000
+  author: Fred Espenak, Jean Meeus
+  dynasty_or_year: '2009'
+  edition: NASA/TP-2009-214174
+  language: en
+  source_type: DATASET
+  url_or_file_reference: https://eclipse.gsfc.nasa.gov/SEpubs/5MCSE.html
+  primary_or_secondary: SECONDARY
+  edition_certainty: NOT_APPLICABLE
+  provenance_note: 'TÔI CHƯA ĐỌC ĐƯỢC MỤC CỤ THỂ cho ngày -0719 tháng 2. Chỉ xác nhận được danh mục này tồn tại, phủ khoảng
+    thời gian cần, và dùng tinh lịch VSOP87 cùng ELP2000-82. QUAN TRỌNG: vì dùng CÙNG BỘ TINH LỊCH với astronomy-engine, nguồn
+    này KHÔNG phải bằng chứng độc lập với phép tính của tôi. Cùng một nhóm. Ghi vào đây để người duyệt tra tay mục -0719 nếu
+    muốn.
 
-  - source_id: SRC-YTLIU-LICHPHAP
-    independence_group: ACADEMIC_CALENDAR_RESEARCH
-    title: "Yuk Tung Liu — 中國曆法, trang 六十干支 và bộ đổi số ngày Julius"
-    author: "Yuk Tung Liu"
-    dynasty_or_year: "2018, sửa lớn 2019"
-    edition: "bản web"
-    language: zh-Hant
-    source_type: ARTICLE
-    url_or_file_reference: "https://ytliu0.github.io/ChineseCalendar/sexagenary_chinese.html"
-    primary_or_secondary: SECONDARY
-    edition_certainty: NOT_APPLICABLE
-    provenance_note: >
-      Cài đặt học thuật, có nêu rõ công thức và mốc neo, ĐỘC LẬP với sxtwl và
-      lunar-python. Công thức: T = 1 + mod(JD - 1, 10), B = 1 + mod(JD + 1, 12),
-      mốc neo JD 2458511 (27 tháng 1 năm 2019) là ngày Giáp Tý.
-    status: ACTIVE
-    notes: "Đã kiểm 20000 ngày ngẫu nhiên trải 1200 năm, không lệch ngày nào."
+    '
+  status: PENDING
+  notes: Chờ đọc được mục cụ thể mới chuyển sang ACTIVE.
+- source_id: SRC-YTLIU-LICHPHAP
+  independence_group: ACADEMIC_CALENDAR_RESEARCH
+  title: Yuk Tung Liu — 中國曆法, trang 六十干支 và bộ đổi số ngày Julius
+  author: Yuk Tung Liu
+  dynasty_or_year: 2018, sửa lớn 2019
+  edition: bản web
+  language: zh-Hant
+  source_type: ARTICLE
+  url_or_file_reference: https://ytliu0.github.io/ChineseCalendar/sexagenary_chinese.html
+  primary_or_secondary: SECONDARY
+  edition_certainty: NOT_APPLICABLE
+  provenance_note: 'Cài đặt học thuật, có nêu rõ công thức và mốc neo, ĐỘC LẬP với sxtwl và lunar-python. Công thức: T = 1
+    + mod(JD - 1, 10), B = 1 + mod(JD + 1, 12), mốc neo JD 2458511 (27 tháng 1 năm 2019) là ngày Giáp Tý.
 
-  - source_id: SRC-BANG-DOI-SAU
-    independence_group: MODERN_PRACTITIONER_LITERATURE
-    title: "Bảng Tàng Can lưu hành trong giới hành nghề đời sau"
-    author: null
-    dynasty_or_year: "không xác định, phổ biến từ thế kỷ 20"
-    edition: null
-    language: zh
-    source_type: ARTICLE
-    url_or_file_reference: "nhiều bản trên mạng, nội dung bảng trùng nhau"
-    primary_or_secondary: SECONDARY
-    edition_certainty: TRANSCRIPTION_ONLY
-    provenance_note: >
-      Khẩu quyết đời sau: 子中單癸水，丑藏己癸辛。寅中甲丙戊，卯中乙木藏。
-      辰藏戊乙癸，巳藏丙戊庚。午中丁己土，未中己丁乙。申裡庚壬戊，
-      酉中獨辛金。戌裡戊辛丁，亥中壬甲藏。
-      Nhiều bản khác nhau nhưng CÙNG MỘT DÒNG TRUYỀN, nên chỉ tính là
-      MỘT bằng chứng, không phải nhiều.
-    status: ACTIVE
-    notes: >
-      TẬP CAN trùng khớp hoàn toàn với Uyên Hải Tử Bình ở cả 12 Chi.
-      THỨ TỰ khác ở 5 Chi. Dùng để đối chiếu, không dùng làm nguồn chính.
+    '
+  status: ACTIVE
+  notes: Đã kiểm 20000 ngày ngẫu nhiên trải 1200 năm, không lệch ngày nào.
+- source_id: SRC-BANG-DOI-SAU
+  independence_group: MODERN_PRACTITIONER_LITERATURE
+  title: Bảng Tàng Can lưu hành trong giới hành nghề đời sau
+  author: null
+  dynasty_or_year: không xác định, phổ biến từ thế kỷ 20
+  edition: null
+  language: zh
+  source_type: ARTICLE
+  url_or_file_reference: nhiều bản trên mạng, nội dung bảng trùng nhau
+  primary_or_secondary: SECONDARY
+  edition_certainty: TRANSCRIPTION_ONLY
+  provenance_note: 'Khẩu quyết đời sau: 子中單癸水，丑藏己癸辛。寅中甲丙戊，卯中乙木藏。 辰藏戊乙癸，巳藏丙戊庚。午中丁己土，未中己丁乙。申裡庚壬戊， 酉中獨辛金。戌裡戊辛丁，亥中壬甲藏。 Nhiều bản
+    khác nhau nhưng CÙNG MỘT DÒNG TRUYỀN, nên chỉ tính là MỘT bằng chứng, không phải nhiều.
 
-  # --- Chỗ trống thay cho nguồn chưa có ------------------------------
-  - source_id: SRC-CHUA-CO-NGUON
-    independence_group: NONE
-    title: "CHƯA CÓ NGUỒN — quy ước đang dùng tạm để hệ thống chạy được"
-    author: null
-    dynasty_or_year: null
-    edition: null
-    language: vi
-    source_type: OTHER
-    url_or_file_reference: null
-    primary_or_secondary: SECONDARY
-    edition_certainty: NOT_APPLICABLE
-    status: PENDING
-    notes: >
-      Bản ghi này CỐ Ý không phải một cuốn sách. Nó đánh dấu những quy ước
-      đang chạy mà chưa truy được về nguồn cổ điển. Mọi quy tắc gắn với nó
-      không được đưa vào tính điểm chính thức.
+    '
+  status: ACTIVE
+  notes: 'TẬP CAN trùng khớp hoàn toàn với Uyên Hải Tử Bình ở cả 12 Chi. THỨ TỰ khác ở 5 Chi. Dùng để đối chiếu, không dùng
+    làm nguồn chính.
 
-  - source_id: SRC-DOI-CHIEU-HD
-    independence_group: MODERN_CALENDAR_IMPLEMENTATION
-    title: "Đối chiếu bằng hai cài đặt hiện đại (sxtwl và lunar-python)"
-    author: null
-    dynasty_or_year: "2017 tới nay"
-    edition: null
-    language: zh
-    source_type: DATASET
-    url_or_file_reference: "https://pypi.org/project/sxtwl/ ; https://pypi.org/project/lunar-python/"
-    primary_or_secondary: SECONDARY
-    edition_certainty: NOT_APPLICABLE
-    status: ACTIVE
-    notes: >
-      CHỈ dùng để đối chiếu, KHÔNG được dùng làm nguồn chính.
-      Hai thư viện này cùng xuất phát từ một truyền thống nên sự trùng khớp
-      của chúng không phải hai bằng chứng độc lập.
-      Đối chiếu thực tế: 8 trên 8 thời điểm khớp hoàn toàn với Engine.
+    '
+- source_id: SRC-CHUA-CO-NGUON
+  independence_group: NONE
+  title: CHƯA CÓ NGUỒN — quy ước đang dùng tạm để hệ thống chạy được
+  author: null
+  dynasty_or_year: null
+  edition: null
+  language: vi
+  source_type: OTHER
+  url_or_file_reference: null
+  primary_or_secondary: SECONDARY
+  edition_certainty: NOT_APPLICABLE
+  status: PENDING
+  notes: 'Bản ghi này CỐ Ý không phải một cuốn sách. Nó đánh dấu những quy ước đang chạy mà chưa truy được về nguồn cổ điển.
+    Mọi quy tắc gắn với nó không được đưa vào tính điểm chính thức.
 
-# --- Đoạn nguyên văn cổ thư -----------------------------------------
+    '
+- source_id: SRC-DOI-CHIEU-HD
+  independence_group: MODERN_CALENDAR_IMPLEMENTATION
+  title: Đối chiếu bằng hai cài đặt hiện đại (sxtwl và lunar-python)
+  author: null
+  dynasty_or_year: 2017 tới nay
+  edition: null
+  language: zh
+  source_type: DATASET
+  url_or_file_reference: https://pypi.org/project/sxtwl/ ; https://pypi.org/project/lunar-python/
+  primary_or_secondary: SECONDARY
+  edition_certainty: NOT_APPLICABLE
+  status: ACTIVE
+  notes: 'CHỈ dùng để đối chiếu, KHÔNG được dùng làm nguồn chính. Hai thư viện này cùng xuất phát từ một truyền thống nên
+    sự trùng khớp của chúng không phải hai bằng chứng độc lập. Đối chiếu thực tế: 8 trên 8 thời điểm khớp hoàn toàn với Engine.
+
+    '
+- source_id: SRC-ZPZQ-NLC-SCAN
+  independence_group: CLASSICAL_TEXT
+  title: 子平真詮 — Tử Bình Chân Thuyên, bản scan thư viện (quyển chứa nguyên văn)
+  author: Thẩm Hiếu Chiêm (沈孝瞻)
+  dynasty_or_year: Thanh
+  edition: Bản scan NLC, tệp số hóa lưu trên Wikimedia Commons
+  language: zh-Hant
+  source_type: CLASSIC
+  url_or_file_reference: https://upload.wikimedia.org/wikipedia/commons/d/d5/NLC416-13jh002326-46443_%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE_%E7%AC%AC2%E5%8D%B7.pdf
+  primary_or_secondary: PRIMARY
+  edition_certainty: PINNED_SCAN
+  provenance_note: Đã mở trực tiếp bản PDF scan và đối chiếu các mục Luận thập can đắc thời bất vượng thất thời bất nhược,
+    Luận dụng thần và Luận hành vận với bản chép số hóa.
+  status: ACTIVE
+  notes: Nguồn chính để khóa phương pháp Tử Bình Chân Thuyên. Không dùng phần bình chú đời sau làm nguyên văn của Thẩm Hiếu
+    Chiêm.
+- source_id: SRC-ZPZQ-DONGLI
+  independence_group: CLASSICAL_TEXT
+  title: 子平真詮 — bản chép số hóa Đông Lý Thư Trai
+  author: Thẩm Hiếu Chiêm (沈孝瞻)
+  dynasty_or_year: Thanh
+  edition: Bản web chép lại, có ghi hiệu khảo chữ dị bản
+  language: zh-Hant
+  source_type: CLASSICAL_TEXT_TRANSCRIPTION
+  url_or_file_reference: https://www.donglishuzhai.net/chapter/3721.html
+  primary_or_secondary: SECONDARY
+  edition_certainty: TRANSCRIPTION_ONLY
+  provenance_note: Dùng để đối chiếu chữ với bản scan; không thay bản scan làm nguồn chính.
+  status: ACTIVE
+  notes: Đối chiếu nhanh các chương 6, 8 và 25.
 passages:
-  - passage_id: PSG-UHTB-NGUHO
-    source_id: SRC-UHTB-CHEP
-    chapter: "Ngũ Hổ Độn niên khởi nguyệt (五虎遁)"
-    original_text: |
-      甲己之年丙作首
-      乙庚之歲戊為頭
-      丙辛之歲尋庚上
-      丁壬壬位順行流
-      戊癸何方發
-      甲寅之上好追求
-    translation_vi: |
-      Năm Giáp hoặc Kỷ thì Bính làm đầu.
-      Năm Ất hoặc Canh thì Mậu làm đầu.
-      Năm Bính hoặc Tân thì tìm lên Canh.
-      Năm Đinh hoặc Nhâm thì từ ngôi Nhâm thuận dòng.
-      Năm Mậu hoặc Quý khởi từ đâu, hãy tìm ở Giáp Dần.
-    derivation_note: >
-      Sáu câu phú cho NĂM nhóm tương đương, không phải mười quy tắc rời.
-      Mỗi câu ấn định Can của tháng Dần. Các tháng sau đi thuận theo lục thập hoa giáp.
+- passage_id: PSG-UHTB-NGUHO
+  source_id: SRC-UHTB-CHEP
+  chapter: Ngũ Hổ Độn niên khởi nguyệt (五虎遁)
+  original_text: '甲己之年丙作首
 
-  - passage_id: PSG-UHTB-NGUTHU
-    source_id: SRC-UHTB-CHEP
-    chapter: "Ngũ Thử Độn nhật khởi thời (五鼠遁)"
-    original_text: |
-      甲己還加甲
-      乙庚丙作初
-      丙辛從戊起
-      丁壬庚子居
-      戊癸何方發
-      壬子是真途
-    translation_vi: |
-      Ngày Giáp hoặc Kỷ thì lại thêm Giáp.
-      Ngày Ất hoặc Canh thì Bính làm khởi đầu.
-      Ngày Bính hoặc Tân thì khởi từ Mậu.
-      Ngày Đinh hoặc Nhâm thì ở Canh Tý.
-      Ngày Mậu hoặc Quý khởi từ đâu, Nhâm Tý là đường thật.
-    derivation_note: >
-      Bài phú trả lời: KHI ĐÃ BIẾT Can ngày dùng để khởi giờ, thì Can giờ Tý
-      bắt đầu từ đâu. Nó KHÔNG trả lời câu hỏi chọn Can ngày nào ở khoảng
-      trước nửa đêm — đó là TIME-0007, một vấn đề khác.
+    乙庚之歲戊為頭
 
-  - passage_id: PSG-UHTB-DAIVAN
-    source_id: SRC-UHTB-CHEP
-    chapter: "Luận khởi Đại vận pháp (論起大運法)"
-    original_text: |
-      陽男陰女順行
-      陽女陰男逆行
-      三日為一歲
-    translation_vi: |
-      Dương nam, Âm nữ đi thuận.
-      Dương nữ, Âm nam đi nghịch.
-      Ba ngày ứng một tuổi.
-    derivation_note: >
-      Văn bản xác lập BA điều: chiều thuận nghịch, đếm tới Tiết
-      (thuận đếm tới Tiết kế, nghịch đếm về Tiết đã qua), và tỷ lệ ba ngày một tuổi.
-      Văn bản KHÔNG nói cách quy đổi phần dư giờ phút thành tháng ngày giao vận.
+    丙辛之歲尋庚上
 
-  - passage_id: PSG-UHTB-GIAOTIET
-    source_id: SRC-UHTB-CHEP
-    chapter: "Luận khởi Đại vận pháp — phần giao Tiết"
-    original_text: "交節"
-    translation_vi: "Giao Tiết."
-    derivation_note: >
-      Phần khởi Đại vận dùng trực tiếp các Tiết như Lập Xuân, Kinh Trập, và nêu
-      người sinh trước hoặc sau lúc giao Tiết có thể thuộc tháng trước hoặc tháng sau.
-      Đây là bằng chứng gián tiếp rằng tháng lịch pháp mở tại Tiết.
-      Nó KHÔNG phải một phát biểu trọn vẹn về thuật toán chia tháng.
+    丁壬壬位順行流
 
-  - passage_id: PSG-XUANTHU-KYTI
-    source_id: SRC-XUANTHU-NHATTHUC
-    chapter: "Xuân Thu, Lỗ Ẩn Công năm thứ ba, tháng hai"
-    original_text: "三年春，王二月己巳，日有食之"
-    translation_vi: "Năm thứ ba, mùa xuân, tháng hai nhà Chu, ngày Kỷ Tị, mặt trời bị ăn."
-    derivation_note: >
-      Ghi chép này gắn một CAN CHI NGÀY với một HIỆN TƯỢNG THIÊN VĂN.
-      Nhờ đó nó neo được chu kỳ 60 vào trục thời gian tuyệt đối, việc mà
-      một mình tính tuần hoàn không làm được.
+    戊癸何方發
 
-  - passage_id: PSG-TMTH-DAIVAN
-    source_id: SRC-TMTH-CHEP
-    chapter: "Tam Mệnh Thông Hội, quyển hai, Luận Đại vận"
-    original_text: |
-      陽男陰女，大運以生日後未來節氣日時為數，順而行之。
-      陰男陽女，大運以生日前過去節氣日時為數，逆而行之。
-      總十年之運氣，凡三日有三十六時，乃見三百六十日，為一歲之數。
-      實歷過六十三日，折除過六十三時，折除計六百三十日，乃一歲奇九月之大運。
-    translation_vi: |
-      Dương nam Âm nữ, Đại vận đếm theo ngày giờ tới Tiết sắp đến sau ngày sinh, đi thuận.
-      Âm nam Dương nữ, đếm theo ngày giờ tới Tiết đã qua trước ngày sinh, đi nghịch.
-      Gộp vận mười năm, ba ngày có ba mươi sáu thời, thành ba trăm sáu mươi ngày là số của một tuổi.
-      Thực lịch quá sáu mươi ba ngày, chiết trừ quá sáu mươi ba thời, chiết trừ kế sáu trăm ba mươi ngày, ấy là Đại vận một tuổi lẻ chín tháng.
-    derivation_note: >
-      Đây là phần chi tiết mà Uyên Hải Tử Bình KHÔNG nói.
-      Giải ví dụ: 5 ngày 3 thời thần tới Lập Xuân.
-        3 ngày = 1 tuổi;  1 ngày = 4 tháng;  1 thời thần = 10 ngày.
-        5 ngày -> 1 tuổi dư 2 ngày -> 8 tháng; 3 thời -> 30 ngày -> 1 tháng.
-        Cộng lại: 1 tuổi 9 tháng. Khớp nguyên văn.
-      Kiểm con số 630: (5 + 3/12) chia 3 rồi nhân 360 = đúng 630 ngày.
-      => Cổ thư chiết trừ theo NĂM 360 NGÀY, không phải năm 365,2422 ngày.
+    甲寅之上好追求
 
-  - passage_id: PSG-UHTB-TANGCAN
-    source_id: SRC-UHTB-CHEP
-    chapter: "Hựu Địa Chi tàng độn ca (又地支藏遁歌)"
-    original_text: |
-      子宮癸水在其中，丑癸辛金己土同；
-      寅宮甲木兼丙戊，卯宮乙木獨相逢。
-      辰藏乙戊三分癸，巳中庚金丙戊叢；
-      午宮丁火并己土，未宮乙己丁共宗。
-      申位庚金壬水戊，酉宮辛金獨豐隆；
-      戌宮辛金及丁戊，亥藏壬甲是真蹤。
-    translation_vi: |
-      Cung Tý có Quý thủy ở trong, Sửu có Quý, Tân kim, Kỷ thổ cùng;
-      Cung Dần có Giáp mộc kèm Bính Mậu, cung Mão chỉ gặp riêng Ất mộc.
-      Thìn tàng Ất Mậu, ba phần Quý; trong Tị có Canh kim, Bính Mậu tụ;
-      Cung Ngọ có Đinh hỏa cùng Kỷ thổ, cung Mùi có Ất Kỷ Đinh chung gốc.
-      Ngôi Thân có Canh kim Nhâm thủy Mậu, cung Dậu chỉ riêng Tân kim đầy đặn;
-      Cung Tuất có Tân kim và Đinh Mậu, Hợi tàng Nhâm Giáp là dấu thật.
-    derivation_note: >
-      Bài phú cho TẬP CAN của 12 Chi và MỘT THỨ TỰ liệt kê.
-      Nó KHÔNG nói Can nào mạnh yếu, không nói tỷ lệ, không gọi tên bản khí
-      trung khí dư khí. Mọi điều đó nằm ngoài văn bản này.
-      Riêng câu Thìn có chữ "三分". Chưa rõ nghĩa, không quy thành tỷ lệ.
+    '
+  translation_vi: 'Năm Giáp hoặc Kỷ thì Bính làm đầu.
 
-  - passage_id: PSG-TMTH-NHANNGUYEN
-    source_id: SRC-TMTH-CHEP
-    chapter: "Tam Mệnh Thông Hội, quyển hai, Luận Nhân Nguyên Ty Sự (論人元司事)"
-    original_text: "故支中所藏者主命，謂之人元，名為司事之神，以命術言之為月令。"
-    translation_vi: >
-      Cho nên cái tàng trong Chi thì chủ về mệnh, gọi là Nhân Nguyên,
-      đặt tên là thần ty sự, xét theo mệnh thuật thì là nguyệt lệnh.
-    derivation_note: >
-      PHẠM VI: đoạn này nói về NHÂN NGUYÊN TY SỰ, tức Can nào ĐƯƠNG QUYỀN
-      trong từng đoạn nguyệt lệnh. Đó là SEASONAL_GOVERNING_QI.
-      Nó KHÔNG phải phát biểu về TẬP Tàng Can tĩnh (STATIC_HIDDEN_STEM_SET).
-      Hai khái niệm có liên quan nhưng KHÔNG được đồng nhất.
-      Vì vậy đoạn này KHÔNG được dùng làm nguồn xác nhận BT-HIDDEN-*.
-      Nó dành cho nhóm BT-SEASON-POWER, chưa làm.
+    Năm Ất hoặc Canh thì Mậu làm đầu.
 
-      Nội dung đáng chú ý: chính sách này, ở phần sau, mượn lời Túy Tỉnh Tử
-      để nghi ngờ thuyết nhân nguyên ty sự. Người biên chú bản in hiện đại ghi
-      "cổ đại thuật sĩ đối thử thuyết pháp tịnh bất tương đồng" và
-      "tàng can chi thâm thiển thượng vô nhất định chi tiêu chuẩn".
-      => Ngay ở nhóm BT-SEASON-POWER sau này, nhiều khả năng phải để CONFLICTED.
+    Năm Bính hoặc Tân thì tìm lên Canh.
 
-  - passage_id: PSG-UHTB-THAPTHAN
-    source_id: SRC-UHTB-CHEP
-    chapter: "Uyên Hải Tử Bình, quyển một — đoạn năm loại quan hệ"
-    original_text: |
-      一曰官，分之陰陽，曰官、曰殺，甲乙見庚辛也。
-      甲見庚為殺，陽見陽也。見辛為官，陽見陰也。乙木庚為官，見辛為殺。
-      二曰財，分之陰陽，曰正財、偏財，甲乙見戊己是也。陽見陰為正財，陰見陰為偏財。
-      三曰生氣之陰陽，曰印綬、曰倒食，甲乙見壬癸是也。
-      甲見癸，乙見壬為印綬；甲見壬，乙見癸為偏印。
-      四曰竊氣之陰陽，曰食神、曰傷官，甲乙見丙丁是也。
-      甲見丙為食神、見丁為傷官，乙見丁為食神、見丙為傷官。
-      五曰同類之陰陽，曰劫財、曰羊刃，甲乙見甲乙是也。陽見陽為羊刃，陰見陽為劫財。
-    translation_vi: |
-      Một là Quan, chia theo âm dương thành Quan và Sát, là Giáp Ất gặp Canh Tân.
-      Giáp gặp Canh là Sát, dương gặp dương. Gặp Tân là Quan, dương gặp âm.
-      Ất mộc gặp Canh là Quan, gặp Tân là Sát.
-      Hai là Tài, chia thành Chính Tài và Thiên Tài, là Giáp Ất gặp Mậu Kỷ.
-      Dương gặp âm là Chính Tài, âm gặp âm là Thiên Tài.
-      Ba là khí sinh, chia thành Ấn Thụ và Đảo Thực, là Giáp Ất gặp Nhâm Quý.
-      Giáp gặp Quý, Ất gặp Nhâm là Ấn Thụ; Giáp gặp Nhâm, Ất gặp Quý là Thiên Ấn.
-      Bốn là khí tiết ra, chia thành Thực Thần và Thương Quan, là Giáp Ất gặp Bính Đinh.
-      Giáp gặp Bính là Thực Thần, gặp Đinh là Thương Quan;
-      Ất gặp Đinh là Thực Thần, gặp Bính là Thương Quan.
-      Năm là đồng loại, chia thành Kiếp Tài và Dương Nhận, là Giáp Ất gặp Giáp Ất.
-      Dương gặp dương là Dương Nhận, âm gặp dương là Kiếp Tài.
-    derivation_note: >
-      Đoạn này định nghĩa NĂM CHIỀU QUAN HỆ và quy ước chia theo âm dương.
-      Nó cho đủ căn cứ cho tám trên mười ô, qua các ví dụ nói thẳng.
-      RIÊNG cặp đồng loại, sách gọi là "Kiếp Tài và Dương Nhận", KHÔNG phải
-      "Tỷ Kiên và Kiếp Tài" như quy ước hiện đại. Xem BT-TG-CONFLICT-001.
+    Năm Đinh hoặc Nhâm thì từ ngôi Nhâm thuận dòng.
 
-# --- Quy tắc lịch pháp gắn vào kho quy tắc --------------------------
-# effect_class để EXPLANATORY vì đây là quy tắc lịch pháp, không chấm điểm.
-# Không cái nào được đặt VERIFIED nếu nguồn là SRC-CHUA-CO-NGUON.
+    Năm Mậu hoặc Quý khởi từ đâu, hãy tìm ở Giáp Dần.
+
+    '
+  derivation_note: 'Sáu câu phú cho NĂM nhóm tương đương, không phải mười quy tắc rời. Mỗi câu ấn định Can của tháng Dần.
+    Các tháng sau đi thuận theo lục thập hoa giáp.
+
+    '
+- passage_id: PSG-UHTB-NGUTHU
+  source_id: SRC-UHTB-CHEP
+  chapter: Ngũ Thử Độn nhật khởi thời (五鼠遁)
+  original_text: '甲己還加甲
+
+    乙庚丙作初
+
+    丙辛從戊起
+
+    丁壬庚子居
+
+    戊癸何方發
+
+    壬子是真途
+
+    '
+  translation_vi: 'Ngày Giáp hoặc Kỷ thì lại thêm Giáp.
+
+    Ngày Ất hoặc Canh thì Bính làm khởi đầu.
+
+    Ngày Bính hoặc Tân thì khởi từ Mậu.
+
+    Ngày Đinh hoặc Nhâm thì ở Canh Tý.
+
+    Ngày Mậu hoặc Quý khởi từ đâu, Nhâm Tý là đường thật.
+
+    '
+  derivation_note: 'Bài phú trả lời: KHI ĐÃ BIẾT Can ngày dùng để khởi giờ, thì Can giờ Tý bắt đầu từ đâu. Nó KHÔNG trả lời
+    câu hỏi chọn Can ngày nào ở khoảng trước nửa đêm — đó là TIME-0007, một vấn đề khác.
+
+    '
+- passage_id: PSG-UHTB-DAIVAN
+  source_id: SRC-UHTB-CHEP
+  chapter: Luận khởi Đại vận pháp (論起大運法)
+  original_text: '陽男陰女順行
+
+    陽女陰男逆行
+
+    三日為一歲
+
+    '
+  translation_vi: 'Dương nam, Âm nữ đi thuận.
+
+    Dương nữ, Âm nam đi nghịch.
+
+    Ba ngày ứng một tuổi.
+
+    '
+  derivation_note: 'Văn bản xác lập BA điều: chiều thuận nghịch, đếm tới Tiết (thuận đếm tới Tiết kế, nghịch đếm về Tiết đã
+    qua), và tỷ lệ ba ngày một tuổi. Văn bản KHÔNG nói cách quy đổi phần dư giờ phút thành tháng ngày giao vận.
+
+    '
+- passage_id: PSG-UHTB-GIAOTIET
+  source_id: SRC-UHTB-CHEP
+  chapter: Luận khởi Đại vận pháp — phần giao Tiết
+  original_text: 交節
+  translation_vi: Giao Tiết.
+  derivation_note: 'Phần khởi Đại vận dùng trực tiếp các Tiết như Lập Xuân, Kinh Trập, và nêu người sinh trước hoặc sau lúc
+    giao Tiết có thể thuộc tháng trước hoặc tháng sau. Đây là bằng chứng gián tiếp rằng tháng lịch pháp mở tại Tiết. Nó KHÔNG
+    phải một phát biểu trọn vẹn về thuật toán chia tháng.
+
+    '
+- passage_id: PSG-XUANTHU-KYTI
+  source_id: SRC-XUANTHU-NHATTHUC
+  chapter: Xuân Thu, Lỗ Ẩn Công năm thứ ba, tháng hai
+  original_text: 三年春，王二月己巳，日有食之
+  translation_vi: Năm thứ ba, mùa xuân, tháng hai nhà Chu, ngày Kỷ Tị, mặt trời bị ăn.
+  derivation_note: 'Ghi chép này gắn một CAN CHI NGÀY với một HIỆN TƯỢNG THIÊN VĂN. Nhờ đó nó neo được chu kỳ 60 vào trục
+    thời gian tuyệt đối, việc mà một mình tính tuần hoàn không làm được.
+
+    '
+- passage_id: PSG-TMTH-DAIVAN
+  source_id: SRC-TMTH-CHEP
+  chapter: Tam Mệnh Thông Hội, quyển hai, Luận Đại vận
+  original_text: '陽男陰女，大運以生日後未來節氣日時為數，順而行之。
+
+    陰男陽女，大運以生日前過去節氣日時為數，逆而行之。
+
+    總十年之運氣，凡三日有三十六時，乃見三百六十日，為一歲之數。
+
+    實歷過六十三日，折除過六十三時，折除計六百三十日，乃一歲奇九月之大運。
+
+    '
+  translation_vi: 'Dương nam Âm nữ, Đại vận đếm theo ngày giờ tới Tiết sắp đến sau ngày sinh, đi thuận.
+
+    Âm nam Dương nữ, đếm theo ngày giờ tới Tiết đã qua trước ngày sinh, đi nghịch.
+
+    Gộp vận mười năm, ba ngày có ba mươi sáu thời, thành ba trăm sáu mươi ngày là số của một tuổi.
+
+    Thực lịch quá sáu mươi ba ngày, chiết trừ quá sáu mươi ba thời, chiết trừ kế sáu trăm ba mươi ngày, ấy là Đại vận một
+    tuổi lẻ chín tháng.
+
+    '
+  derivation_note: "Đây là phần chi tiết mà Uyên Hải Tử Bình KHÔNG nói. Giải ví dụ: 5 ngày 3 thời thần tới Lập Xuân.\n  3\
+    \ ngày = 1 tuổi;  1 ngày = 4 tháng;  1 thời thần = 10 ngày.\n  5 ngày -> 1 tuổi dư 2 ngày -> 8 tháng; 3 thời -> 30 ngày\
+    \ -> 1 tháng.\n  Cộng lại: 1 tuổi 9 tháng. Khớp nguyên văn.\nKiểm con số 630: (5 + 3/12) chia 3 rồi nhân 360 = đúng 630\
+    \ ngày. => Cổ thư chiết trừ theo NĂM 360 NGÀY, không phải năm 365,2422 ngày.\n"
+- passage_id: PSG-UHTB-TANGCAN
+  source_id: SRC-UHTB-CHEP
+  chapter: Hựu Địa Chi tàng độn ca (又地支藏遁歌)
+  original_text: '子宮癸水在其中，丑癸辛金己土同；
+
+    寅宮甲木兼丙戊，卯宮乙木獨相逢。
+
+    辰藏乙戊三分癸，巳中庚金丙戊叢；
+
+    午宮丁火并己土，未宮乙己丁共宗。
+
+    申位庚金壬水戊，酉宮辛金獨豐隆；
+
+    戌宮辛金及丁戊，亥藏壬甲是真蹤。
+
+    '
+  translation_vi: 'Cung Tý có Quý thủy ở trong, Sửu có Quý, Tân kim, Kỷ thổ cùng;
+
+    Cung Dần có Giáp mộc kèm Bính Mậu, cung Mão chỉ gặp riêng Ất mộc.
+
+    Thìn tàng Ất Mậu, ba phần Quý; trong Tị có Canh kim, Bính Mậu tụ;
+
+    Cung Ngọ có Đinh hỏa cùng Kỷ thổ, cung Mùi có Ất Kỷ Đinh chung gốc.
+
+    Ngôi Thân có Canh kim Nhâm thủy Mậu, cung Dậu chỉ riêng Tân kim đầy đặn;
+
+    Cung Tuất có Tân kim và Đinh Mậu, Hợi tàng Nhâm Giáp là dấu thật.
+
+    '
+  derivation_note: 'Bài phú cho TẬP CAN của 12 Chi và MỘT THỨ TỰ liệt kê. Nó KHÔNG nói Can nào mạnh yếu, không nói tỷ lệ,
+    không gọi tên bản khí trung khí dư khí. Mọi điều đó nằm ngoài văn bản này. Riêng câu Thìn có chữ "三分". Chưa rõ nghĩa,
+    không quy thành tỷ lệ.
+
+    '
+- passage_id: PSG-TMTH-NHANNGUYEN
+  source_id: SRC-TMTH-CHEP
+  chapter: Tam Mệnh Thông Hội, quyển hai, Luận Nhân Nguyên Ty Sự (論人元司事)
+  original_text: 故支中所藏者主命，謂之人元，名為司事之神，以命術言之為月令。
+  translation_vi: 'Cho nên cái tàng trong Chi thì chủ về mệnh, gọi là Nhân Nguyên, đặt tên là thần ty sự, xét theo mệnh thuật
+    thì là nguyệt lệnh.
+
+    '
+  derivation_note: 'PHẠM VI: đoạn này nói về NHÂN NGUYÊN TY SỰ, tức Can nào ĐƯƠNG QUYỀN trong từng đoạn nguyệt lệnh. Đó là
+    SEASONAL_GOVERNING_QI. Nó KHÔNG phải phát biểu về TẬP Tàng Can tĩnh (STATIC_HIDDEN_STEM_SET). Hai khái niệm có liên quan
+    nhưng KHÔNG được đồng nhất. Vì vậy đoạn này KHÔNG được dùng làm nguồn xác nhận BT-HIDDEN-*. Nó dành cho nhóm BT-SEASON-POWER,
+    chưa làm.
+
+    Nội dung đáng chú ý: chính sách này, ở phần sau, mượn lời Túy Tỉnh Tử để nghi ngờ thuyết nhân nguyên ty sự. Người biên
+    chú bản in hiện đại ghi "cổ đại thuật sĩ đối thử thuyết pháp tịnh bất tương đồng" và "tàng can chi thâm thiển thượng vô
+    nhất định chi tiêu chuẩn". => Ngay ở nhóm BT-SEASON-POWER sau này, nhiều khả năng phải để CONFLICTED.
+
+    '
+- passage_id: PSG-UHTB-THAPTHAN
+  source_id: SRC-UHTB-CHEP
+  chapter: Uyên Hải Tử Bình, quyển một — đoạn năm loại quan hệ
+  original_text: '一曰官，分之陰陽，曰官、曰殺，甲乙見庚辛也。
+
+    甲見庚為殺，陽見陽也。見辛為官，陽見陰也。乙木庚為官，見辛為殺。
+
+    二曰財，分之陰陽，曰正財、偏財，甲乙見戊己是也。陽見陰為正財，陰見陰為偏財。
+
+    三曰生氣之陰陽，曰印綬、曰倒食，甲乙見壬癸是也。
+
+    甲見癸，乙見壬為印綬；甲見壬，乙見癸為偏印。
+
+    四曰竊氣之陰陽，曰食神、曰傷官，甲乙見丙丁是也。
+
+    甲見丙為食神、見丁為傷官，乙見丁為食神、見丙為傷官。
+
+    五曰同類之陰陽，曰劫財、曰羊刃，甲乙見甲乙是也。陽見陽為羊刃，陰見陽為劫財。
+
+    '
+  translation_vi: 'Một là Quan, chia theo âm dương thành Quan và Sát, là Giáp Ất gặp Canh Tân.
+
+    Giáp gặp Canh là Sát, dương gặp dương. Gặp Tân là Quan, dương gặp âm.
+
+    Ất mộc gặp Canh là Quan, gặp Tân là Sát.
+
+    Hai là Tài, chia thành Chính Tài và Thiên Tài, là Giáp Ất gặp Mậu Kỷ.
+
+    Dương gặp âm là Chính Tài, âm gặp âm là Thiên Tài.
+
+    Ba là khí sinh, chia thành Ấn Thụ và Đảo Thực, là Giáp Ất gặp Nhâm Quý.
+
+    Giáp gặp Quý, Ất gặp Nhâm là Ấn Thụ; Giáp gặp Nhâm, Ất gặp Quý là Thiên Ấn.
+
+    Bốn là khí tiết ra, chia thành Thực Thần và Thương Quan, là Giáp Ất gặp Bính Đinh.
+
+    Giáp gặp Bính là Thực Thần, gặp Đinh là Thương Quan;
+
+    Ất gặp Đinh là Thực Thần, gặp Bính là Thương Quan.
+
+    Năm là đồng loại, chia thành Kiếp Tài và Dương Nhận, là Giáp Ất gặp Giáp Ất.
+
+    Dương gặp dương là Dương Nhận, âm gặp dương là Kiếp Tài.
+
+    '
+  derivation_note: 'Đoạn này định nghĩa NĂM CHIỀU QUAN HỆ và quy ước chia theo âm dương. Nó cho đủ căn cứ cho tám trên mười
+    ô, qua các ví dụ nói thẳng. RIÊNG cặp đồng loại, sách gọi là "Kiếp Tài và Dương Nhận", KHÔNG phải "Tỷ Kiên và Kiếp Tài"
+    như quy ước hiện đại. Xem BT-TG-CONFLICT-001.
+
+    '
+- passage_id: PSG-ZPZQ-STRENGTH
+  source_id: SRC-ZPZQ-NLC-SCAN
+  chapter: 六、論十干得時不旺失時不弱
+  original_text: 況八字雖以月令爲重，而旺相休囚，年月日時，亦有損益之權。
+  translation_vi: Bát Tự tuy lấy nguyệt lệnh làm trọng, nhưng trạng thái vượng–tướng–hưu–tù còn chịu sự tăng giảm của năm,
+    tháng, ngày và giờ.
+  derivation_note: 'Khóa nguyên tắc: không được đồng nhất “đắc lệnh = chắc chắn thân vượng” hoặc “thất lệnh = chắc chắn thân
+    nhược”. Đánh giá mạnh yếu phải nhìn toàn Tứ Trụ và căn khí, nhưng đây chưa phải công thức chấm trọng số.'
+- passage_id: PSG-ZPZQ-USE-MONTH
+  source_id: SRC-ZPZQ-NLC-SCAN
+  chapter: 八、論用神
+  original_text: 八字用神，專求月令，以日干配月令地支，而生尅不同，格局分焉。
+  translation_vi: Dụng thần của Bát Tự chuyên tìm ở nguyệt lệnh; lấy Nhật can phối với Địa chi tháng, theo sinh khắc khác
+    nhau mà phân thành cách cục.
+  derivation_note: Trong Tử Bình Chân Thuyên, “Dụng thần” trước hết là dụng thần/cách cục từ nguyệt lệnh, không được tự động
+    đồng nhất với “ngũ hành cân bằng thân mạnh-yếu” của các hệ đời sau.
+- passage_id: PSG-ZPZQ-TRANSIT
+  source_id: SRC-ZPZQ-NLC-SCAN
+  chapter: 二十五、論行運
+  original_text: 論運與看命，無二法也。看命以四柱干支，配月令之喜忌；而取運則又以運之干支，配八字之喜忌。
+  translation_vi: 'Luận vận và xem mệnh không phải hai phép khác nhau: xem mệnh lấy Can Chi Tứ Trụ phối với hỷ kỵ của nguyệt
+    lệnh; xét vận lại lấy Can Chi của vận phối với hỷ kỵ của Bát Tự.'
+  derivation_note: 'Khóa đường hợp lưu: phải xác lập cấu trúc/hỷ kỵ từ mệnh gốc trước, rồi mới cho Đại vận/Năm/Tháng/Ngày/Giờ
+    tác động vào. Không lấy Thập Thần hay một quan hệ Chi của thời điểm thay cho hỷ kỵ mệnh gốc.'
 rules:
-  - rule_id: TIME-0001
-    namespace: TIME
-    rule_group: TIME-TIETKHI
-    name_vi: "Thời điểm 24 tiết khí theo kinh độ mặt trời biểu kiến"
-    name_original: "二十四節氣"
-    status: VERIFIED
-    confidence: HIGH
-    is_active: true
-    logic: { kieu: THIEN_VAN, dieu_kien: "kinh độ mặt trời biểu kiến đạt bội số của 15 độ" }
-    notes: "Đối chiếu ba cài đặt độc lập, lệch dưới 4 giây."
-    sources:
-      - { source_id: SRC-VSOP87-AE, source_level: PRIMARY, logic_note: "Tìm thời điểm kinh độ đạt giá trị đích." }
-      - { source_id: SRC-MEEUS, source_level: SUPPORTING, logic_note: "Nền dự phòng." }
+- rule_id: TIME-0001
+  namespace: TIME
+  rule_group: TIME-TIETKHI
+  name_vi: Thời điểm 24 tiết khí theo kinh độ mặt trời biểu kiến
+  name_original: 二十四節氣
+  status: VERIFIED
+  confidence: HIGH
+  is_active: true
+  logic:
+    kieu: THIEN_VAN
+    dieu_kien: kinh độ mặt trời biểu kiến đạt bội số của 15 độ
+  notes: Đối chiếu ba cài đặt độc lập, lệch dưới 4 giây.
+  sources:
+  - source_id: SRC-VSOP87-AE
+    source_level: PRIMARY
+    logic_note: Tìm thời điểm kinh độ đạt giá trị đích.
+  - source_id: SRC-MEEUS
+    source_level: SUPPORTING
+    logic_note: Nền dự phòng.
+- rule_id: TIME-0002
+  namespace: TIME
+  rule_group: TIME-THANG
+  name_vi: Tháng lịch pháp mở tại Tiết, không mở tại Khí
+  name_original: 節氣分月
+  status: PROVISIONAL
+  confidence: HIGH
+  is_active: false
+  logic:
+    kieu: RANH_GIOI
+    dieu_kien: tháng đổi tại 12 Tiết
+  passages:
+  - PSG-UHTB-GIAOTIET
+  notes: 'Nâng độ tin cậy lên HIGH vì phần khởi Đại vận của Uyên Hải Tử Bình dùng trực tiếp các Tiết và nêu chuyện sinh trước
+    hay sau lúc giao Tiết. GIỮ PROVISIONAL vì đó là bằng chứng gián tiếp, chưa phải phát biểu trọn vẹn về thuật toán chia
+    tháng. Không ép lên VERIFIED.
 
-  - rule_id: TIME-0002
-    namespace: TIME
-    rule_group: TIME-THANG
-    name_vi: "Tháng lịch pháp mở tại Tiết, không mở tại Khí"
-    name_original: "節氣分月"
-    status: PROVISIONAL
-    confidence: HIGH
-    is_active: false
-    logic: { kieu: RANH_GIOI, dieu_kien: "tháng đổi tại 12 Tiết" }
-    passages: [PSG-UHTB-GIAOTIET]
-    notes: >
-      Nâng độ tin cậy lên HIGH vì phần khởi Đại vận của Uyên Hải Tử Bình dùng
-      trực tiếp các Tiết và nêu chuyện sinh trước hay sau lúc giao Tiết.
-      GIỮ PROVISIONAL vì đó là bằng chứng gián tiếp, chưa phải phát biểu trọn vẹn
-      về thuật toán chia tháng. Không ép lên VERIFIED.
-    sources:
-      - { source_id: SRC-UHTB-CHEP, source_level: PRIMARY, source_location: "Luận khởi Đại vận pháp", logic_note: "Bằng chứng gián tiếp qua việc dùng giao Tiết." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Hai cài đặt hiện đại cùng dùng quy ước này." }
+    '
+  sources:
+  - source_id: SRC-UHTB-CHEP
+    source_level: PRIMARY
+    source_location: Luận khởi Đại vận pháp
+    logic_note: Bằng chứng gián tiếp qua việc dùng giao Tiết.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Hai cài đặt hiện đại cùng dùng quy ước này.
+- rule_id: TIME-0003
+  namespace: TIME
+  rule_group: TIME-CANTHANG
+  name_vi: Ngũ Hổ Độn — năm nhóm quy tắc khởi Can tháng Dần theo Can năm
+  name_original: 五虎遁
+  status: VERIFIED
+  confidence: MEDIUM
+  is_active: true
+  logic:
+    kieu: BANG_TRA_THEO_NHOM
+    so_nhom: 5
+    so_khoa_tra_cuu: 10
+    ghi_chu: Tầng tri thức có 5 nhóm. 10 khóa do mã tự dựng, không liệt kê tay.
+    nguon_bang: cau_hinh/can_chi/quy_uoc_can_chi.yaml
+  passages:
+  - PSG-UHTB-NGUHO
+  notes: 'VERIFIED về mặt có nguồn cổ nêu đủ năm nhóm. Độ tin cậy để MEDIUM chứ không HIGH vì bản chép chưa khóa được bản
+    in, xem edition_certainty của nguồn.
 
-  - rule_id: TIME-0003
-    namespace: TIME
-    rule_group: TIME-CANTHANG
-    name_vi: "Ngũ Hổ Độn — năm nhóm quy tắc khởi Can tháng Dần theo Can năm"
-    name_original: "五虎遁"
-    status: VERIFIED
-    confidence: MEDIUM
-    is_active: true
-    logic:
-      kieu: BANG_TRA_THEO_NHOM
-      so_nhom: 5
-      so_khoa_tra_cuu: 10
-      ghi_chu: "Tầng tri thức có 5 nhóm. 10 khóa do mã tự dựng, không liệt kê tay."
-      nguon_bang: "cau_hinh/can_chi/quy_uoc_can_chi.yaml"
-    passages: [PSG-UHTB-NGUHO]
-    notes: >
-      VERIFIED về mặt có nguồn cổ nêu đủ năm nhóm. Độ tin cậy để MEDIUM chứ không
-      HIGH vì bản chép chưa khóa được bản in, xem edition_certainty của nguồn.
-    sources:
-      - { source_id: SRC-UHTB-CHEP, source_level: PRIMARY, source_location: "Ngũ Hổ Độn niên khởi nguyệt", logic_note: "Sáu câu phú cho năm nhóm. Mỗi nhóm ấn định Can tháng Dần." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Khớp." }
+    '
+  sources:
+  - source_id: SRC-UHTB-CHEP
+    source_level: PRIMARY
+    source_location: Ngũ Hổ Độn niên khởi nguyệt
+    logic_note: Sáu câu phú cho năm nhóm. Mỗi nhóm ấn định Can tháng Dần.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Khớp.
+- rule_id: TIME-0004
+  namespace: TIME
+  rule_group: TIME-CANGIO
+  name_vi: Ngũ Thử Độn — năm nhóm quy tắc khởi Can giờ Tý theo Can ngày
+  name_original: 五鼠遁
+  status: VERIFIED
+  confidence: MEDIUM
+  is_active: true
+  logic:
+    kieu: BANG_TRA_THEO_NHOM
+    so_nhom: 5
+    so_khoa_tra_cuu: 10
+    pham_vi: 'Chỉ trả lời: đã biết Can ngày thì Can giờ Tý khởi từ đâu.'
+    khong_thuoc_pham_vi: Việc chọn Can ngày nào ở khoảng trước nửa đêm thuộc TIME-0007.
+    nguon_bang: cau_hinh/can_chi/quy_uoc_can_chi.yaml
+  passages:
+  - PSG-UHTB-NGUTHU
+  notes: 'Không trộn với TIME-0007. Đây là hai câu hỏi khác nhau. Độ tin cậy MEDIUM vì bản chép chưa khóa được bản in.
 
-  - rule_id: TIME-0004
-    namespace: TIME
-    rule_group: TIME-CANGIO
-    name_vi: "Ngũ Thử Độn — năm nhóm quy tắc khởi Can giờ Tý theo Can ngày"
-    name_original: "五鼠遁"
-    status: VERIFIED
-    confidence: MEDIUM
-    is_active: true
-    logic:
-      kieu: BANG_TRA_THEO_NHOM
-      so_nhom: 5
-      so_khoa_tra_cuu: 10
-      pham_vi: "Chỉ trả lời: đã biết Can ngày thì Can giờ Tý khởi từ đâu."
-      khong_thuoc_pham_vi: "Việc chọn Can ngày nào ở khoảng trước nửa đêm thuộc TIME-0007."
-      nguon_bang: "cau_hinh/can_chi/quy_uoc_can_chi.yaml"
-    passages: [PSG-UHTB-NGUTHU]
-    notes: >
-      Không trộn với TIME-0007. Đây là hai câu hỏi khác nhau.
-      Độ tin cậy MEDIUM vì bản chép chưa khóa được bản in.
-    sources:
-      - { source_id: SRC-UHTB-CHEP, source_level: PRIMARY, source_location: "Ngũ Thử Độn nhật khởi thời", logic_note: "Sáu câu phú cho năm nhóm." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Khớp." }
+    '
+  sources:
+  - source_id: SRC-UHTB-CHEP
+    source_level: PRIMARY
+    source_location: Ngũ Thử Độn nhật khởi thời
+    logic_note: Sáu câu phú cho năm nhóm.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Khớp.
+- rule_id: TIME-0005A
+  namespace: TIME
+  rule_group: TIME-CHUKYNGAY
+  name_vi: Can Chi ngày tuần hoàn liên tục theo chu kỳ 60, không đứt quãng
+  name_original: 日干支六十循環
+  status: VERIFIED
+  confidence: HIGH
+  is_active: true
+  logic:
+    kieu: CHU_KY
+    do_dai: 60
+    dac_tinh: không đứt quãng, không phụ thuộc tháng hay năm
+  passages:
+  - PSG-XUANTHU-KYTI
+  notes: 'Tính liên tục được chứng minh bằng chính phép thử bắc cầu: chiếu chu kỳ 60 từ mốc năm 720 trước Công nguyên tới
+    nay, qua 2738 năm, khớp mọi ngày đã kiểm. Nếu chu kỳ từng đứt hay lệch dù chỉ một ngày, phép chiếu này đã sai. Đây là
+    bằng chứng cho TÍNH LIÊN TỤC, tách khỏi bằng chứng cho MỐC NEO.
 
-  - rule_id: TIME-0005A
-    namespace: TIME
-    rule_group: TIME-CHUKYNGAY
-    name_vi: "Can Chi ngày tuần hoàn liên tục theo chu kỳ 60, không đứt quãng"
-    name_original: "日干支六十循環"
-    status: VERIFIED
-    confidence: HIGH
-    is_active: true
-    logic: { kieu: CHU_KY, do_dai: 60, dac_tinh: "không đứt quãng, không phụ thuộc tháng hay năm" }
-    passages: [PSG-XUANTHU-KYTI]
-    notes: >
-      Tính liên tục được chứng minh bằng chính phép thử bắc cầu: chiếu chu kỳ 60
-      từ mốc năm 720 trước Công nguyên tới nay, qua 2738 năm, khớp mọi ngày đã kiểm.
-      Nếu chu kỳ từng đứt hay lệch dù chỉ một ngày, phép chiếu này đã sai.
-      Đây là bằng chứng cho TÍNH LIÊN TỤC, tách khỏi bằng chứng cho MỐC NEO.
-    sources:
-      - { source_id: SRC-XUANTHU-NHATTHUC, source_level: PRIMARY, source_location: "Lỗ Ẩn Công năm thứ ba", logic_note: "Điểm xuất phát của chuỗi ghi chép liên tục." }
-      - { source_id: SRC-YTLIU-LICHPHAP, source_level: SUPPORTING, logic_note: "Cài đặt học thuật độc lập, công thức đồng dư chu kỳ 60." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Hai cài đặt hiện đại đều tuần hoàn 60, không đứt." }
+    '
+  sources:
+  - source_id: SRC-XUANTHU-NHATTHUC
+    source_level: PRIMARY
+    source_location: Lỗ Ẩn Công năm thứ ba
+    logic_note: Điểm xuất phát của chuỗi ghi chép liên tục.
+  - source_id: SRC-YTLIU-LICHPHAP
+    source_level: SUPPORTING
+    logic_note: Cài đặt học thuật độc lập, công thức đồng dư chu kỳ 60.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Hai cài đặt hiện đại đều tuần hoàn 60, không đứt.
+- rule_id: TIME-0005B
+  namespace: TIME
+  rule_group: TIME-CHUKYNGAY
+  name_vi: 'Mốc neo tuyệt đối: ngày Kỷ Tị có nhật thực, năm 720 trước Công nguyên'
+  name_original: 日干支定盤
+  status: VERIFIED
+  confidence: MEDIUM
+  is_active: true
+  logic:
+    kieu: MOC_NEO
+    jdn: 1458496
+    can_chi: KY-TI
+    mo_ta: 22 tháng 2 năm 720 trước Công nguyên, lịch Julius
+    nguon_bang: cau_hinh/can_chi/quy_uoc_can_chi.yaml
+  passages:
+  - PSG-XUANTHU-KYTI
+  notes: 'Ba đường độc lập gặp nhau: sách chép ngày Kỷ Tị có nhật thực; thiên văn xác nhận nhật thực thấy được ở nước Lỗ sáng
+    ngày đó; và chu kỳ 60 chiếu từ mốc này khớp sáu mốc đối chiếu trải 2738 năm. ĐỘ TIN CẬY ĐỂ MEDIUM chứ không HIGH, vì việc
+    quy câu chép về đúng ngày 22 tháng 2 năm 720 trước Công nguyên là KẾT QUẢ NGHIÊN CỨU HIỆN ĐẠI, không phải điều sách viết
+    ra. Nếu giới nghiên cứu đổi cách định niên, mốc này phải xét lại.
 
-  - rule_id: TIME-0005B
-    namespace: TIME
-    rule_group: TIME-CHUKYNGAY
-    name_vi: "Mốc neo tuyệt đối: ngày Kỷ Tị có nhật thực, năm 720 trước Công nguyên"
-    name_original: "日干支定盤"
-    status: VERIFIED
-    confidence: MEDIUM
-    is_active: true
-    logic:
-      kieu: MOC_NEO
-      jdn: 1458496
-      can_chi: "KY-TI"
-      mo_ta: "22 tháng 2 năm 720 trước Công nguyên, lịch Julius"
-      nguon_bang: "cau_hinh/can_chi/quy_uoc_can_chi.yaml"
-    passages: [PSG-XUANTHU-KYTI]
-    notes: >
-      Ba đường độc lập gặp nhau: sách chép ngày Kỷ Tị có nhật thực;
-      thiên văn xác nhận nhật thực thấy được ở nước Lỗ sáng ngày đó;
-      và chu kỳ 60 chiếu từ mốc này khớp sáu mốc đối chiếu trải 2738 năm.
-      ĐỘ TIN CẬY ĐỂ MEDIUM chứ không HIGH, vì việc quy câu chép về đúng ngày
-      22 tháng 2 năm 720 trước Công nguyên là KẾT QUẢ NGHIÊN CỨU HIỆN ĐẠI,
-      không phải điều sách viết ra. Nếu giới nghiên cứu đổi cách định niên,
-      mốc này phải xét lại.
-    sources:
-      - { source_id: SRC-XUANTHU-NHATTHUC, source_level: PRIMARY, source_location: "Lỗ Ẩn Công năm thứ ba, tháng hai", logic_note: "Cặp ngày Can Chi và hiện tượng thiên văn." }
-      - { source_id: SRC-THIENVAN-NHATTHUC, source_level: PRIMARY, logic_note: "Xác nhận nhật thực thấy được ở nước Lỗ, che 35 phần trăm, sáng 22 tháng 2." }
-      - { source_id: SRC-YTLIU-LICHPHAP, source_level: SUPPORTING, logic_note: "Mốc neo độc lập JD 2458511 = Giáp Tý, kiểm 20000 ngày không lệch." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Khớp mốc 2024-06-11 = Bính Ngọ." }
+    '
+  sources:
+  - source_id: SRC-XUANTHU-NHATTHUC
+    source_level: PRIMARY
+    source_location: Lỗ Ẩn Công năm thứ ba, tháng hai
+    logic_note: Cặp ngày Can Chi và hiện tượng thiên văn.
+  - source_id: SRC-THIENVAN-NHATTHUC
+    source_level: PRIMARY
+    logic_note: Xác nhận nhật thực thấy được ở nước Lỗ, che 35 phần trăm, sáng 22 tháng 2.
+  - source_id: SRC-YTLIU-LICHPHAP
+    source_level: SUPPORTING
+    logic_note: Mốc neo độc lập JD 2458511 = Giáp Tý, kiểm 20000 ngày không lệch.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Khớp mốc 2024-06-11 = Bính Ngọ.
+- rule_id: TIME-0006
+  namespace: TIME
+  rule_group: TIME-DAIVAN
+  name_vi: Khởi Đại vận — chiều thuận nghịch, đếm tới Tiết, ba ngày một tuổi
+  name_original: 論起大運法
+  status: VERIFIED
+  confidence: MEDIUM
+  is_active: true
+  logic:
+    kieu: QUY_DOI
+    chieu: Dương nam Âm nữ đi thuận; Dương nữ Âm nam đi nghịch
+    moc_dem: thuận đếm tới Tiết kế tiếp; nghịch đếm về Tiết đã qua
+    ty_le: 3 ngày = 1 tuổi
+  passages:
+  - PSG-UHTB-DAIVAN
+  notes: 'VERIFIED cho đúng ba điều mà nguyên văn nói ra. Không hơn. Phần quy đổi chi tiết nằm ở TIME-0006B và vẫn PROVISIONAL.
 
-  - rule_id: TIME-0006
-    namespace: TIME
-    rule_group: TIME-DAIVAN
-    name_vi: "Khởi Đại vận — chiều thuận nghịch, đếm tới Tiết, ba ngày một tuổi"
-    name_original: "論起大運法"
-    status: VERIFIED
-    confidence: MEDIUM
-    is_active: true
-    logic:
-      kieu: QUY_DOI
-      chieu: "Dương nam Âm nữ đi thuận; Dương nữ Âm nam đi nghịch"
-      moc_dem: "thuận đếm tới Tiết kế tiếp; nghịch đếm về Tiết đã qua"
-      ty_le: "3 ngày = 1 tuổi"
-    passages: [PSG-UHTB-DAIVAN]
-    notes: >
-      VERIFIED cho đúng ba điều mà nguyên văn nói ra. Không hơn.
-      Phần quy đổi chi tiết nằm ở TIME-0006B và vẫn PROVISIONAL.
-    sources:
-      - { source_id: SRC-UHTB-CHEP, source_level: PRIMARY, source_location: "論起大運法", logic_note: "Ba câu ấn định chiều, mốc đếm, và tỷ lệ." }
+    '
+  sources:
+  - source_id: SRC-UHTB-CHEP
+    source_level: PRIMARY
+    source_location: 論起大運法
+    logic_note: Ba câu ấn định chiều, mốc đếm, và tỷ lệ.
+- rule_id: TIME-0006B
+  namespace: TIME
+  rule_group: TIME-DAIVAN
+  name_vi: Thang chiết trừ cổ thư — ba ngày một tuổi, một ngày bốn tháng, một thời thần mười ngày
+  name_original: 折除
+  status: VERIFIED
+  confidence: MEDIUM
+  is_active: true
+  logic:
+    kieu: THANG_CHIET_TRU
+    bac:
+      3 ngày: 1 tuổi
+      1 ngày: 4 tháng
+      1 thời thần: 10 ngày
+    nam_chiet_tru_ngay: 360
+    pham_vi: 'Chỉ trả lời: khoảng cách tới Tiết quy thành TUỔI khởi vận là bao nhiêu.'
+    khong_thuoc_pham_vi: Đổi tuổi đó thành một ngày dương lịch cụ thể là TIME-0006C.
+  passages:
+  - PSG-TMTH-DAIVAN
+  notes: 'VERIFIED đúng phần cổ thư nói ra, không hơn. Đã giải lại ví dụ trong sách: 5 ngày 3 thời thần cho 1 tuổi 9 tháng,
+    và con số 630 ngày. Cả hai khớp nguyên văn. Độ tin cậy MEDIUM vì bản chép chưa khóa được bản in.
 
-  - rule_id: TIME-0006B
-    namespace: TIME
-    rule_group: TIME-DAIVAN
-    name_vi: "Thang chiết trừ cổ thư — ba ngày một tuổi, một ngày bốn tháng, một thời thần mười ngày"
-    name_original: "折除"
-    status: VERIFIED
-    confidence: MEDIUM
-    is_active: true
-    logic:
-      kieu: THANG_CHIET_TRU
-      bac:
-        "3 ngày": "1 tuổi"
-        "1 ngày": "4 tháng"
-        "1 thời thần": "10 ngày"
-      nam_chiet_tru_ngay: 360
-      pham_vi: "Chỉ trả lời: khoảng cách tới Tiết quy thành TUỔI khởi vận là bao nhiêu."
-      khong_thuoc_pham_vi: "Đổi tuổi đó thành một ngày dương lịch cụ thể là TIME-0006C."
-    passages: [PSG-TMTH-DAIVAN]
-    notes: >
-      VERIFIED đúng phần cổ thư nói ra, không hơn.
-      Đã giải lại ví dụ trong sách: 5 ngày 3 thời thần cho 1 tuổi 9 tháng,
-      và con số 630 ngày. Cả hai khớp nguyên văn.
-      Độ tin cậy MEDIUM vì bản chép chưa khóa được bản in.
-    sources:
-      - { source_id: SRC-TMTH-CHEP, source_level: PRIMARY, source_location: "quyển hai, Luận Đại vận", logic_note: "Thang chiết trừ và ví dụ tính mẫu, đã đối chiếu lại." }
+    '
+  sources:
+  - source_id: SRC-TMTH-CHEP
+    source_level: PRIMARY
+    source_location: quyển hai, Luận Đại vận
+    logic_note: Thang chiết trừ và ví dụ tính mẫu, đã đối chiếu lại.
+- rule_id: TIME-0006C
+  namespace: TIME
+  rule_group: TIME-DAIVAN
+  name_vi: Đổi tuổi khởi vận thành một thời điểm dương lịch tuyệt đối
+  name_original: null
+  status: PROVISIONAL
+  confidence: LOW
+  is_active: false
+  logic:
+    kieu: QUY_DOI_RA_NGAY
+    cach_lam_hien_tai: tuổi khởi vận nhân 365.2422 ngày, cộng vào thời điểm sinh
+    cach_co_thu_ngu_y: tuổi khởi vận nhân 360 ngày
+    lech: khoảng 52 ngày với một ca khởi vận gần 10 tuổi
+    anh_huong_toi:
+    - first_da_yun_start_instant
+    - moc_bat_dau_tung_van
+  notes: 'CHƯA CÓ NGUỒN. Cổ thư dùng năm 360 ngày để CHIẾT TRỪ, nhưng không nói phải dùng con số nào để ra NGÀY GIAO VẬN THẬT
+    trên lịch. Năm 360 ngày có thể chỉ là đơn vị kế toán để diễn đạt tuổi. Cài đặt hiện dùng 365,2422. Đây là lựa chọn của
+    tôi, không phải của sách. KHÔNG được lấy nhãn VERIFIED của TIME-0006B che phần này.
 
-  - rule_id: TIME-0006C
-    namespace: TIME
-    rule_group: TIME-DAIVAN
-    name_vi: "Đổi tuổi khởi vận thành một thời điểm dương lịch tuyệt đối"
-    name_original: null
-    status: PROVISIONAL
-    confidence: LOW
-    is_active: false
-    logic:
-      kieu: QUY_DOI_RA_NGAY
-      cach_lam_hien_tai: "tuổi khởi vận nhân 365.2422 ngày, cộng vào thời điểm sinh"
-      cach_co_thu_ngu_y: "tuổi khởi vận nhân 360 ngày"
-      lech: "khoảng 52 ngày với một ca khởi vận gần 10 tuổi"
-      anh_huong_toi: ["first_da_yun_start_instant", "moc_bat_dau_tung_van"]
-    notes: >
-      CHƯA CÓ NGUỒN. Cổ thư dùng năm 360 ngày để CHIẾT TRỪ, nhưng không nói
-      phải dùng con số nào để ra NGÀY GIAO VẬN THẬT trên lịch.
-      Năm 360 ngày có thể chỉ là đơn vị kế toán để diễn đạt tuổi.
-      Cài đặt hiện dùng 365,2422. Đây là lựa chọn của tôi, không phải của sách.
-      KHÔNG được lấy nhãn VERIFIED của TIME-0006B che phần này.
-    sources:
-      - { source_id: SRC-CHUA-CO-NGUON, source_level: PRIMARY, logic_note: "Chờ nguồn cổ hoặc học thuật về cách xác định ngày giao vận." }
+    '
+  sources:
+  - source_id: SRC-CHUA-CO-NGUON
+    source_level: PRIMARY
+    logic_note: Chờ nguồn cổ hoặc học thuật về cách xác định ngày giao vận.
+- rule_id: TIME-0007
+  namespace: TIME
+  rule_group: TIME-GIOTY
+  name_vi: Can giờ Tý phần trước nửa đêm — hai cách hiểu chưa ngã ngũ
+  name_original: 早晚子時
+  status: CONFLICTED
+  confidence: LOW
+  is_active: false
+  logic:
+    kieu: TRANH_LUAN
+    cau_hoi: Ở khoảng trước nửa đêm, lấy Can ngày hiện tại hay Can ngày kế tiếp để khởi giờ?
+    cach_a: DUNG_CAN_NGAY_HIEN_TAI
+    cach_b: DUNG_CAN_NGAY_HOM_SAU
+    quyet_dinh: đọc khoá HOUR_STEM_LATE_ZI của bộ quy ước lịch
+    khong_thuoc_pham_vi: Cách khởi Can giờ Tý từ Can ngày đã cho là TIME-0004, đã có nguồn.
+  notes: 'KNOWN_CONFLICT, giữ nguyên. Nguồn cổ lần này KHÔNG chạm tới câu hỏi này. Giá trị trong cấu hình chỉ là implementation_default,
+    đánh dấu NOT_VERIFIED và NOT_FOR_GOLDEN_SCORING.
 
-  - rule_id: TIME-0007
-    namespace: TIME
-    rule_group: TIME-GIOTY
-    name_vi: "Can giờ Tý phần trước nửa đêm — hai cách hiểu chưa ngã ngũ"
-    name_original: "早晚子時"
-    status: CONFLICTED
-    confidence: LOW
-    is_active: false
-    logic:
-      kieu: TRANH_LUAN
-      cau_hoi: "Ở khoảng trước nửa đêm, lấy Can ngày hiện tại hay Can ngày kế tiếp để khởi giờ?"
-      cach_a: "DUNG_CAN_NGAY_HIEN_TAI"
-      cach_b: "DUNG_CAN_NGAY_HOM_SAU"
-      quyet_dinh: "đọc khoá HOUR_STEM_LATE_ZI của bộ quy ước lịch"
-      khong_thuoc_pham_vi: "Cách khởi Can giờ Tý từ Can ngày đã cho là TIME-0004, đã có nguồn."
-    notes: >
-      KNOWN_CONFLICT, giữ nguyên. Nguồn cổ lần này KHÔNG chạm tới câu hỏi này.
-      Giá trị trong cấu hình chỉ là implementation_default,
-      đánh dấu NOT_VERIFIED và NOT_FOR_GOLDEN_SCORING.
-    sources:
-      - { source_id: SRC-CHUA-CO-NGUON, source_level: PRIMARY, logic_note: "Cần nguồn phân xử hai cách hiểu." }
-      - { source_id: SRC-DOI-CHIEU-HD, source_level: CROSS_REFERENCE, logic_note: "Một cài đặt hiện đại chọn cách B, không nêu lý do." }
+    '
+  sources:
+  - source_id: SRC-CHUA-CO-NGUON
+    source_level: PRIMARY
+    logic_note: Cần nguồn phân xử hai cách hiểu.
+  - source_id: SRC-DOI-CHIEU-HD
+    source_level: CROSS_REFERENCE
+    logic_note: Một cài đặt hiện đại chọn cách B, không nêu lý do.
+- rule_id: BT-BASE-0401
+  namespace: BT-BASE
+  rule_group: BT-STRENGTH-METHOD
+  name_vi: Đắc thời không đủ để kết luận vượng; thất thời không đủ để kết luận nhược
+  name_original: 十干得時不旺失時不弱
+  status: VERIFIED
+  confidence: HIGH
+  is_active: true
+  logic:
+    kieu: METHODOLOGY
+    month_command_priority: true
+    all_pillars_modify_strength: true
+    no_single-factor_strength_verdict: true
+  passages:
+  - PSG-ZPZQ-STRENGTH
+  notes: Quy tắc phương pháp, KHÔNG phải công thức số để chấm vượng suy.
+  sources:
+  - source_id: SRC-ZPZQ-NLC-SCAN
+    source_level: PRIMARY
+    source_location: 子平真詮·六、論十干得時不旺失時不弱
+    logic_note: Nguyên văn nêu nguyệt lệnh là trọng nhưng năm tháng ngày giờ đều có quyền tăng giảm.
+  - source_id: SRC-ZPZQ-DONGLI
+    source_level: CROSS_REFERENCE
+    source_location: chapter 3719
+    logic_note: Đối chiếu chữ.
+- rule_id: BT-USE-0401
+  namespace: BT-USE
+  rule_group: BT-ZPZQ-USE-METHOD
+  name_vi: Tử Bình Chân Thuyên lấy Dụng thần từ nguyệt lệnh để phân cách cục
+  name_original: 八字用神專求月令
+  status: VERIFIED
+  confidence: HIGH
+  is_active: true
+  logic:
+    kieu: METHODOLOGY
+    school: ZPZQ_GEJU
+    start_from_month_command: true
+    day_master_relates_to_month_command: true
+    do_not_replace_with_balance_element: true
+  passages:
+  - PSG-ZPZQ-USE-MONTH
+  notes: Khóa nghĩa “Dụng thần” của phương pháp lõi V1 theo Tử Bình Chân Thuyên; chưa đồng nghĩa đã cài xong thuật toán định
+    cách/cứu ứng.
+  sources:
+  - source_id: SRC-ZPZQ-NLC-SCAN
+    source_level: PRIMARY
+    source_location: 子平真詮·八、論用神
+    logic_note: Nguyên văn trực tiếp.
+  - source_id: SRC-ZPZQ-DONGLI
+    source_level: CROSS_REFERENCE
+    source_location: chapter 3721
+    logic_note: Đối chiếu chữ.
+- rule_id: BT-DY-0401
+  namespace: BT-DY
+  rule_group: BT-TRANSIT-FUSION-METHOD
+  name_vi: Hành vận phải phối với hỷ kỵ đã xác lập từ mệnh gốc
+  name_original: 論運與看命無二法
+  status: VERIFIED
+  confidence: HIGH
+  is_active: true
+  logic:
+    kieu: METHODOLOGY
+    natal_first: true
+    transit_against_natal_preferences: true
+    timeline:
+    - DAI_VAN
+    - NAM
+    - THANG
+    - NGAY
+    - GIO
+    no_transit_standalone_good_bad: true
+  passages:
+  - PSG-ZPZQ-TRANSIT
+  notes: Đây là quy tắc cổng hợp lưu. Khi mệnh gốc chưa có hỷ/kỵ đủ căn cứ, tầng vận chỉ được mô tả cấu trúc, không được phán
+    thuận/nghịch cá nhân.
+  sources:
+  - source_id: SRC-ZPZQ-NLC-SCAN
+    source_level: PRIMARY
+    source_location: 子平真詮·二十五、論行運
+    logic_note: Nguyên văn yêu cầu phối Can Chi vận với hỷ kỵ Bát Tự.

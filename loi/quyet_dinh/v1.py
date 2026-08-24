@@ -2,13 +2,12 @@
 
 Mục tiêu của lớp này là trả lời ba câu hỏi sản phẩm V1 bằng các quy tắc đã
 có thể xác minh trực tiếp:
-  1) tháng này đang có nhịp hòa hợp / va chạm trực tiếp nào với lá số;
-  2) hôm nay có quan hệ trực tiếp nào đáng chú ý;
-  3) ngày nào phù hợp hơn cho MỘT VIỆC theo Hiệp Kỷ, dùng 12 Trực làm lớp
-     sự kiện tối thiểu và quan hệ Địa Chi cá nhân làm lớp phụ.
+  1) mô tả quan hệ Địa Chi đang xuất hiện, không tự gọi tốt/xấu cá nhân;
+  2) đánh giá ngày theo Hiệp Kỷ cho MỘT VIỆC ở lớp sự kiện độc lập;
+  3) giữ evidence cá nhân để sau này hợp lưu khi Cách cục + hỷ/kỵ đã sẵn sàng.
 
-Không chấm điểm 0-10. Không suy Dụng/Hỷ/Kỵ. Không coi Thập Thần tự thân là
-cát/hung. Xếp hạng dùng thứ tự quyết định rời rạc, không dùng trọng số số học.
+Không chấm điểm 0-10. Không dùng Thập Thần/xung-hợp để thay Dụng/Hỷ/Kỵ.
+Xếp hạng hiện có của ngày chỉ phản ánh lớp Hiệp Kỷ đã cài.
 """
 from __future__ import annotations
 
@@ -123,91 +122,52 @@ def quan_he_chi(a: str, b: str) -> QuanHeChi:
     return QuanHeChi("NONE","Không có quan hệ trực tiếp","NEUTRAL",f"Không thấy Lục hợp, Lục xung, Lục hại hoặc Hình trực tiếp giữa {CHI_VI[a]} và {CHI_VI[b]} ở lớp V1.","FUS-V1-REL-0001",SRC_PRODUCT)
 
 
-def _dien_giai_ung_dung(qh: QuanHeChi, scope: str) -> dict:
-    """Diễn giải sản phẩm từ QUAN HỆ CẤU TRÚC đã xác minh.
-
-    Đây KHÔNG phải câu nguyên văn cổ thư và KHÔNG được quảng bá như dự báo chắc chắn.
-    Mỗi câu đều giữ giới hạn: quan hệ Chi chỉ là một tín hiệu cấu trúc, không thay
-    Dụng/Hỷ/Kỵ và không tự suy ra tiền bạc/sức khỏe tốt xấu.
-    """
-    is_month = scope == "month"
-    horizon = "tháng" if is_month else "ngày"
-    base = {
-        "interpretation_status": "PRODUCT_INTERPRETATION",
-        "evidence_scope": "VERIFIED_BRANCH_RELATION_ONLY",
-        "khong_suy_dien": "Không dùng riêng quan hệ này để kết luận tài chính, sức khỏe hay thành bại của việc lớn.",
-        "technical_trigger": qh.mo_ta,
-    }
-    if qh.ma == "LUC_HOP":
-        return {**base,
-            "headline": f"{horizon.capitalize()} có nhịp phối hợp thuận hơn",
-            "trigger": "Nhịp hiện tại tạo một quan hệ phối hợp trực tiếp với cấu trúc ngày sinh.",
-            "cong_viec": "Thuận hơn cho việc cần phối hợp, trao đổi hoặc nối lại công việc đang dang dở; việc quan trọng vẫn nên xét đúng loại việc trước khi chốt.",
-            "tai_chinh": "Chưa có căn cứ riêng để gọi là tháng/ngày tài lộc; nếu có giao dịch lớn, dùng mục Tìm ngày và kiểm tra điều kiện thực tế.",
-            "quan_he": "Dễ tìm điểm chung hơn trong trao đổi; phù hợp để nói rõ nhu cầu, thống nhất cách làm hoặc hàn gắn một bất đồng nhỏ.",
-            "viec_lon": "Có thể chủ động chuẩn bị, nhưng không dùng Lục hợp một mình để quyết định thời điểm cuối cùng.",
-            "focus": ["Ưu tiên việc cần phối hợp và thống nhất", "Chốt rõ trách nhiệm, mốc thời gian và điều kiện thực tế"],
-        }
-    if qh.ma == "LUC_XUNG":
-        return {**base,
-            "headline": f"{horizon.capitalize()} có nhịp thay đổi và va chạm trực tiếp",
-            "trigger": "Nhịp hiện tại va chạm trực tiếp với cấu trúc ngày sinh, nên khả năng phải điều chỉnh cao hơn bình thường.",
-            "cong_viec": "Dễ phát sinh đổi lịch, đổi cách làm hoặc việc chen ngang; nên chừa khoảng trống và có phương án B cho việc cần chốt.",
-            "tai_chinh": "Không tự suy ra hao tài. Với khoản lớn, tránh quyết định chỉ vì cảm giác gấp; kiểm tra lại điều kiện, dòng tiền và thời điểm cụ thể.",
-            "quan_he": "Dễ khó đồng bộ quan điểm hoặc nhịp hành động; nên xử lý từng việc cụ thể, tránh đẩy bất đồng nhỏ thành tranh luận lớn.",
-            "viec_lon": "Không đồng nghĩa phải hoãn mọi việc lớn; nếu buộc làm, nên chuẩn bị phương án dự phòng và chọn ngày/giờ theo đúng loại việc.",
-            "focus": ["Rà lại lịch và điểm dễ thay đổi", "Giữ phương án dự phòng cho việc khó đảo ngược"],
-        }
-    if qh.ma == "LUC_HAI":
-        return {**base,
-            "headline": f"{horizon.capitalize()} có điểm vướng cần kiểm tra kỹ",
-            "trigger": "Nhịp hiện tại tạo một điểm vướng trực tiếp với cấu trúc ngày sinh; nên kiểm tra kỹ phần dễ bị hiểu lệch hoặc bỏ sót.",
-            "cong_viec": "Nên làm rõ điều kiện, đầu mối và phần việc dễ bị hiểu khác nhau; tránh dựa vào thỏa thuận miệng ở việc quan trọng.",
-            "tai_chinh": "Chưa có căn cứ để kết luận tiền bạc xấu; ưu tiên kiểm tra phí, điều khoản và phần nghĩa vụ dễ bị bỏ sót.",
-            "quan_he": "Dễ có cảm giác không hiểu nhau hoặc kỳ vọng lệch nhau; nói rõ việc cụ thể và xác nhận lại điều đã thống nhất.",
-            "viec_lon": "Có thể tiến hành khi điều kiện đủ rõ; nên tăng bước kiểm tra trước khi ký, chuyển tiền hoặc cam kết dài hạn.",
-            "focus": ["Làm rõ điều kiện và trách nhiệm", "Kiểm tra phần dễ bị bỏ sót trước khi chốt"],
-        }
-    if qh.ma in {"HINH", "TU_HINH"}:
-        return {**base,
-            "headline": f"{horizon.capitalize()} dễ phát sinh ma sát hoặc tự gây áp lực",
-            "trigger": "Nhịp hiện tại tạo một dạng ma sát trực tiếp với cấu trúc ngày sinh; nên giảm áp lực và xử lý từng điểm nghẽn.",
-            "cong_viec": "Nên giảm việc làm song song quá nhiều, rà quy trình và xử lý một điểm nghẽn mỗi lần.",
-            "tai_chinh": "Không có căn cứ riêng để gọi là xấu về tiền; tránh quyết định khi đang căng thẳng hoặc muốn xử lý quá nhanh.",
-            "quan_he": "Dễ căng vì cách làm hoặc cách nói hơn là vì bản chất vấn đề; nên hạ nhịp và tách người khỏi việc khi trao đổi.",
-            "viec_lon": "Nếu có nhiều ràng buộc chưa rõ, nên hoàn tất checklist trước khi đưa ra cam kết khó đảo ngược.",
-            "focus": ["Giảm quá tải và xử lý từng điểm nghẽn", "Hoàn tất checklist trước quyết định quan trọng"],
-        }
-    return {**base,
-        "headline": f"{horizon.capitalize()} chưa có tín hiệu quan hệ nổi bật",
-        "trigger": "Ở lớp quan hệ trực tiếp hiện dùng, chưa thấy tín hiệu đủ nổi bật để ưu tiên hay cảnh báo riêng.",
-        "cong_viec": "Có thể xử lý theo kế hoạch bình thường; nếu là việc quan trọng, nên xét riêng theo loại việc thay vì dựa vào nhịp chung.",
-        "tai_chinh": "Chưa có tín hiệu riêng để kết luận thuận/nghịch về tài chính.",
-        "quan_he": "Chưa thấy quan hệ Địa Chi trực tiếp đủ mạnh để đưa ra cảnh báo hoặc ưu tiên riêng.",
-        "viec_lon": "Không dùng trạng thái này như một xác nhận rằng mọi việc đều tốt; hãy chọn ngày theo đúng loại việc nếu cần chốt thời điểm.",
-        "focus": ["Giữ kế hoạch bình thường", "Việc lớn: xét riêng theo đúng loại việc"],
-    }
-
 
 def danh_gia_giai_doan(chi_menh_ngay: str, chi_hien_tai: str, scope: str) -> dict:
+    """API tương thích cũ: chỉ mô tả quan hệ Chi, không phán thuận/nghịch.
+
+    Từ 0.4.0, quan hệ Địa Chi đơn lẻ không có quyền sinh NÊN/TRÁNH hay
+    nhãn cát/hung cá nhân. Hàm này được giữ để các caller cũ không gãy, nhưng
+    mọi quyết định cá nhân phải đi qua nền mệnh Cách cục + hỷ/kỵ khi lớp đó
+    được cài đủ.
+    """
     qh = quan_he_chi(chi_menh_ngay, chi_hien_tai)
-    dg = _dien_giai_ung_dung(qh, scope)
-    if qh.muc == "POSITIVE":
-        label, state = "Khá thuận", "THUAN"
-    elif qh.muc == "CAUTION":
-        label, state = "Có điểm cần lưu ý", "CAN_NHAC"
+    horizon = "tháng" if scope == "month" else "ngày" if scope == "day" else "giai đoạn"
+    if qh.ma == "NONE":
+        headline = f"{horizon.capitalize()} chưa có quan hệ Địa Chi trực tiếp trong nhóm quy tắc hiện đã cài"
     else:
-        label, state = "Chưa có tín hiệu nổi bật", "TRUNG_TINH"
+        headline = f"{horizon.capitalize()} có quan hệ {qh.nhan} với Chi ngày sinh"
     return {
-        "scope": scope, "state": state, "label": label, "relation": qh.__dict__,
-        "recommended": list(dg["focus"]),
-        "caution": [dg["khong_suy_dien"]],
+        "scope": scope,
+        "state": "DESCRIPTIVE_ONLY",
+        "label": "Chỉ ghi nhận cấu trúc",
+        "relation": {**qh.__dict__, "muc": "STRUCTURAL_ONLY"},
+        "recommended": [],
+        "caution": [],
         "confidence": "MEDIUM" if qh.ma != "NONE" else "LOW",
-        "basis": dg["headline"],
-        "dien_giai": dg,
+        "basis": headline,
+        "dien_giai": {
+            "interpretation_status": "ZPZQ_DESCRIPTIVE_ONLY_0_4",
+            "evidence_scope": "BRANCH_RELATION_NOT_DECISION",
+            "headline": headline,
+            "trigger": qh.mo_ta,
+            "cong_viec": "Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch công việc.",
+            "tai_chinh": "Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch tài chính.",
+            "quan_he": "Quan hệ này chỉ mô tả kiểu tương tác cấu trúc; chưa đồng nghĩa tốt/xấu.",
+            "viec_lon": "Không dùng quan hệ Chi đơn lẻ để quyết định việc lớn.",
+            "focus": [],
+            "khong_suy_dien": "Chờ Cách cục + hỷ/kỵ mệnh gốc trước khi cho quan hệ thời gian tác động vào quyết định cá nhân.",
+            "technical_trigger": qh.mo_ta,
+        },
     }
 
 def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code: str) -> dict:
+    """Đánh giá lớp Hiệp Kỷ theo việc, tách khỏi phán quyết cá nhân.
+
+    `chi_menh_ngay` vẫn được nhận để giữ tương thích API, nhưng quan hệ với mệnh
+    chỉ được ghi trong evidence. Nó KHÔNG được nâng/hạ hạng cho tới khi lớp
+    Cách cục + hỷ/kỵ cá nhân sẵn sàng.
+    """
     code = chuan_hoa_event(event_code)
     rule = EVENT_RULES.get(code or "")
     if not rule:
@@ -219,49 +179,45 @@ def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code
         event_state = "YI"
     else:
         event_state = "NEUTRAL"
+
+    # Quan hệ với mệnh được giữ để truy nguyên, tuyệt đối không dùng làm
+    # quyết định tốt/xấu ở bản 0.4.0.
     qh = quan_he_chi(chi_menh_ngay, chi_ngay)
 
-    # Chính sách hợp lưu rời rạc: kỵ theo việc có ưu tiên cao nhất; sau đó mới đến
-    # ngày được sách nêu là宜; quan hệ cá nhân chỉ dùng để phân hạng trong cùng lớp.
     if event_state == "JI":
-        group, label = 5, "Không ưu tiên"
-    elif event_state == "YI" and qh.muc == "POSITIVE" and rule.mapping_status == "VERIFIED":
-        group, label = 0, "Ưu tiên"
+        group, label = 5, "Không ưu tiên theo việc"
     elif event_state == "YI" and rule.mapping_status == "VERIFIED":
-        group, label = 1, "Phù hợp"
+        group, label = 1, "Phù hợp theo Hiệp Kỷ"
     elif event_state == "YI":
-        # Ánh xạ hiện đại còn PROVISIONAL: không được nâng thành “Phù hợp” mạnh.
-        group, label = 2, "Có thể cân nhắc"
-    elif qh.muc == "POSITIVE":
-        # Quan hệ cá nhân chỉ phá hòa trong lớp sự kiện trung tính; không được
-        # nâng thành “ngày tốt cho việc” khi Hiệp Kỷ chưa nêu Trực này là 宜.
-        group, label = 2, "Có thể cân nhắc"
-    elif qh.muc == "CAUTION":
-        group, label = 4, "Cân nhắc"
+        group, label = 2, "Có thể cân nhắc theo Hiệp Kỷ"
     else:
-        group, label = 3, "Chưa có tín hiệu nổi bật"
+        group, label = 3, "Chưa có tín hiệu theo việc"
 
     reasons = [f"Ngày thuộc Trực {TRUC_VI[truc]} trong tháng hiện tại."]
-    if event_state == "YI": reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm được nêu là phù hợp cho {rule.ten} ở lớp quy tắc V1-basic.")
-    if event_state == "JI": reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm cần tránh cho {rule.ten} ở lớp quy tắc V1-basic.")
-    if qh.ma != "NONE": reasons.append(qh.mo_ta)
+    if event_state == "YI":
+        reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm được nêu là phù hợp cho {rule.ten} ở lớp quy tắc V1-basic.")
+    if event_state == "JI":
+        reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm cần tránh cho {rule.ten} ở lớp quy tắc V1-basic.")
+    if qh.ma != "NONE":
+        reasons.append(qh.mo_ta + " Quan hệ này hiện chỉ là evidence cấu trúc, không đổi thứ hạng ngày.")
     if rule.mapping_status == "PROVISIONAL":
         reasons.append("Ánh xạ từ việc hiện đại sang mục cổ thư đang ở trạng thái PROVISIONAL; nhãn được hạ mức tin cậy.")
+
     return {
         "support_level":"ACTIVE_BASIC", "event_code":code, "event_name":rule.ten,
         "classical_event":rule.classical, "mapping_status":rule.mapping_status,
         "truc":truc, "truc_vi":TRUC_VI[truc], "event_state":event_state,
-        "personal_relation":qh.__dict__, "label":label, "rank_group":group,
-        "score":None, "scoring_status":"ORDINAL_RULESET_V1",
+        "personal_relation":{**qh.__dict__, "decision_effect":"NONE_UNTIL_NATAL_USE_READY"},
+        "label":label, "rank_group":group,
+        "score":None, "scoring_status":"EVENT_ONLY_PERSONAL_PENDING",
         "reasons":reasons,
         "source_id":SRC_HK11, "source_location":rule.source_location,
         "event_note":rule.note or None,
         "coverage":"PARTIAL_12_TRUC_ONLY",
         "confidence":"MEDIUM" if rule.mapping_status == "VERIFIED" else "LOW",
-        "coverage_note":"Đã dùng phần 12 Trực được nêu trực tiếp trong mục 宜/忌; các cát/hung thần khác của Hiệp Kỷ chưa được đưa vào lớp xếp hạng này.",
+        "coverage_note":"Đã dùng phần 12 Trực được nêu trực tiếp trong mục 宜/忌; cá nhân hóa cát/hung đang chờ Cách cục + hỷ/kỵ mệnh gốc.",
         "rule_ids":["HK-GENERAL-0001", f"HK-EVENT-{list(EVENT_RULES).index(code)+1:04d}", qh.rule_id, "FUS-V1-0001"],
     }
-
 
 def xep_hang(ds: Iterable[dict]) -> list[dict]:
     return sorted(ds, key=lambda x: (x.get("rank_group",9), x.get("ngay","")))

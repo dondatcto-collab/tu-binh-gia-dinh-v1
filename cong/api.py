@@ -35,6 +35,7 @@ from loi.nen.phien_ban import DB_MAC_DINH, ENGINE_VERSION, RULESET_VERSION
 from loi.van import dong_thoi_gian as dtg
 from loi.quyet_dinh.v1 import quan_he_chi, xep_hang, danh_gia_event, danh_gia_giai_doan
 from loi.quyet_dinh.ca_nhan import phan_tich_ca_nhan, bo_sung_event_ca_nhan
+from loi.bat_tu.phuong_phap_tu_binh import gate_payload
 
 app = FastAPI(title="Tử Bình Gia Đình V1 — Stateless API")
 
@@ -188,18 +189,19 @@ GIO_KHOANG = [
 ]
 
 def _gio_tham_khao(kq):
-    """Giờ tham khảo theo hồ sơ, KHÔNG phải giờ tốt đã hợp lưu với ngày.
+    """Quan hệ Chi giờ với hồ sơ — CHỈ MÔ TẢ, không gọi giờ tốt/xấu.
 
-    V1 hiện chỉ có quy tắc quan hệ Địa Chi trực tiếp giữa Chi ngày sinh và Chi giờ.
-    Vì vậy kết quả có thể lặp lại giữa nhiều ngày; API phải nói rõ phạm vi này để
-    giao diện không diễn đạt sai thành “giờ tốt của ngày”.
+    Khi Cách cục + hỷ/kỵ cá nhân chưa sẵn sàng, Lục hợp/Lục xung/... của giờ
+    không được chuyển thành thuận/cân nhắc.
     """
     natal = kq.base_state["tu_tru"]["ngay"]["chi"]
     out=[]
     for i,ch in enumerate(CHI):
         qh=quan_he_chi(natal,ch)
-        nhan = "Tham khảo thuận" if qh.muc=="POSITIVE" else ("Cần cân nhắc" if qh.muc=="CAUTION" else "Chưa có tín hiệu nổi bật")
-        out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,"relation":qh.ma,"relation_level":qh.muc,"ly_do":qh.mo_ta,"scope":"PROFILE_BRANCH_RELATION_ONLY"})
+        nhan = qh.nhan if qh.ma != "NONE" else "Không có quan hệ trực tiếp trong lớp hiện tại"
+        out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,
+                    "relation":qh.ma,"relation_level":"STRUCTURAL_ONLY","relation_nature":qh.muc,
+                    "ly_do":qh.mo_ta,"scope":"STRUCTURAL_ONLY_PERSONAL_USE_PENDING"})
     return out
 
 
@@ -216,18 +218,13 @@ def _tom_tat_phan_tich(dg: dict) -> dict:
 
 
 def _cau_so_sanh(current: dict, other: dict, label: str) -> str:
+    """So sánh cấu trúc, không biến khác biệt thành tốt/xấu khi hỷ/kỵ chưa có."""
     a, b = _tom_tat_phan_tich(current), _tom_tat_phan_tich(other)
     if a["theme_group"] != b["theme_group"]:
-        return f"So với {label}, chủ đề chuyển từ {b['theme'] or 'nhịp khác'} sang {a['theme'] or 'nhịp hiện tại'}; nên ưu tiên loại việc phù hợp với chủ đề mới."
-    if a["caution_count"] > b["caution_count"]:
-        return f"So với {label}, thời điểm này có nhiều điểm va chạm trực tiếp với cấu trúc gốc hơn; nên tăng bước kiểm tra và phương án dự phòng."
-    if a["caution_count"] < b["caution_count"]:
-        return f"So với {label}, thời điểm này ít va chạm trực tiếp với cấu trúc gốc hơn; thuận hơn cho việc cần nhịp ổn định."
-    if a["positive_count"] > b["positive_count"]:
-        return f"So với {label}, thời điểm này có thêm tín hiệu phối hợp trực tiếp; phù hợp hơn với việc cần trao đổi hoặc thống nhất."
-    if a["positive_count"] < b["positive_count"]:
-        return f"So với {label}, tín hiệu phối hợp trực tiếp giảm; nên dựa nhiều hơn vào kế hoạch và điều kiện rõ ràng."
-    return f"So với {label}, cấu trúc nổi bật không đổi nhiều; khác biệt chính nằm ở chi tiết Can/Chi và loại việc cụ thể."
+        return f"So với {label}, nhóm Thập Thần nổi bật đổi từ {b['theme'] or 'chủ đề khác'} sang {a['theme'] or 'chủ đề hiện tại'}. Đây là thay đổi cấu trúc, chưa phải kết luận thuận/nghịch."
+    if a["caution_count"] != b["caution_count"] or a["positive_count"] != b["positive_count"]:
+        return f"So với {label}, số quan hệ Địa Chi trực tiếp với Tứ Trụ gốc thay đổi. 0.4.0 chỉ ghi nhận sự thay đổi này, chưa dùng để kết luận tốt/xấu."
+    return f"So với {label}, cấu trúc Thập Thần và nhóm quan hệ trực tiếp không đổi đáng kể ở lớp hiện có."
 
 
 def _so_sanh_lien_ke(c, hs: HoSo, kq, d: date, scope: str) -> dict:
@@ -282,12 +279,13 @@ def tinh_trang():
             "quy_tac_conflicted": d("SELECT COUNT(*) n FROM rule_versions WHERE status='CONFLICTED'"),
             "quy_tac_hiep_ky": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace LIKE 'HK-%' AND is_active=1"),
             "quy_tac_quan_he": d("SELECT COUNT(*) n FROM rule_registry WHERE namespace='BT-REL' AND is_active=1"),
-            "cham_diem": "ORDINAL_V1_BASIC",
+            "cham_diem": "PERSONAL_DESCRIPTIVE_EVENT_ORDINAL",
             "profile_storage": "DEVICE_ONLY",
+            "phuong_phap_tu_binh": gate_payload(),
             "canh_bao": (
-                "Lõi tính toán và lớp quyết định V1-basic đã chạy. App có thể trả lời nhịp tháng/ngày "
-                "và xếp hạng ngày theo lớp 12 Trực của Hiệp Kỷ + quan hệ Địa Chi cá nhân. "
-                "Điểm 0-10 và các lớp sâu chưa được tự bịa khi chưa hiệu chỉnh."
+                "0.4.0 đã khóa lại đúng phương pháp Tử Bình Chân Thuyên: Thập Thần và quan hệ Can/Chi chỉ mô tả cấu trúc. "
+                "Chưa dùng chúng để phán thuận/nghịch cá nhân cho tới khi Cách cục + hỷ/kỵ mệnh gốc được cài đủ. "
+                "Lớp Hiệp Kỷ hiện vẫn xếp hạng theo coverage riêng của sự kiện."
             ),
         }
 
@@ -328,8 +326,8 @@ def hom_nay(v: DayRequest):
             "don_gian": tang_1(kq, scope="day"),
             "chuyen_sau": tang_2(kq),
             "gio_trong_ngay": _gio_tham_khao(kq),
-            "gio_status": "PROFILE_REFERENCE_ONLY",
-            "gio_note": "Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem.",
+            "gio_status": "STRUCTURAL_ONLY_PERSONAL_USE_PENDING",
+            "gio_note": "Giờ hiện chỉ ghi nhận quan hệ Chi với hồ sơ; chưa phải giờ tốt/xấu cá nhân và chưa hợp lưu với ngày đang xem.",
             "so_sanh_lien_ke": _so_sanh_lien_ke(c, hs, kq, d, "day"),
         }
 
@@ -342,7 +340,7 @@ def dashboard(v: ProfileRequest):
         cmp_day=_so_sanh_lien_ke(c,hs,kq,d,"day"); cmp_month=_so_sanh_lien_ke(c,hs,kq,d,"month")
         return {"ngay":d.isoformat(),
                 "thang":{"don_gian":tang_1(kq,scope="month"),"chuyen_sau":sau,"so_sanh_lien_ke":cmp_month},
-                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq),"gio_status":"PROFILE_REFERENCE_ONLY","gio_note":"Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem.","so_sanh_lien_ke":cmp_day},
+                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq),"gio_status":"STRUCTURAL_ONLY_PERSONAL_USE_PENDING","gio_note":"Giờ hiện chỉ ghi nhận quan hệ Chi với hồ sơ; chưa phải giờ tốt/xấu cá nhân và chưa hợp lưu với ngày đang xem.","so_sanh_lien_ke":cmp_day},
                 "vi_tri":{"dai_van":kq.decade_state,"nam_hien_tai":kq.year_state.get("tru",{}),"thang_hien_tai":kq.month_state.get("tru",{})}}
 
 
@@ -384,7 +382,7 @@ def lich_thang(v: CalendarMonthRequest):
                 dg=personal; label=dg.get("label","Chưa có tín hiệu nổi bật"); state=dg.get("state","THEME_ONLY")
                 detail={"theme":dg.get("theme",{}),"branch_impacts":dg.get("branch_impacts",[])}
             out.append({"ngay":cur.isoformat(),"label":label,"state":state,"detail":detail}); cur+=timedelta(days=1)
-    return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"ORDINAL_V1_1_PERSONAL","days":out}
+    return {"year":v.year,"month":v.month,"viec":v.viec,"scoring_status":"EVENT_ORDINAL_IF_EVENT_ELSE_DESCRIPTIVE","days":out}
 
 
 @app.post("/api/stateless/tim-ngay")
@@ -409,9 +407,9 @@ def tim_ngay(v: WorkRequest):
             personal=phan_tich_ca_nhan(c,tu_tru=tu_tru,nhat_chu=nhat_chu,can_hien_tai=lich.tru_ngay.can,chi_hien_tai=lich.tru_ngay.chi,scope="day",context=[])
             ev=danh_gia_event(lich.tru_thang.chi,lich.tru_ngay.chi,chi_menh,v.viec)
             ev=bo_sung_event_ca_nhan(ev,personal)
-            ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Chưa có tín hiệu nổi bật"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"personal_v1_1":ev.get("personal_v1_1",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"ORDINAL_V1_1_PERSONAL"}); cur+=timedelta(days=1)
+            ds.append({"ngay":cur.isoformat(),"tru_ngay":viet_hoa(lich.tru_ngay.can,lich.tru_ngay.chi),"label":ev.get("label","Chưa có tín hiệu nổi bật"),"rank_group":ev.get("rank_group",9),"truc":ev.get("truc_vi"),"event_state":ev.get("event_state"),"personal_relation":ev.get("personal_relation",{}),"personal_v1_1":ev.get("personal_v1_1",{}),"reasons":ev.get("reasons",[]),"mapping_status":ev.get("mapping_status"),"coverage":ev.get("coverage"),"event_note":ev.get("event_note"),"score":None,"scoring_status":"EVENT_ONLY_PERSONAL_PENDING"}); cur+=timedelta(days=1)
     ranked=xep_hang(ds)
-    return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng dùng các Trực được nêu trực tiếp trong mục 宜/忌 của Hiệp Kỷ và lớp cá nhân hóa Thập Thần + quan hệ với cả bốn trụ gốc. Không dùng điểm 0-10 chưa hiệu chỉnh.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
+    return {"viec":v.viec,"so_ngay_da_quet":len(ds),"co_xep_hang_duoc_khong":True,"xep_hang_status":"EVENT_ONLY_V1_BASIC_PARTIAL_COVERAGE","ghi_chu":"Xếp hạng hiện chỉ dùng lớp Hiệp Kỷ V1-basic theo việc. Thập Thần và quan hệ với Tứ Trụ chỉ hiển thị làm dữ liệu cấu trúc, không nâng/hạ ngày cho tới khi Cách cục + hỷ/kỵ mệnh gốc hoàn chỉnh. Không dùng điểm 0-10.","canh_bao_an_toan":("Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế đã xác nhận là có thể linh hoạt; không trì hoãn cấp cứu và không thay thế chỉ định chuyên môn." if v.viec=="DIEU_TRI" else None),"top":ranked[:3],"cac_ngay":ranked}
 
 
 # Chặn rõ các API hồ sơ cũ để tránh vô tình lưu dữ liệu cá nhân trên server.

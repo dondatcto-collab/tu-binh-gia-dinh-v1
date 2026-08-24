@@ -77,7 +77,7 @@ def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
     chua = []
     if d["score"] is None:
         chua.append("Điểm số 0–10 tuyệt đối chưa dùng vì chưa có bộ hiệu chỉnh được duyệt.")
-    chua.append("Các kết luận sâu dựa trên vượng suy, cách cục và Dụng/Hỷ/Kỵ vẫn nằm ở tầng nghiên cứu cho tới khi đủ nguồn.")
+    chua.append("Lớp cá nhân chưa được phép phán thuận/nghịch cho tới khi Cách cục và hỷ/kỵ mệnh gốc được cài đủ theo phương pháp đã khóa.")
 
     nen = list(d["recommended"])
     can = list(d["caution"])
@@ -86,10 +86,15 @@ def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
         nen = list(danh_gia.get("recommended", nen)) or nen
         can = list(danh_gia.get("caution", can)) or can
 
+    descriptive_only = danh_gia.get("state") == "DESCRIPTIVE_ONLY"
+    if descriptive_only:
+        nen, can = [], []
+
     return {
         "tieu_de": cau_dau,
         "tom_tat": danh_gia.get("label", d["label"]),
-        "co_ket_luan_co_ban": True,
+        "co_ket_luan_co_ban": not descriptive_only,
+        "co_ket_luan_ca_nhan_thuan_nghich": not descriptive_only,
         "vi_sao": basis,
         "dien_giai": danh_gia.get("dien_giai", {}),
         "vi_sao_chua_cham_diem": "Điểm số 0–10 chưa hiệu chỉnh; app dùng nhãn rời rạc có truy nguồn thay vì tạo số giả.",
@@ -102,7 +107,13 @@ def tang_1(kq: KetQuaHopLuu, scope: str = "day") -> dict[str, Any]:
         "khong_uu_tien": khong,
         "confidence": d["confidence"],
         "scoring_status": d["scoring_status"],
-        "canh_bao_trung_thuc": "Kết luận V1-basic chỉ dùng lớp quy tắc đã ghi rõ; phần chưa tra được hoặc chưa đủ nguồn không được suy rộng thành dự báo chắc chắn.",
+        "methodology": danh_gia.get("methodology", {}),
+        "canh_bao_trung_thuc": (
+            "Thập Thần và quan hệ Can/Chi hiện chỉ được dùng để mô tả cấu trúc. "
+            "Không dùng chúng thay Cách cục + hỷ/kỵ để tạo nhãn thuận/nghịch cá nhân."
+            if descriptive_only else
+            "Kết luận chỉ dùng lớp quy tắc đã ghi rõ; phần chưa đủ nguồn không được suy rộng thành dự báo chắc chắn."
+        ),
     }
 
 

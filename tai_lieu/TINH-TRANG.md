@@ -1,74 +1,52 @@
-# Tình trạng thật của từng phần
+# TÌNH TRẠNG THẬT — 0.4.0
 
-Cập nhật: 2026-08-22 · `ENGINE_VERSION` 0.1.0-phase1 · `RULESET_VERSION` RS-2026.08-P1
+Cập nhật: 2026-08-24  
+`ENGINE_VERSION = 0.4.0-zpzq-method-gate`  
+`RULESET_VERSION = RS-2026.08-ZPZQ.1`
 
-## Hai con số phải đọc tách rời
+## 1. Điều đã sửa ở 0.4.0
+0.3.x đã dùng Thập Thần + quan hệ Địa Chi để tạo lời khuyên cá nhân trong khi Cách cục/hỷ-kỵ chưa hoàn chỉnh. 0.4.0 khóa lại phương pháp:
+- Thập Thần và quan hệ Can/Chi vẫn tính và truy nguồn.
+- Chúng chỉ là **evidence cấu trúc**, không thay Dụng/Hỷ/Kỵ.
+- Lớp cá nhân tạm ở `DESCRIPTIVE_ONLY`.
+- Tìm ngày vẫn chạy lớp Hiệp Kỷ, nhưng cá nhân chưa được phép nâng/hạ hạng.
 
-```
-IMPLEMENTATION_STATUS       = PASS        (675 test đạt, 0 trượt)
-SOURCE_VERIFICATION_STATUS  = PARTIAL     (tầng đánh giá chưa có nguồn)
-```
+## 2. Phương pháp cá nhân đã khóa
+**Tử Bình Chân Thuyên — Nguyệt lệnh/Cách cục (`ZPZQ-GEJU-V1`)**.
 
-**Test đạt không có nghĩa cổ thư đã được xác minh.** Đây là hai chuyện khác nhau.
+Ba nguyên tắc phương pháp đã đưa vào rule registry:
+- `BT-BASE-0401`: không lấy đắc/thất thời một mình để kết luận mạnh/yếu; các trụ khác có quyền tăng giảm.
+- `BT-USE-0401`: Dụng thần chuyên cầu từ Nguyệt lệnh, phối Nhật can để phân Cách cục.
+- `BT-DY-0401`: luận vận phải phối Can Chi vận với hỷ/kỵ đã xác lập từ mệnh gốc.
 
-## Phần đã chạy và đã có nguồn
+Nguồn chính được ghim bằng bản scan; bản chép số hóa chỉ dùng đối chiếu.
 
-| Phần | Trạng thái | Nguồn |
-|---|---|---|
-| 24 tiết khí tới từng giây | VERIFIED / HIGH | VSOP87, đối chiếu 3 cài đặt |
-| Chu kỳ Can Chi ngày | VERIFIED / HIGH | Xuân Thu + thiên văn, phủ 2738 năm |
-| Mốc neo ngày (Kỷ Tị, 720 TCN) | VERIFIED / MEDIUM | Xuân Thu + thiên văn, 4 nhóm bằng chứng |
-| Ngũ Hổ Độn (Can tháng) | VERIFIED / MEDIUM | Uyên Hải Tử Bình, 5 nhóm |
-| Ngũ Thử Độn (Can giờ) | VERIFIED / MEDIUM | Uyên Hải Tử Bình, 5 nhóm |
-| Tàng Can 12 Chi | VERIFIED / MEDIUM | Uyên Hải Tử Bình, 又地支藏遁歌 |
-| Thập Thần 10 ô | VERIFIED / MEDIUM | Uyên Hải Tử Bình, quyển một |
-| Nguyệt lệnh 12 tháng | VERIFIED / HIGH | suy từ Tiết mở tháng |
-| Khởi Đại vận (chiều, đếm Tiết, 3 ngày 1 tuổi) | VERIFIED / MEDIUM | Tam Mệnh Thông Hội |
+## 3. Đã có và được phép dùng
+- Lập Tứ Trụ / lịch pháp nền.
+- Nguyệt lệnh.
+- Tàng Can.
+- Thập Thần.
+- Quan hệ Địa Chi đang có nguồn.
+- Đại vận / Năm / Tháng / Ngày ở tầng dữ liệu thời gian.
+- Hiệp Kỷ V1-basic theo 12 Trực cho 13 nhóm việc, giữ trạng thái VERIFIED/PROVISIONAL.
+- Trace Rule → Version → Source → Passage → status.
 
-## Phần chưa chắc
+## 4. Chưa có quyền kết luận cá nhân
+- Cách cục engine đầy đủ.
+- Thành/bại/cứu/ứng và biến hóa cách cục.
+- Hỷ/Kỵ mệnh gốc theo phương pháp đã khóa.
+- Hợp lưu Đại vận→Năm→Tháng→Ngày→Giờ với hỷ/kỵ.
+- Giờ tốt/xấu cá nhân theo chính ngày đang xét.
 
-| Phần | Trạng thái | Vì sao |
-|---|---|---|
-| Tháng mở tại Tiết | PROVISIONAL / HIGH | bằng chứng gián tiếp, chưa có phát biểu trọn vẹn |
-| Mốc chuyển Đại vận ra ngày dương lịch | PROVISIONAL / LOW | cổ thư dùng năm 360 ngày, cài đặt dùng 365,2422 — lệch ~52 ngày |
-| Quyền khí theo tiết | PROVISIONAL, không bật | mới một nguồn, 22 tiết đều INSUFFICIENT_SOURCES |
-| Thứ tự liệt kê Tàng Can | CONFLICTED | hai nguồn khác thứ tự ở 5 Chi |
-| Can giờ Tý trước nửa đêm | CONFLICTED, KNOWN_CONFLICT mở | hai cách hiểu, không tự chọn |
-| Tên gọi ô đồng hành | CONFLICTED, NOT_A_DIRECT_ALIAS | Tỷ Kiên và Dương Nhận là hai khái niệm khác nhau |
+Vì vậy: **chưa được gọi một thời điểm là thuận/nghịch cá nhân chỉ từ Thập Thần hoặc xung/hợp.**
 
-## Phần HOÀN TOÀN CHƯA CÓ
+## 5. Kiểm thử 0.4.0
+- Static Python compile: PASS.
+- JavaScript syntax: PASS.
+- YAML parse: PASS.
+- Rule/seed audit: 0 lỗi, 0 cảnh báo.
+- Bộ hồi quy phương pháp 0.4: PASS.
+- Full Calendar/Golden trong container: chưa chạy hết vì thiếu package `astronomy`; đây là giới hạn môi trường, không được ghi PASS.
 
-Đây là lý do ứng dụng chưa chấm điểm được.
-
-| Phần | Số quy tắc | Cần gì để gỡ |
-|---|---|---|
-| Vượng suy | 0 | giải xong quyền khí trước |
-| Cách cục | 0 | phần Luận cách cục của Tử Bình Chân Thuyên |
-| Dụng / Hỷ / Kỵ | 0 | đứng trên vượng suy và cách cục |
-| Hợp, xung, hình, hại, phá | 0 | nguồn cổ cho từng loại quan hệ |
-| **Hiệp Kỷ theo loại việc** | **0** | **nguyên văn Khâm Định Hiệp Kỷ Biện Phương Thư** |
-| Thần sát | 0 | nguồn và công thức khởi |
-| Chấm điểm | NOT_CALIBRATED | ca vàng nhóm GOLD-FUS đã duyệt |
-
-## Ba thứ cần, theo thứ tự ưu tiên
-
-1. **Nguyên văn Hiệp Kỷ cho 13 nhóm việc** — gỡ được chức năng "Tìm ngày".
-2. **Bảng chia ngày của Tam Mệnh Thông Hội, phần 論人元司事** — gỡ được quyền khí, rồi vượng suy, rồi Dụng/Hỷ/Kỵ.
-3. **Phần Luận cách cục của Tử Bình Chân Thuyên** — gỡ được cách cục.
-
-Chỉ cần thứ nhất là "Tìm ngày" chạy được.
-Cần cả ba thì mới chấm điểm được.
-
-## Ca vàng
-
-```
-APPROVED = 12    PENDING = 6
-```
-
-Ca chờ duyệt không được tính vào bất kỳ con số độ phủ nào.
-
-## Về bản chép cổ thư
-
-M��i nguồn cổ trong hệ thống đều ở mức `edition_certainty = TRANSCRIPTION_ONLY`.
-Nghĩa là: đọc được nguyên văn, nhưng **chưa khóa được bản in cụ thể**.
-Không bản nào là bản chụp nguyên bản.
+## 6. Việc ưu tiên duy nhất
+Trích và mã hóa có nguồn phần **Luận Dụng Thần / Cách cục** của Tử Bình Chân Thuyên trong kiến trúc hiện có. Không xây thêm lớp mới.

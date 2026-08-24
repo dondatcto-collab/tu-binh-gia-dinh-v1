@@ -25,7 +25,7 @@ def test_khai_truong_pha_nhat_khong_uu_tien():
     d = danh_gia_event("YIN", "SHEN", "MAO", "KHAI_TRUONG")
     assert d["truc"] == "PHA"
     assert d["event_state"] == "JI"
-    assert d["label"] == "Không ưu tiên"
+    assert d["label"] == "Không ưu tiên theo việc"
 
 
 def test_xep_hang_khong_dung_trong_so():
@@ -36,7 +36,7 @@ def test_xep_hang_khong_dung_trong_so():
 def test_khong_bia_diem_so():
     d = danh_gia_event("YIN", "ZI", "CHOU", "KHAI_TRUONG")
     assert d["score"] is None
-    assert d["scoring_status"] == "ORDINAL_RULESET_V1"
+    assert d["scoring_status"] == "EVENT_ONLY_PERSONAL_PENDING"
 
 
 def test_anh_xa_tam_khong_duoc_nang_thanh_rat_phu_hop():
@@ -44,7 +44,7 @@ def test_anh_xa_tam_khong_duoc_nang_thanh_rat_phu_hop():
     # quan hệ cá nhân thuận, V1 không được gắn nhãn mạnh nhất.
     d = danh_gia_event("YIN", "XU", "MAO", "THI_CU")  # Dần -> Tuất = Thành
     assert d["mapping_status"] == "PROVISIONAL"
-    assert d["label"] == "Có thể cân nhắc"
+    assert d["label"] == "Có thể cân nhắc theo Hiệp Kỷ"
 
 
 def test_13_nhom_viec_deu_chay_12_truc_khong_co_diem_gia():
@@ -54,7 +54,7 @@ def test_13_nhom_viec_deu_chay_12_truc_khong_co_diem_gia():
             d = danh_gia_event("YIN", day_chi, "MAO", code)
             assert d["support_level"] == "ACTIVE_BASIC"
             assert d["score"] is None
-            assert d["label"] in {"Ưu tiên", "Phù hợp", "Có thể cân nhắc", "Chưa có tín hiệu nổi bật", "Cân nhắc", "Không ưu tiên"}
+            assert d["label"] in {"Phù hợp theo Hiệp Kỷ", "Có thể cân nhắc theo Hiệp Kỷ", "Chưa có tín hiệu theo việc", "Không ưu tiên theo việc"}
 
 
 def test_ma_dia_chi_tu_calendar_engine_duoc_nhan_truc_tiep():
@@ -77,14 +77,15 @@ def test_13_loai_viec_nhan_ma_chi_native_cua_engine():
 def test_nhan_trung_tinh_khong_tao_cam_giac_da_ket_luan_chac_chan():
     from loi.quyet_dinh.v1 import danh_gia_giai_doan
     d = danh_gia_giai_doan("DAN", "TY", "day")
-    assert d["state"] == "TRUNG_TINH"
-    assert d["label"] == "Chưa có tín hiệu nổi bật"
+    assert d["state"] == "DESCRIPTIVE_ONLY"
+    assert d["label"] == "Chỉ ghi nhận cấu trúc"
+    assert d["recommended"] == []
 
 def test_canh_bao_tang_gia_dinh_dung_loi_thuong():
     from loi.quyet_dinh.v1 import danh_gia_giai_doan
     d = danh_gia_giai_doan("DAN", "THAN", "day")
-    assert d["state"] == "CAN_NHAC"
-    assert d["label"] == "Có điểm cần lưu ý"
+    assert d["state"] == "DESCRIPTIVE_ONLY"
+    assert d["label"] == "Chỉ ghi nhận cấu trúc"
     assert "Lục xung" in d["relation"]["nhan"]
 
 def test_event_provisional_khong_duoc_nang_thanh_phu_hop():
@@ -92,7 +93,7 @@ def test_event_provisional_khong_duoc_nang_thanh_phu_hop():
     d = danh_gia_event("DAN", "TUAT", "MAO", "THI_CU")  # Thành
     assert d["event_state"] == "YI"
     assert d["mapping_status"] == "PROVISIONAL"
-    assert d["label"] == "Có thể cân nhắc"
+    assert d["label"] == "Có thể cân nhắc theo Hiệp Kỷ"
 
 def test_an_tang_khong_duoc_tu_tao_nhom_yi():
     # V1 hiện chưa có yi_truc cho an táng, vì vậy không được gắn Phù hợp/Ưu tiên chỉ từ Hiệp Kỷ.
@@ -100,7 +101,7 @@ def test_an_tang_khong_duoc_tu_tao_nhom_yi():
     assert EVENT_RULES["AN_TANG"].yi_truc == frozenset()
     for day_chi in CHI:
         d = danh_gia_event("DAN", day_chi, "MAO", "AN_TANG")
-        assert d["label"] not in {"Ưu tiên", "Phù hợp"}
+        assert d["label"] != "Phù hợp theo Hiệp Kỷ"
 
 def test_chon_viec_thuc_su_lam_thay_doi_ket_qua_cung_mot_ngay():
     # Tháng Dần, ngày Tý = Trực Khai: khai trương được nêu 宜, cầu tài không nêu Khai là 宜.

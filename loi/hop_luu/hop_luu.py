@@ -137,38 +137,34 @@ class KetQuaHopLuu:
 CAC_O_CHUA_CO_CAN_CU = [
     DieuChuaBiet(
         "VUONG_SUY",
-        "Sức của bạn đang mạnh hay yếu so với thời tiết trong năm",
-        "Nhật chủ mạnh hay yếu",
-        "Muốn xét vượng suy phải biết Can nào đương quyền trong đoạn tiết khí. "
-        "Đó là nhóm BT-SEASON-POWER, hiện cả 22 tiết đều INSUFFICIENT_SOURCES.",
-        "Cần bảng chia ngày của Tam Mệnh Thông Hội hoặc một nguồn cổ thứ hai."),
+        "Nhật chủ có đủ lực để gánh cấu trúc đang có hay không",
+        "Mức mạnh/yếu của Nhật chủ trong toàn Tứ Trụ",
+        "Tử Bình Chân Thuyên đã khóa nguyên tắc: nguyệt lệnh là trọng nhưng không được lấy đắc/thất lệnh một mình để phán vượng nhược. Engine chưa cài đủ quy tắc thông căn, trợ/khắc và toàn cục để đưa ra kết luận này.",
+        "Cài bộ quy tắc sức Nhật chủ theo nguyên văn đã kiểm chứng và ca vàng; không dùng bảng điểm tự đặt."),
     DieuChuaBiet(
         "CACH_CUC",
-        "Kiểu vận mệnh tổng thể của bạn thuộc dạng nào",
-        "Cách cục của lá số",
-        "Nhóm BT-PAT chưa có quy tắc nào. Việc xét thành bại cứu ứng cần "
-        "nguồn Tử Bình Chân Thuyên mà tôi chưa có trong tay.",
-        "Cần phần Luận cách cục của Tử Bình Chân Thuyên."),
+        "Cấu trúc chính của lá số đang vận hành theo kiểu nào",
+        "Dụng thần nguyệt lệnh / cách cục và trạng thái thành-bại-cứu ứng",
+        "Đã có nguồn Tử Bình Chân Thuyên xác nhận phải lấy nguyệt lệnh làm đề cương, nhưng Engine chưa cài đủ các quy tắc định cách, biến hóa, thành bại và cứu ứng.",
+        "Cài lần lượt Luận dụng thần → thành bại cứu ứng → biến hóa → tương thần theo nguồn đã khóa."),
     DieuChuaBiet(
         "DUNG_HY_KY",
-        "Điều gì hợp với bạn và điều gì không hợp",
-        "Dụng thần, Hỷ thần, Kỵ thần",
-        "Nhóm BT-USE chưa có quy tắc nào, và nó đứng trên vượng suy lẫn cách cục "
-        "— cả hai đều chưa xác định được.",
-        "Cần giải xong vượng suy và cách cục trước."),
+        "Yếu tố nào đang hỗ trợ cấu trúc của bạn và yếu tố nào đang phá nó",
+        "Hỷ/Kỵ của mệnh gốc theo cách cục",
+        "Theo Tử Bình Chân Thuyên, Dụng thần của phương pháp lõi lấy từ nguyệt lệnh/cách cục; hỷ/kỵ phải xét trong cấu trúc thành-bại-cứu ứng và toàn Tứ Trụ. Không được thay bằng một ngũ hành cân bằng tự chọn.",
+        "Hoàn thiện Cách cục và quy tắc hỷ/kỵ theo từng cách rồi mới cho vận/năm/tháng/ngày/giờ tham gia quyết định."),
     DieuChuaBiet(
         "THAN_SAT",
-        "Ngày này có điểm gì đáng chú ý riêng không",
+        "Ngày này có điểm phụ nào đáng chú ý không",
         "Thần sát",
-        "Nhóm SS chưa có quy tắc nào.",
-        "Cần nguồn và công thức khởi cho từng Thần sát."),
+        "Nhóm SS chưa đủ quy tắc nguồn; theo phạm vi V1, Thần sát chỉ là lớp phụ và không được lật kết luận chính.",
+        "Chỉ bổ sung khi có nguồn và công thức khởi rõ ràng."),
     DieuChuaBiet(
         "CHAM_DIEM",
-        "Chấm điểm ngày từ 0 tới 10",
+        "Mức độ ưu tiên định lượng",
         "Điểm số và nhãn",
-        "Chưa có hệ chấm điểm nào được hiệu chỉnh bằng ca vàng đã duyệt. "
-        "Đặc tả cấm tự chốt ngưỡng chỉ vì ví dụ trong lệnh.",
-        "Cần ca vàng nhóm GOLD-FUS đã duyệt để hiệu chỉnh."),
+        "Chưa có hệ chấm điểm được hiệu chỉnh bằng ca vàng; đặc tả cấm tự đặt trọng số/ngưỡng.",
+        "Chỉ hiệu chỉnh sau khi logic cách cục-hỷ/kỵ và ca vàng đã đủ."),
 ]
 
 
@@ -370,7 +366,7 @@ def hop_luu(conn: sqlite3.Connection, hs: HoSo,
         score=None,
         label=main_label or UNKNOWN,
         confidence=main_conf,
-        scoring_status="ORDINAL_V1_BASIC",
+        scoring_status="PERSONAL_DESCRIPTIVE_EVENT_ORDINAL",
         recommended=rec,
         caution=caut,
         avoid=avoid_list,

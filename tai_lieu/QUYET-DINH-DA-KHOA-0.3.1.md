@@ -1,3 +1,5 @@
+> **SUPERSEDED VỀ PHƯƠNG PHÁP CÁ NHÂN:** từ 0.4.0, xem `QUYET-DINH-DA-KHOA-0.4.0.md`. Các quyết định sản phẩm/UI vẫn kế thừa; mọi hiệu lực quyết định dựa riêng trên Thập Thần + quan hệ Chi của 0.3.x đã bị vô hiệu hóa.
+
 # QUYẾT ĐỊNH ĐÃ KHÓA — TỬ BÌNH GIA ĐÌNH V1 / 0.3.1
 
 Kế thừa toàn bộ `QUYET-DINH-DA-KHOA-0.3.0.md`. Không mở lại nội dung LOCKED nếu không có test chứng minh lỗi hoặc chủ dự án yêu cầu thay đổi.
