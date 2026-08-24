@@ -8,7 +8,7 @@
 - Ruleset: `RS-2026.08-ZPZQ.2`
 - Hồ sơ cá nhân: lưu trên thiết bị (`DEVICE_ONLY`), không lưu hồ sơ sinh trên máy chủ.
 - Quyết định: nhãn thứ bậc, **không dùng điểm số 0–10** (`numeric_score = LOCKED_OFF`).
-- UI: nhãn phiên bản và màu trạng thái lịch đã đồng bộ theo 0.5.0.
+- UI: nhãn phiên bản và màu trạng thái lịch/kết quả đã đồng bộ theo 0.5.0.
 
 ## V1 hiện đã hỗ trợ
 
