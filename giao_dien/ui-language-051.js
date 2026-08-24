@@ -46,6 +46,7 @@
     document.head.appendChild(s);
   }
 
+  // User-facing color/status language.
   badgeClass=function(label=''){
     const x=String(label||'');
     if(/Bị chặn|Không ưu tiên|JI|HARD_BLOCK/i.test(x))return'bad';
@@ -101,6 +102,7 @@
       ${(adjacent||hours)?`<details class="card today-051-secondary"><summary>Thông tin tham khảo thêm</summary>${adjacent}${hours}</details>`:''}`;
   };
 
+  // Standardize calendar wording without changing the underlying state/ranking.
   const oldRenderCalendar=renderCalendar;
   renderCalendar=async function(){
     await oldRenderCalendar();
@@ -111,6 +113,7 @@
   };
 
   addPolishStyles();
+  // app.js starts boot before this layer is loaded; re-render once after boot settles.
   window.addEventListener('load',()=>setTimeout(()=>{
     try{if(currentProfile)loadHomeDashboard();if($('screen-calendar')?.classList.contains('active'))renderCalendar()}catch{}
   },700));
