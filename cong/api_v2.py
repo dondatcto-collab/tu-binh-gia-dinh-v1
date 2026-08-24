@@ -8,8 +8,9 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay, toi_dang_o_dau
-from loi.ket_qua.v2 import decade_result, event_search, finance_result, personal_result, schema_status, work_result
+from loi.ket_qua.v2 import decade_result, event_search, finance_result, personal_result, relationship_result, schema_status, work_result
 from loi.linh_vuc.cong_viec import danh_gia_cong_viec
+from loi.linh_vuc.quan_he import danh_gia_quan_he
 from loi.linh_vuc.tai_chinh import danh_gia_tai_chinh
 
 router = APIRouter(prefix="/api/v2", tags=["v2"])
@@ -57,18 +58,24 @@ def _domain_raw(v: DomainRequest):
 def v2_cong_viec(v: DomainRequest):
     raw = _domain_raw(v)
     out = work_result(danh_gia_cong_viec(raw, scope=v.scope))
-    if v.scope == "day":
-        out["date"] = raw.get("ngay")
+    if v.scope == "day": out["date"] = raw.get("ngay")
     return out
 
 
 @router.post("/tai-chinh")
 def v2_tai_chinh(v: DomainRequest):
-    """V2.2 Tiền bạc: chỉ day/month, không chấm điểm và không dự báo lợi nhuận."""
     raw = _domain_raw(v)
     out = finance_result(danh_gia_tai_chinh(raw, scope=v.scope))
-    if v.scope == "day":
-        out["date"] = raw.get("ngay")
+    if v.scope == "day": out["date"] = raw.get("ngay")
+    return out
+
+
+@router.post("/quan-he")
+def v2_quan_he(v: DomainRequest):
+    """V2.3 Quan hệ: social/collaboration only; không dự báo tình cảm/hôn nhân."""
+    raw = _domain_raw(v)
+    out = relationship_result(danh_gia_quan_he(raw, scope=v.scope))
+    if v.scope == "day": out["date"] = raw.get("ngay")
     return out
 
 
@@ -79,6 +86,5 @@ def v2_tim_ngay(v: WorkRequest):
 
 
 def register_v2(app) -> None:
-    """Đăng ký route V2 vào FastAPI app mà không làm thay đổi route V1."""
     if not any(getattr(r, "path", "").startswith("/api/v2/") for r in app.routes):
         app.include_router(router)
