@@ -8,6 +8,7 @@
 - Ruleset: `RS-2026.08-ZPZQ.2`
 - Hồ sơ cá nhân: lưu trên thiết bị (`DEVICE_ONLY`), không lưu hồ sơ sinh trên máy chủ.
 - Quyết định: nhãn thứ bậc, **không dùng điểm số 0–10** (`numeric_score = LOCKED_OFF`).
+- UI: nhãn phiên bản và màu trạng thái lịch đã đồng bộ theo 0.5.0.
 
 ## V1 hiện đã hỗ trợ
 
@@ -96,7 +97,7 @@ Bản chạy cục bộ có thể dùng kho SQLite theo cấu hình của ứng 
 
 - Nên nhập đúng ngày và giờ sinh; V1 không tự đoán giờ sinh.
 - Hồ sơ sinh tại Việt Nam dùng `Asia/Ho_Chi_Minh` mặc định.
-- Nếu sinh ở nước khác, chọn đúng múi giờ nơi sinh trong màn hình Hồ sơ.
+- Nếu sinh ở nước khác, chọn đúng mú́i giờ nơi sinh trong màn hình Hồ sơ.
 
 ## Y tế
 
