@@ -1,0 +1,114 @@
+name: Live smoke production
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - finalize-0.5.0-docs-smoke
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Smoke POST production
+        env:
+          BASE_URL: https://tu-binh-gia-dinh-v1.vercel.app
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.request
+
+          base = os.environ["BASE_URL"].rstrip("/")
+          profile = {
+              "profile_id": "SMOKE-050",
+              "full_name": "Ho So Kiem Thu",
+              "gender": "NAM",
+              "birth": {"year": 1990, "month": 1, "day": 15, "hour": 8, "minute": 0},
+              "birth_place_text": "Can Tho",
+              "timezone_name": "Asia/Ho_Chi_Minh",
+              "time_certainty": "KNOWN",
+              "note": "Automated production smoke test",
+          }
+
+          def request_json(path, payload=None, attempts=3):
+              body = None if payload is None else json.dumps(payload).encode("utf-8")
+              headers = {"Accept": "application/json"}
+              if body is not None:
+                  headers["Content-Type"] = "application/json"
+              last = None
+              for attempt in range(1, attempts + 1):
+                  req = urllib.request.Request(
+                      base + path,
+                      data=body,
+                      headers=headers,
+                      method="GET" if body is None else "POST",
+                  )
+                  try:
+                      with urllib.request.urlopen(req, timeout=90) as r:
+                          if r.status != 200:
+                              raise AssertionError(f"{path}: HTTP {r.status}")
+                          return json.loads(r.read().decode("utf-8"))
+                  except Exception as exc:
+                      last = exc
+                      if attempt < attempts:
+                          time.sleep(5 * attempt)
+              raise AssertionError(f"{path}: request failed: {last}")
+
+          health = request_json("/api/health")
+          assert health.get("ok") is True, health
+          assert health.get("engine_version") == "0.5.0-zpzq-fusion", health
+          assert health.get("checks", {}).get("rule_db") is True, health
+          assert health.get("checks", {}).get("astronomy") is True, health
+          assert health.get("checks", {}).get("events") == 12, health
+
+          dashboard = request_json("/api/stateless/dashboard", {"profile": profile})
+          assert all(k in dashboard for k in ("vi_tri", "thang", "hom_nay")), dashboard.keys()
+
+          today = request_json(
+              "/api/stateless/hom-nay",
+              {"profile": profile, "ngay": "2026-08-24"},
+          )
+          assert today.get("ngay") == "2026-08-24", today
+          assert "don_gian" in today and "chuyen_sau" in today, today.keys()
+          assert today.get("gio_status") == "STRUCTURAL_ONLY_PERSONAL_USE_PENDING", today
+
+          month = request_json("/api/stateless/thang-nay", {"profile": profile})
+          assert "don_gian" in month and "chuyen_sau" in month, month.keys()
+
+          calendar = request_json(
+              "/api/stateless/lich-thang",
+              {"profile": profile, "year": 2026, "month": 8, "viec": "KY_HOP_DONG"},
+          )
+          assert calendar.get("year") == 2026 and calendar.get("month") == 8, calendar
+          assert calendar.get("viec") == "KY_HOP_DONG", calendar
+          assert calendar.get("scoring_status") == "ORDINAL_V1_1_PERSONAL", calendar
+          assert len(calendar.get("days", [])) == 31, len(calendar.get("days", []))
+
+          search = request_json(
+              "/api/stateless/tim-ngay",
+              {
+                  "profile": profile,
+                  "viec": "KY_HOP_DONG",
+                  "tu_ngay": "2026-08-24",
+                  "den_ngay": "2026-08-31",
+              },
+          )
+          assert search.get("viec") == "KY_HOP_DONG", search
+          assert search.get("so_ngay_da_quet") == 8, search
+          assert search.get("xep_hang_status") == "ORDINAL_V1_1_PERSONAL", search
+          assert len(search.get("cac_ngay", [])) == 8, search
+          assert all(row.get("score") is None for row in search["cac_ngay"]), search["cac_ngay"]
+
+          print("LIVE_SMOKE_PRODUCTION = PASS")
+          print("health=PASS dashboard=PASS hom_nay=PASS thang_nay=PASS lich_thang=PASS tim_ngay=PASS")
+          PY
