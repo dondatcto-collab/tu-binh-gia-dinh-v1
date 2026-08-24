@@ -63,7 +63,7 @@ def _plain(label: str, scope: str) -> tuple[str, str, list[str], list[str]]:
         noun = "Hôm nay" if scope == "day" else "Giai đoạn này"
         return (
             f"{noun} nên chậm lại trước các quyết định quan trọng",
-            "Nền cá nhân kém thuận hơn bình thường. Việc thường ngày vẫn có thể làm; việc quan trọng nên kiểm riêng trước khi quyết định.",
+            "Nền cá nhân kém thuận hơn bình thường. Việc thường ngày vẫn có thể làm; việc quan trọng nên kiểm riêng trước khi quyết định. Kết luận chung này chưa đủ căn cứ để nói riêng về tiền bạc hay quan hệ.",
             ["Giữ nhịp công việc và sinh hoạt bình thường.", "Kiểm kỹ thông tin trước quyết định quan trọng."],
             ["Hạn chế quyết định vội khi chưa kiểm đủ thông tin.", "Không suy kết luận chung thành dự đoán riêng về tiền bạc hay quan hệ."],
         )
@@ -71,20 +71,20 @@ def _plain(label: str, scope: str) -> tuple[str, str, list[str], list[str]]:
         noun = "Hôm nay" if scope == "day" else "Giai đoạn này"
         return (
             f"{noun} nhìn chung khá thuận với bạn",
-            "Nền cá nhân được hỗ trợ hơn bình thường. Điều này không có nghĩa mọi lĩnh vực đều tốt; việc quan trọng vẫn cần kiểm theo đúng loại việc.",
+            "Nền cá nhân được hỗ trợ hơn bình thường. Kết luận chung này chưa đủ căn cứ để nói riêng rằng tiền bạc hay quan hệ đều tốt; việc quan trọng vẫn cần kiểm theo đúng loại việc.",
             ["Tiếp tục các kế hoạch đã chuẩn bị rõ ràng.", "Nếu là việc lớn, chọn đúng loại việc để kiểm riêng."],
             ["Không suy từ trạng thái thuận thành chắc chắn có lợi về tiền bạc hay quan hệ."],
         )
     if label == "Cân bằng":
         return (
             "Thời điểm này tương đối cân bằng",
-            "Chưa có tín hiệu đủ mạnh để gọi là thuận hay nghịch. Có thể tiếp tục việc thường ngày; việc quan trọng nên kiểm riêng.",
+            "Chưa có tín hiệu đủ mạnh để gọi là thuận hay nghịch. Có thể tiếp tục việc thường ngày; chưa đủ căn cứ để kết luận riêng về tiền bạc hay quan hệ, và việc quan trọng nên kiểm riêng.",
             ["Tiếp tục việc thường ngày như bình thường."],
             ["Không xem trạng thái cân bằng là ngày tốt tuyệt đối."],
         )
     return (
         "Chưa có tín hiệu đủ rõ để kết luận mạnh",
-        "Ứng dụng chưa có đủ căn cứ ở lớp hiện tại nên không ép kết luận.",
+        "Ứng dụng chưa có đủ căn cứ ở lớp hiện tại nên không ép kết luận riêng về tiền bạc, quan hệ hoặc một lĩnh vực đời sống khác.",
         ["Với việc quan trọng, kiểm theo đúng loại việc."],
         ["Không tự suy thành kết luận riêng về tiền bạc, quan hệ hoặc sức khỏe."],
     )
