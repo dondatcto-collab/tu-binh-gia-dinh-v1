@@ -1,13 +1,13 @@
 """Result Schema V2.
 
-Mục tiêu: UI V2 chỉ đọc một cấu trúc ổn định. Module này không đổi engine,
+UI V2 chỉ đọc một cấu trúc ổn định. Module này không đổi engine,
 không chấm điểm số và không tự suy kết luận lĩnh vực khi rule chưa có.
 """
 from __future__ import annotations
 
 from typing import Any
 
-SCHEMA_VERSION = "2.0-alpha.1"
+SCHEMA_VERSION = "2.0-alpha.2"
 NUMERIC_SCORE_STATUS = "LOCKED_OFF"
 
 
@@ -90,7 +90,7 @@ def _plain(label: str, scope: str) -> tuple[str, str, list[str], list[str]]:
     )
 
 
-def _confidence(label: str, *, event: bool = False, hard_block: bool = False) -> str:
+def _confidence(label: str, *, hard_block: bool = False) -> str:
     if hard_block or label in {"Bị chặn", "Ưu tiên"}:
         return "Căn cứ rõ"
     if label == "Chưa đủ căn cứ":
@@ -124,6 +124,44 @@ def personal_result(raw: dict[str, Any], *, scope: str, domain: str = "general")
     }
 
 
+def decade_result(raw: dict[str, Any]) -> dict[str, Any]:
+    """Chuẩn hóa Đại vận ở tầng phổ thông, chỉ mô tả vị trí giai đoạn.
+
+    Không tự suy tài chính/công việc/quan hệ từ tên Can Chi của Đại vận.
+    """
+    dv = raw.get("dai_van") or {}
+    pillar = dv.get("tru") or "Chưa xác định"
+    year_no = dv.get("nam_thu_may")
+    start = dv.get("nam_bat_dau")
+    end = dv.get("nam_ket_thuc")
+    if isinstance(year_no, int) and year_no > 0:
+        stage = "đầu" if year_no <= 3 else ("giữa" if year_no <= 7 else "cuối")
+        title = f"Bạn đang ở giai đoạn {stage} của vận 10 năm hiện tại"
+        explanation = f"Đây là bối cảnh dài hạn của khoảng {start or '—'}–{end or '—'}. Nó không quyết định từng ngày và chưa đủ căn cứ để kết luận riêng về công việc, tiền bạc hay quan hệ."
+    else:
+        title = "Đã xác định vận 10 năm hiện tại"
+        explanation = "Đại vận là bối cảnh dài hạn. Từng năm, tháng và ngày vẫn cần được xét riêng; app không suy lĩnh vực đời sống chỉ từ tên Đại vận."
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "kind": "personal_period",
+        "scope": "decade",
+        "domain": "general",
+        "conclusion": {"state": "DESCRIPTIVE_ONLY", "label": "Bối cảnh dài hạn", "title": title},
+        "plain_explanation": explanation,
+        "recommended_actions": ["Dùng Đại vận để hiểu bối cảnh dài hạn, rồi xem năm, tháng và ngày cho quyết định cụ thể."],
+        "cautions": ["Không hiểu một Đại vận là tốt hoặc xấu tuyệt đối cho cả 10 năm."],
+        "confidence_state": "Căn cứ vừa" if pillar != "Chưa xác định" else "Chưa đủ căn cứ",
+        "event_context": None,
+        "personal_context": {"decade_pillar": pillar, "year_in_decade": year_no, "start_year": start, "end_year": end},
+        "evidence": [],
+        "rules": [],
+        "sources": [],
+        "technical": raw,
+        "numeric_score": None,
+        "numeric_score_status": NUMERIC_SCORE_STATUS,
+    }
+
+
 def event_item(item: dict[str, Any], *, event_code: str) -> dict[str, Any]:
     raw_label = item.get("label") or item.get("decision_state") or ""
     label = _label(raw_label)
@@ -141,22 +179,13 @@ def event_item(item: dict[str, Any], *, event_code: str) -> dict[str, Any]:
         "plain_explanation": explanation,
         "recommended_actions": yes,
         "cautions": caution,
-        "confidence_state": _confidence(label, event=True, hard_block=hard_block),
-        "event_context": {
-            "event_code": event_code,
-            "hard_block": hard_block,
-            "event_state": item.get("event_state"),
-            "rank_group": item.get("rank_group"),
-        },
+        "confidence_state": _confidence(label, hard_block=hard_block),
+        "event_context": {"event_code": event_code, "hard_block": hard_block, "event_state": item.get("event_state"), "rank_group": item.get("rank_group")},
         "personal_context": item.get("personal_v1_1") or {},
         "evidence": item.get("reasons") or [],
         "rules": [],
         "sources": [],
-        "technical": {
-            "truc": item.get("truc"),
-            "coverage": item.get("coverage"),
-            "mapping_status": item.get("mapping_status"),
-        },
+        "technical": {"truc": item.get("truc"), "coverage": item.get("coverage"), "mapping_status": item.get("mapping_status")},
         "numeric_score": None,
         "numeric_score_status": NUMERIC_SCORE_STATUS,
     }
@@ -182,14 +211,15 @@ def event_search(raw: dict[str, Any]) -> dict[str, Any]:
 def schema_status() -> dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
-        "status": "ALPHA_FOUNDATION",
+        "status": "ALPHA_CORE_FLOWS",
         "numeric_score": NUMERIC_SCORE_STATUS,
         "principles": [
             "Người dùng phổ thông hiểu trước",
             "Không đủ căn cứ thì không kết luận",
             "HARD_BLOCK luôn thắng",
             "Mọi kết luận phải truy ngược được",
+            "UI không tự suy quyết định từ dữ liệu kỹ thuật",
         ],
-        "implemented_scopes": ["day", "month", "event_search"],
-        "pending_scopes": ["decade", "work_domain", "finance_domain", "relationship_domain", "personal_hour"],
+        "implemented_scopes": ["day", "month", "decade", "event_search"],
+        "pending_scopes": ["work_domain", "finance_domain", "relationship_domain", "personal_hour"],
     }
