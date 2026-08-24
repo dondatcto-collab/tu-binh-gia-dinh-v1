@@ -1,14 +1,10 @@
-"""Phiên bản và hằng số nền.
-
-Mọi kết quả tính toán phải ghi kèm ENGINE_VERSION và RULESET_VERSION.
-Đổi một trong hai thì kết quả cũ không còn so sánh trực tiếp được.
-"""
+"""Phiên bản và hằng số nền cho release V1."""
 from __future__ import annotations
 from pathlib import Path
 import os
 
-ENGINE_VERSION = "0.4.0-zpzq-method-gate"
-RULESET_VERSION = "RS-2026.08-ZPZQ.1"
+ENGINE_VERSION = "0.5.0-zpzq-fusion"
+RULESET_VERSION = "RS-2026.08-ZPZQ.2"
 SCHEMA_MIGRATIONS_TABLE = "schema_migrations"
 GOC_DU_AN = Path(__file__).resolve().parents[2]
 DUONG_DAN = {

@@ -1,13 +1,7 @@
-"""Quyết định V1 tối thiểu, có căn cứ nguồn và không dùng trọng số bịa.
+"""Lớp quyết định V1: 12 việc chính thức, không dùng điểm số tự đặt.
 
-Mục tiêu của lớp này là trả lời ba câu hỏi sản phẩm V1 bằng các quy tắc đã
-có thể xác minh trực tiếp:
-  1) mô tả quan hệ Địa Chi đang xuất hiện, không tự gọi tốt/xấu cá nhân;
-  2) đánh giá ngày theo Hiệp Kỷ cho MỘT VIỆC ở lớp sự kiện độc lập;
-  3) giữ evidence cá nhân để sau này hợp lưu khi Cách cục + hỷ/kỵ đã sẵn sàng.
-
-Không chấm điểm 0-10. Không dùng Thập Thần/xung-hợp để thay Dụng/Hỷ/Kỵ.
-Xếp hạng hiện có của ngày chỉ phản ánh lớp Hiệp Kỷ đã cài.
+Hiệp Kỷ trong V1 chỉ triển khai phần 12 Trực đã khóa nguồn. Quan hệ Địa Chi
+cá nhân vẫn được lưu làm evidence cấu trúc, không tự sinh kết luận tốt/xấu.
 """
 from __future__ import annotations
 
@@ -16,7 +10,6 @@ from typing import Iterable
 
 from loi.lich.quy_uoc_can_chi import CHI as CHI_NATIVE, CHI_VI as CHI_VI_NATIVE
 
-# Dùng cùng mã Địa Chi với Calendar Engine. Vẫn nhận pinyin cũ để tương thích dữ liệu/test cũ.
 CHI = list(CHI_NATIVE)
 CHI_VI = dict(zip(CHI, CHI_VI_NATIVE))
 CHI_ALIAS = {
@@ -24,20 +17,16 @@ CHI_ALIAS = {
     "CHEN":"THIN", "SI":"TI", "WU":"NGO", "WEI":"MUI",
     "SHEN":"THAN", "YOU":"DAU", "XU":"TUAT", "HAI":"HOI",
 }
-
-def chuan_hoa_chi(code: str) -> str:
-    c = str(code or "").strip().upper()
-    c = CHI_ALIAS.get(c, c)
-    if c not in CHI:
-        raise ValueError(f"CHI_KHONG_HOP_LE: {code}")
-    return c
 TRUC = ["KIEN","TRU","MAN","BINH","DINH","CHAP","PHA","NGUY","THANH","THU","KHAI","BE"]
 TRUC_VI = {
     "KIEN":"Kiến","TRU":"Trừ","MAN":"Mãn","BINH":"Bình","DINH":"Định","CHAP":"Chấp",
     "PHA":"Phá","NGUY":"Nguy","THANH":"Thành","THU":"Thu","KHAI":"Khai","BE":"Bế",
 }
+V1_EVENT_COVERAGE = "12/12"
+HIEP_KY_COVERAGE = "PARTIAL_12_TRUC_ONLY"
+NUMERIC_SCORE_STATUS = "LOCKED_OFF"
+BACKLOG_EVENT_CODES = frozenset({"THI_CU"})
 
-# 三命通會, quyển 2: 支元六合 / 冲击 / 六害 / 三刑.
 LUC_HOP = {frozenset(x) for x in [("TY","SUU"),("DAN","HOI"),("MAO","TUAT"),("THIN","DAU"),("TI","THAN"),("NGO","MUI")]}
 LUC_XUNG = {frozenset(x) for x in [("TY","NGO"),("SUU","MUI"),("DAN","THAN"),("MAO","DAU"),("THIN","TUAT"),("TI","HOI")]}
 LUC_HAI = {frozenset(x) for x in [("TY","MUI"),("SUU","NGO"),("DAN","TI"),("MAO","THIN"),("THAN","HOI"),("DAU","TUAT")]}
@@ -46,14 +35,13 @@ TU_HINH = {"THIN","NGO","DAU","HOI"}
 
 SRC_REL = "SRC-TMTH-V02-WIKISOURCE"
 SRC_HK11 = "SRC-HK-QD-V11-WIKISOURCE"
-SRC_HK04 = "SRC-HK-QD-V04-KANRIPO"
 SRC_PRODUCT = "SRC-PRODUCT-V1-SPEC"
 
 @dataclass(frozen=True)
 class QuanHeChi:
     ma: str
     nhan: str
-    muc: str   # POSITIVE | CAUTION | NEUTRAL
+    muc: str
     mo_ta: str
     rule_id: str
     source_id: str
@@ -69,38 +57,42 @@ class EventRule:
     source_location: str
     note: str = ""
 
-# Chỉ dùng các Trực được nêu trực tiếp trong mục 宜/忌 của 協紀辨方書卷十一.
-# Các thần khác chưa được tính ở V1-basic, vì vậy kết quả ghi rõ coverage PARTIAL.
+# Phạm vi V1 đã khóa: 12 việc. Thi/phỏng vấn chuyển BACKLOG_NOT_V1.
 EVENT_RULES = {
     "KHAI_TRUONG": EventRule("KHAI_TRUONG","Khai trương","開市",frozenset({"MAN","THANH","KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 開市"),
     "KY_HOP_DONG": EventRule("KY_HOP_DONG","Ký hợp đồng / giao dịch quan trọng","立券交易",frozenset({"MAN"}),frozenset({"PHA","BINH","THU"}),"VERIFIED","卷十一 · 立券交易"),
     "MUA_TAI_SAN": EventRule("MUA_TAI_SAN","Mua tài sản lớn","納財",frozenset({"MAN","THU"}),frozenset({"PHA","BINH"}),"PROVISIONAL","卷十一 · 納財","Nhóm hiện đại rộng; V1 dùng 納財 làm đại diện."),
     "DONG_THO": EventRule("DONG_THO","Động thổ / sửa nhà","興造動土/修造",frozenset({"KHAI"}),frozenset({"KIEN","PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 興造動土"),
-    "NHAP_TRACH": EventRule("NHAP_TRACH","Nhập trạch / chuyển nhà","般移/移徙",frozenset({"THANH","KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 般移〈移徙同〉"),
-    "CUOI_HOI": EventRule("CUOI_HOI","Cưới hỏi","嫁娶",frozenset(),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 嫁娶","Các cát thần cưới hỏi khác chưa tính trong V1-basic."),
+    "NHAP_TRACH": EventRule("NHAP_TRACH","Chuyển nhà / di dời","般移/移徙",frozenset({"THANH","KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 般移〈移徙同〉"),
+    "CUOI_HOI": EventRule("CUOI_HOI","Cưới hỏi","嫁娶",frozenset(),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 嫁娶","Các cát thần cưới hỏi khác chưa tính trong V1."),
     "XUAT_HANH": EventRule("XUAT_HANH","Đi xa / xuất hành","出行",frozenset({"KIEN","KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"VERIFIED","卷十一 · 行幸遣使〈出行同〉"),
-    "DIEU_TRI": EventRule("DIEU_TRI","Khám / điều trị / thủ thuật linh hoạt","求醫療病",frozenset({"TRU","PHA","KHAI"}),frozenset({"KIEN","BINH","THU","MAN","BE"}),"VERIFIED","卷十一 · 求醫療病","Chỉ dùng trong các lựa chọn thời gian đã được bác sĩ cho phép; không trì hoãn cấp cứu."),
-    "DAM_PHAN": EventRule("DAM_PHAN","Gặp gỡ / đàm phán quan trọng","會親友",frozenset({"KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"PROVISIONAL","卷十一 · 宴會〈會親友同〉","Đàm phán hiện đại được ánh xạ gần nhất sang 會親友."),
-    "NHAM_CHUC": EventRule("NHAM_CHUC","Bắt đầu công việc mới / nhận chức","上官赴任",frozenset({"KIEN","KHAI"}),frozenset({"PHA","BINH","THU","MAN","BE"}),"VERIFIED","卷十一 · 上官赴任"),
-    "THI_CU": EventRule("THI_CU","Thi cử / phỏng vấn","入學",frozenset({"THANH","KHAI"}),frozenset(),"PROVISIONAL","卷十一 · 入學","Thi cử/phỏng vấn là nhóm hiện đại; 入學 là ánh xạ gần nhất cho lớp học hành."),
-    "CAU_TAI": EventRule("CAU_TAI","Cầu tài / thu hồi tiền / giao dịch","納財",frozenset({"MAN","THU"}),frozenset({"PHA","BINH"}),"VERIFIED","卷十一 · 納財"),
-    "AN_TANG": EventRule("AN_TANG","Tang lễ / an táng","安葬",frozenset(),frozenset({"KIEN","PHA","BINH","THU"}),"VERIFIED","卷十一 · 安葬","Các cát thần chuyên biệt cho an táng chưa tính trong V1-basic."),
+    "DIEU_TRI": EventRule("DIEU_TRI","Khám / điều trị","求醫療病",frozenset({"TRU","PHA","KHAI"}),frozenset({"KIEN","BINH","THU","MAN","BE"}),"VERIFIED","卷十一 · 求醫療病","Chỉ dùng khi thời điểm đã linh hoạt về mặt y khoa; không trì hoãn cấp cứu."),
+    "DAM_PHAN": EventRule("DAM_PHAN","Họp / gặp gỡ","會親友",frozenset({"KHAI"}),frozenset({"PHA","BINH","THU","BE"}),"PROVISIONAL","卷十一 · 宴會〈會親友同〉","Ánh xạ hiện đại ở mức PROVISIONAL."),
+    "NHAM_CHUC": EventRule("NHAM_CHUC","Nhận chức / nhậm chức","上官赴任",frozenset({"KIEN","KHAI"}),frozenset({"PHA","BINH","THU","MAN","BE"}),"VERIFIED","卷十一 · 上官赴任"),
+    "CAU_TAI": EventRule("CAU_TAI","Thu / nhận tiền","納財",frozenset({"MAN","THU"}),frozenset({"PHA","BINH"}),"VERIFIED","卷十一 · 納財"),
+    "AN_TANG": EventRule("AN_TANG","Tang lễ / an táng","安葬",frozenset(),frozenset({"KIEN","PHA","BINH","THU"}),"VERIFIED","卷十一 · 安葬","Các cát thần chuyên biệt cho an táng chưa tính trong V1."),
 }
 
-# Alias để không làm gãy hồ sơ/URL cũ.
-ALIASES = {
-    "DAU_TU":"CAU_TAI", "XAY_DUNG":"DONG_THO", "HOC_TAP":"THI_CU",
-}
+ALIASES = {"DAU_TU":"CAU_TAI", "XAY_DUNG":"DONG_THO"}
+
+
+def chuan_hoa_chi(code: str) -> str:
+    c = CHI_ALIAS.get(str(code or "").strip().upper(), str(code or "").strip().upper())
+    if c not in CHI:
+        raise ValueError(f"CHI_KHONG_HOP_LE: {code}")
+    return c
 
 
 def chuan_hoa_event(code: str | None) -> str | None:
     if not code:
         return None
-    return ALIASES.get(code, code)
+    c = str(code).strip().upper()
+    if c in BACKLOG_EVENT_CODES or c == "HOC_TAP":
+        return c
+    return ALIASES.get(c, c)
 
 
 def tinh_truc(chi_thang: str, chi_ngay: str) -> str:
-    """建 đặt tại chi tháng, sau đó thuận 12 chi: 建除滿平定執破危成收開閉."""
     chi_thang = chuan_hoa_chi(chi_thang)
     chi_ngay = chuan_hoa_chi(chi_ngay)
     return TRUC[(CHI.index(chi_ngay) - CHI.index(chi_thang)) % 12]
@@ -122,68 +114,36 @@ def quan_he_chi(a: str, b: str) -> QuanHeChi:
     return QuanHeChi("NONE","Không có quan hệ trực tiếp","NEUTRAL",f"Không thấy Lục hợp, Lục xung, Lục hại hoặc Hình trực tiếp giữa {CHI_VI[a]} và {CHI_VI[b]} ở lớp V1.","FUS-V1-REL-0001",SRC_PRODUCT)
 
 
-
 def danh_gia_giai_doan(chi_menh_ngay: str, chi_hien_tai: str, scope: str) -> dict:
-    """API tương thích cũ: chỉ mô tả quan hệ Chi, không phán thuận/nghịch.
-
-    Từ 0.4.0, quan hệ Địa Chi đơn lẻ không có quyền sinh NÊN/TRÁNH hay
-    nhãn cát/hung cá nhân. Hàm này được giữ để các caller cũ không gãy, nhưng
-    mọi quyết định cá nhân phải đi qua nền mệnh Cách cục + hỷ/kỵ khi lớp đó
-    được cài đủ.
-    """
     qh = quan_he_chi(chi_menh_ngay, chi_hien_tai)
     horizon = "tháng" if scope == "month" else "ngày" if scope == "day" else "giai đoạn"
-    if qh.ma == "NONE":
-        headline = f"{horizon.capitalize()} chưa có quan hệ Địa Chi trực tiếp trong nhóm quy tắc hiện đã cài"
-    else:
-        headline = f"{horizon.capitalize()} có quan hệ {qh.nhan} với Chi ngày sinh"
+    headline = (f"{horizon.capitalize()} chưa có quan hệ Địa Chi trực tiếp trong nhóm quy tắc hiện đã cài" if qh.ma == "NONE" else f"{horizon.capitalize()} có quan hệ {qh.nhan} với Chi ngày sinh")
     return {
-        "scope": scope,
-        "state": "DESCRIPTIVE_ONLY",
-        "label": "Chỉ ghi nhận cấu trúc",
-        "relation": {**qh.__dict__, "muc": "STRUCTURAL_ONLY"},
-        "recommended": [],
-        "caution": [],
-        "confidence": "MEDIUM" if qh.ma != "NONE" else "LOW",
-        "basis": headline,
-        "dien_giai": {
-            "interpretation_status": "ZPZQ_DESCRIPTIVE_ONLY_0_4",
-            "evidence_scope": "BRANCH_RELATION_NOT_DECISION",
-            "headline": headline,
-            "trigger": qh.mo_ta,
-            "cong_viec": "Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch công việc.",
-            "tai_chinh": "Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch tài chính.",
-            "quan_he": "Quan hệ này chỉ mô tả kiểu tương tác cấu trúc; chưa đồng nghĩa tốt/xấu.",
-            "viec_lon": "Không dùng quan hệ Chi đơn lẻ để quyết định việc lớn.",
-            "focus": [],
-            "khong_suy_dien": "Chờ Cách cục + hỷ/kỵ mệnh gốc trước khi cho quan hệ thời gian tác động vào quyết định cá nhân.",
-            "technical_trigger": qh.mo_ta,
+        "scope":scope, "state":"DESCRIPTIVE_ONLY", "label":"Chỉ ghi nhận cấu trúc",
+        "relation":{**qh.__dict__, "muc":"STRUCTURAL_ONLY"}, "recommended":[], "caution":[],
+        "confidence":"MEDIUM" if qh.ma != "NONE" else "LOW", "basis":headline,
+        "dien_giai":{
+            "interpretation_status":"ZPZQ_DESCRIPTIVE_ONLY_0_5", "evidence_scope":"BRANCH_RELATION_NOT_DECISION",
+            "headline":headline, "trigger":qh.mo_ta,
+            "cong_viec":"Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch công việc.",
+            "tai_chinh":"Chưa dùng quan hệ Chi đơn lẻ để kết luận thuận/nghịch tài chính.",
+            "quan_he":"Quan hệ này chỉ mô tả kiểu tương tác cấu trúc; chưa đồng nghĩa tốt/xấu.",
+            "viec_lon":"Không dùng quan hệ Chi đơn lẻ để quyết định việc lớn.",
+            "focus":[], "khong_suy_dien":"Chờ Cách cục + hỷ/kỵ mệnh gốc trước khi cho quan hệ thời gian tác động vào quyết định cá nhân.",
+            "technical_trigger":qh.mo_ta,
         },
     }
 
-def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code: str) -> dict:
-    """Đánh giá lớp Hiệp Kỷ theo việc, tách khỏi phán quyết cá nhân.
 
-    `chi_menh_ngay` vẫn được nhận để giữ tương thích API, nhưng quan hệ với mệnh
-    chỉ được ghi trong evidence. Nó KHÔNG được nâng/hạ hạng cho tới khi lớp
-    Cách cục + hỷ/kỵ cá nhân sẵn sàng.
-    """
+def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code: str) -> dict:
     code = chuan_hoa_event(event_code)
     rule = EVENT_RULES.get(code or "")
     if not rule:
-        return {"support_level":"NO_RULE","label":"Chưa hỗ trợ","rank_group":9,"score":None}
+        status = "BACKLOG_NOT_V1" if code in BACKLOG_EVENT_CODES or code == "HOC_TAP" else "NO_RULE"
+        return {"support_level":status,"event_code":code,"label":"Chưa hỗ trợ trong V1","rank_group":9,"score":None,"scoring_status":"NO_NUMERIC_SCORE"}
     truc = tinh_truc(chi_thang, chi_ngay)
-    if truc in rule.ji_truc:
-        event_state = "JI"
-    elif truc in rule.yi_truc:
-        event_state = "YI"
-    else:
-        event_state = "NEUTRAL"
-
-    # Quan hệ với mệnh được giữ để truy nguyên, tuyệt đối không dùng làm
-    # quyết định tốt/xấu ở bản 0.4.0.
+    event_state = "JI" if truc in rule.ji_truc else "YI" if truc in rule.yi_truc else "NEUTRAL"
     qh = quan_he_chi(chi_menh_ngay, chi_ngay)
-
     if event_state == "JI":
         group, label = 5, "Không ưu tiên theo việc"
     elif event_state == "YI" and rule.mapping_status == "VERIFIED":
@@ -192,32 +152,26 @@ def danh_gia_event(chi_thang: str, chi_ngay: str, chi_menh_ngay: str, event_code
         group, label = 2, "Có thể cân nhắc theo Hiệp Kỷ"
     else:
         group, label = 3, "Chưa có tín hiệu theo việc"
-
     reasons = [f"Ngày thuộc Trực {TRUC_VI[truc]} trong tháng hiện tại."]
-    if event_state == "YI":
-        reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm được nêu là phù hợp cho {rule.ten} ở lớp quy tắc V1-basic.")
-    if event_state == "JI":
-        reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm cần tránh cho {rule.ten} ở lớp quy tắc V1-basic.")
-    if qh.ma != "NONE":
-        reasons.append(qh.mo_ta + " Quan hệ này hiện chỉ là evidence cấu trúc, không đổi thứ hạng ngày.")
-    if rule.mapping_status == "PROVISIONAL":
-        reasons.append("Ánh xạ từ việc hiện đại sang mục cổ thư đang ở trạng thái PROVISIONAL; nhãn được hạ mức tin cậy.")
-
+    if event_state == "YI": reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm được nêu là phù hợp cho {rule.ten} ở lớp quy tắc V1.")
+    if event_state == "JI": reasons.append(f"Trực {TRUC_VI[truc]} nằm trong nhóm cần tránh cho {rule.ten} ở lớp quy tắc V1.")
+    if qh.ma != "NONE": reasons.append(qh.mo_ta + " Quan hệ này hiện chỉ là evidence cấu trúc, không đổi thứ hạng ngày.")
+    if rule.mapping_status == "PROVISIONAL": reasons.append("Ánh xạ hiện đại đang ở trạng thái PROVISIONAL; nhãn được hạ mức tin cậy.")
     return {
         "support_level":"ACTIVE_BASIC", "event_code":code, "event_name":rule.ten,
         "classical_event":rule.classical, "mapping_status":rule.mapping_status,
         "truc":truc, "truc_vi":TRUC_VI[truc], "event_state":event_state,
         "personal_relation":{**qh.__dict__, "decision_effect":"NONE_UNTIL_NATAL_USE_READY"},
-        "label":label, "rank_group":group,
-        "score":None, "scoring_status":"EVENT_ONLY_PERSONAL_PENDING",
-        "reasons":reasons,
-        "source_id":SRC_HK11, "source_location":rule.source_location,
-        "event_note":rule.note or None,
-        "coverage":"PARTIAL_12_TRUC_ONLY",
+        "label":label, "rank_group":group, "score":None,
+        "scoring_status":"NO_NUMERIC_SCORE", "numeric_score_status":NUMERIC_SCORE_STATUS,
+        "reasons":reasons, "source_id":SRC_HK11, "source_location":rule.source_location,
+        "event_note":rule.note or None, "coverage":HIEP_KY_COVERAGE,
+        "v1_event_coverage":V1_EVENT_COVERAGE,
         "confidence":"MEDIUM" if rule.mapping_status == "VERIFIED" else "LOW",
-        "coverage_note":"Đã dùng phần 12 Trực được nêu trực tiếp trong mục 宜/忌; cá nhân hóa cát/hung đang chờ Cách cục + hỷ/kỵ mệnh gốc.",
+        "coverage_note":"V1 dùng phần 12 Trực được nêu trực tiếp trong mục 宜/忌; không tuyên bố Hiệp Kỷ đầy đủ.",
         "rule_ids":["HK-GENERAL-0001", f"HK-EVENT-{list(EVENT_RULES).index(code)+1:04d}", qh.rule_id, "FUS-V1-0001"],
     }
+
 
 def xep_hang(ds: Iterable[dict]) -> list[dict]:
     return sorted(ds, key=lambda x: (x.get("rank_group",9), x.get("ngay","")))
