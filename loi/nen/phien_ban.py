@@ -7,7 +7,7 @@ from __future__ import annotations
 from pathlib import Path
 import os
 
-ENGINE_VERSION = "0.2.5-fix52-stable"
+ENGINE_VERSION = "0.3.1-meaningful-decision"
 RULESET_VERSION = "RS-2026.08-V1BASIC.3"
 SCHEMA_MIGRATIONS_TABLE = "schema_migrations"
 GOC_DU_AN = Path(__file__).resolve().parents[2]

@@ -24,10 +24,10 @@ def test_gio_khong_bi_trinh_bay_nhu_gio_tot_theo_ngay():
 
 
 def test_phien_ban_pwa_dong_bo_030():
-    assert 'version = "0.3.0"' in (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
-    assert '0.3.0' in (ROOT / 'public' / 'service-worker.js').read_text(encoding='utf-8')
-    assert "APP_VERSION='0.3.0'" in (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')
-    assert '0.3.0' in (ROOT / 'public' / 'index.html').read_text(encoding='utf-8')
+    assert 'version = "0.3.1"' in (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
+    assert '0.3.1' in (ROOT / 'public' / 'service-worker.js').read_text(encoding='utf-8')
+    assert "APP_VERSION='0.3.1'" in (ROOT / 'public' / 'static' / 'app.js').read_text(encoding='utf-8')
+    assert '0.3.1' in (ROOT / 'public' / 'index.html').read_text(encoding='utf-8')
 
 
 def test_ui_public_va_source_dong_bo():

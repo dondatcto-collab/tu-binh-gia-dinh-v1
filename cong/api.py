@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 # Vercel chỉ cho ghi an toàn vào /tmp. DB này chỉ chứa rule/source, không có hồ sơ thật.
 if os.environ.get("VERCEL"):
-    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules-fix52.sqlite3")
+    os.environ.setdefault("XEMNGAY_DB_PATH", "/tmp/xemngay-rules-031.sqlite3")
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -202,6 +202,55 @@ def _gio_tham_khao(kq):
         out.append({"chi":ch,"chi_vi":CHI_VI[i],"khoang_gio":GIO_KHOANG[i],"nhan":nhan,"relation":qh.ma,"relation_level":qh.muc,"ly_do":qh.mo_ta,"scope":"PROFILE_BRANCH_RELATION_ONLY"})
     return out
 
+
+def _tom_tat_phan_tich(dg: dict) -> dict:
+    d = dg.get("dien_giai", {})
+    return {
+        "label": dg.get("label"),
+        "headline": d.get("headline"),
+        "theme": d.get("chu_de_chinh"),
+        "theme_group": dg.get("theme", {}).get("theme_group"),
+        "caution_count": sum(1 for x in dg.get("branch_impacts", []) if x.get("level") == "CAUTION"),
+        "positive_count": sum(1 for x in dg.get("branch_impacts", []) if x.get("level") == "POSITIVE"),
+    }
+
+
+def _cau_so_sanh(current: dict, other: dict, label: str) -> str:
+    a, b = _tom_tat_phan_tich(current), _tom_tat_phan_tich(other)
+    if a["theme_group"] != b["theme_group"]:
+        return f"So với {label}, chủ đề chuyển từ {b['theme'] or 'nhịp khác'} sang {a['theme'] or 'nhịp hiện tại'}; nên ưu tiên loại việc phù hợp với chủ đề mới."
+    if a["caution_count"] > b["caution_count"]:
+        return f"So với {label}, thời điểm này có nhiều điểm va chạm trực tiếp với cấu trúc gốc hơn; nên tăng bước kiểm tra và phương án dự phòng."
+    if a["caution_count"] < b["caution_count"]:
+        return f"So với {label}, thời điểm này ít va chạm trực tiếp với cấu trúc gốc hơn; thuận hơn cho việc cần nhịp ổn định."
+    if a["positive_count"] > b["positive_count"]:
+        return f"So với {label}, thời điểm này có thêm tín hiệu phối hợp trực tiếp; phù hợp hơn với việc cần trao đổi hoặc thống nhất."
+    if a["positive_count"] < b["positive_count"]:
+        return f"So với {label}, tín hiệu phối hợp trực tiếp giảm; nên dựa nhiều hơn vào kế hoạch và điều kiện rõ ràng."
+    return f"So với {label}, cấu trúc nổi bật không đổi nhiều; khác biệt chính nằm ở chi tiết Can/Chi và loại việc cụ thể."
+
+
+def _so_sanh_lien_ke(c, hs: HoSo, kq, d: date, scope: str) -> dict:
+    base = kq.base_state
+    tu_tru = {k: dtg.TruVi(v["can"], v["chi"]) for k, v in base["tu_tru"].items()}
+    nhat_chu = base["nhat_chu"]
+    e = CalendarEngine(tai_bo_lich()["CAL-V1"])
+    current = kq.day_state["danh_gia"] if scope == "day" else kq.month_state["danh_gia"]
+    out = {}
+    if scope == "day":
+        dates = [("hom_qua", "hôm qua", d - timedelta(days=1)), ("ngay_mai", "ngày mai", d + timedelta(days=1))]
+        for key, label, dd in dates:
+            lich = e.tinh(dd.year, dd.month, dd.day, 12, 0, timezone_name=hs.timezone_name, gioi_tinh=hs.gender, tinh_dai_van=False)
+            q = phan_tich_ca_nhan(c, tu_tru=tu_tru, nhat_chu=nhat_chu, can_hien_tai=lich.tru_ngay.can, chi_hien_tai=lich.tru_ngay.chi, scope="day", context=[])
+            out[key] = {"ngay": dd.isoformat(), "headline": q.get("dien_giai",{}).get("headline"), "label": q.get("label"), "so_sanh": _cau_so_sanh(current, q, label)}
+        return out
+    dates = [("thang_truoc", "tháng trước", d - timedelta(days=35)), ("thang_sau", "tháng sau", d + timedelta(days=35))]
+    for key, label, dd in dates:
+        lich = e.tinh(dd.year, dd.month, dd.day, 12, 0, timezone_name=hs.timezone_name, gioi_tinh=hs.gender, tinh_dai_van=False)
+        q = phan_tich_ca_nhan(c, tu_tru=tu_tru, nhat_chu=nhat_chu, can_hien_tai=lich.tru_thang.can, chi_hien_tai=lich.tru_thang.chi, scope="month", context=[])
+        out[key] = {"moc": dd.isoformat(), "tru": viet_hoa(lich.tru_thang.can, lich.tru_thang.chi), "headline": q.get("dien_giai",{}).get("headline"), "label": q.get("label"), "so_sanh": _cau_so_sanh(current, q, label)}
+    return out
+
 @app.get("/api/health")
 def health():
     checks={"rule_db":False,"astronomy":False,"events":0}
@@ -265,7 +314,7 @@ def thang_nay(v: ProfileRequest):
     hs = _ho_so(v.profile)
     with _conn() as c:
         kq = hop_luu(c, hs)
-        return {"don_gian": tang_1(kq, scope="month"), "chuyen_sau": tang_2(kq)}
+        return {"don_gian": tang_1(kq, scope="month"), "chuyen_sau": tang_2(kq), "so_sanh_lien_ke": _so_sanh_lien_ke(c, hs, kq, _ngay_ho_so(hs, None), "month")}
 
 
 @app.post("/api/stateless/hom-nay")
@@ -281,6 +330,7 @@ def hom_nay(v: DayRequest):
             "gio_trong_ngay": _gio_tham_khao(kq),
             "gio_status": "PROFILE_REFERENCE_ONLY",
             "gio_note": "Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem.",
+            "so_sanh_lien_ke": _so_sanh_lien_ke(c, hs, kq, d, "day"),
         }
 
 
@@ -289,9 +339,10 @@ def dashboard(v: ProfileRequest):
     hs=_ho_so(v.profile); d=_ngay_ho_so(hs,None)
     with _conn() as c:
         kq=hop_luu(c,hs,ngay=d); sau=tang_2(kq)
+        cmp_day=_so_sanh_lien_ke(c,hs,kq,d,"day"); cmp_month=_so_sanh_lien_ke(c,hs,kq,d,"month")
         return {"ngay":d.isoformat(),
-                "thang":{"don_gian":tang_1(kq,scope="month"),"chuyen_sau":sau},
-                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq),"gio_status":"PROFILE_REFERENCE_ONLY","gio_note":"Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem."},
+                "thang":{"don_gian":tang_1(kq,scope="month"),"chuyen_sau":sau,"so_sanh_lien_ke":cmp_month},
+                "hom_nay":{"don_gian":tang_1(kq,scope="day"),"chuyen_sau":sau,"gio_trong_ngay":_gio_tham_khao(kq),"gio_status":"PROFILE_REFERENCE_ONLY","gio_note":"Giờ hiện chỉ là tham khảo theo quan hệ Chi ngày sinh ↔ Chi giờ; chưa phải giờ tốt đã hợp lưu riêng với ngày đang xem.","so_sanh_lien_ke":cmp_day},
                 "vi_tri":{"dai_van":kq.decade_state,"nam_hien_tai":kq.year_state.get("tru",{}),"thang_hien_tai":kq.month_state.get("tru",{})}}
 
 

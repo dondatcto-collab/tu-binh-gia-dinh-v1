@@ -38,6 +38,110 @@ POSITION_VI = {
 }
 
 
+ACTION_BY_GROUP = {
+    "RESOURCE": {
+        "nen": [
+            "Rà lại hồ sơ, dữ liệu và điều kiện trước khi quyết định.",
+            "Xin ý kiến/hỗ trợ ở phần mình còn thiếu thông tin.",
+            "Dành thời gian học nhanh hoặc chuẩn bị nền trước khi triển khai."
+        ],
+        "tranh": [
+            "Chốt việc lớn khi thông tin còn thiếu hoặc chỉ dựa vào cảm giác.",
+            "Bỏ qua bước kiểm chứng vì nghĩ mình đã hiểu đủ."
+        ],
+    },
+    "AUTHORITY": {
+        "nen": [
+            "Chốt trách nhiệm, deadline và tiêu chuẩn hoàn thành.",
+            "Xử lý việc tồn đọng cần kỷ luật hoặc quyết định dứt khoát.",
+            "Làm việc theo checklist, quy trình hoặc văn bản rõ ràng."
+        ],
+        "tranh": [
+            "Nhận thêm nghĩa vụ khi chưa rõ phạm vi trách nhiệm.",
+            "Đối đầu trực diện với quy trình/quy định khi chưa có phương án thay thế."
+        ],
+    },
+    "WEALTH": {
+        "nen": [
+            "Rà dòng tiền, giá, điều khoản và khả năng thu hồi trước giao dịch.",
+            "Ưu tiên việc có đầu ra tài chính hoặc nguồn lực đo được.",
+            "Chốt con số và giới hạn rủi ro trước khi cam kết."
+        ],
+        "tranh": [
+            "Ra quyết định tiền bạc chỉ vì cơ hội có vẻ hấp dẫn.",
+            "Cam kết khoản lớn khi chưa rõ điều kiện thoát hoặc thu hồi."
+        ],
+    },
+    "OUTPUT": {
+        "nen": [
+            "Hoàn tất sản phẩm, báo cáo hoặc đầu ra cụ thể đang dang dở.",
+            "Trình bày, trao đổi, phản biện hoặc thử một cách làm mới có thể kiểm chứng.",
+            "Biến ý tưởng thành bước thực hiện có kết quả quan sát được."
+        ],
+        "tranh": [
+            "Tranh luận chỉ để thắng mà không tạo ra kết quả cụ thể.",
+            "Mở quá nhiều hướng mới trước khi đóng việc đang làm."
+        ],
+    },
+    "PEER": {
+        "nen": [
+            "Chốt ai làm gì, quyền quyết định và phần nguồn lực của từng người.",
+            "Trao đổi trực tiếp với người cùng vai để giảm hiểu nhầm.",
+            "Tách rõ việc chung và phần trách nhiệm cá nhân."
+        ],
+        "tranh": [
+            "Dùng nguồn lực chung mà chưa thống nhất nguyên tắc.",
+            "Để cạnh tranh vai trò biến thành xung đột cá nhân."
+        ],
+    },
+}
+
+
+def _three_factors(theme: dict[str, Any], impacts: list[dict[str, Any]], context: list[dict[str, Any]]) -> list[dict[str, str]]:
+    factors = [{
+        "type": "TEN_GOD",
+        "title": theme["ten_god_vi"],
+        "plain": f"Can của giai đoạn tạo chủ đề {theme['theme'].lower()}.",
+        "rule_id": theme["rule_id"],
+    }]
+    # Ưu tiên va chạm/cộng hưởng trực tiếp với trụ gốc.
+    ordered = sorted(impacts, key=lambda x: 0 if x["level"] == "CAUTION" else 1)
+    for x in ordered[:2]:
+        factors.append({
+            "type": "BRANCH_RELATION",
+            "title": f"Tương tác với {x['position_vi']} gốc",
+            "plain": (f"Có điểm dễ va chạm/thay đổi với {x['position_vi']} gốc." if x["level"] == "CAUTION" else f"Có tín hiệu phối hợp trực tiếp với {x['position_vi']} gốc."),
+            "rule_id": x["rule_id"],
+        })
+    if len(factors) < 3:
+        for x in reversed(context):
+            if x.get("label") and x.get("tru") and x.get("ten_god_vi"):
+                factors.append({
+                    "type": "CONTEXT",
+                    "title": x["label"],
+                    "plain": f"{x['label']} {x['tru']} tạo bối cảnh {x['ten_god_vi']}.",
+                    "rule_id": "CONTEXT_ONLY",
+                })
+                if len(factors) >= 3:
+                    break
+    return factors[:3]
+
+
+def _actionable(theme_group: str, caution: bool, positive: bool) -> tuple[list[str], list[str]]:
+    pack = ACTION_BY_GROUP.get(theme_group, {
+        "nen": ["Làm rõ mục tiêu, điều kiện và đầu ra trước khi hành động."],
+        "tranh": ["Không quyết định khi điều kiện chính còn mơ hồ."],
+    })
+    nen = list(pack["nen"][:3])
+    tranh = list(pack["tranh"][:2])
+    if caution:
+        nen.insert(0, "Chuẩn bị phương án B cho phần việc khó đảo ngược hoặc dễ đổi lịch.")
+        tranh.insert(0, "Không khóa kế hoạch quá sớm khi còn dấu hiệu va chạm/thay đổi.")
+    elif positive:
+        nen.insert(0, "Ưu tiên việc cần phối hợp, xác nhận hoặc nối lại đầu mối đang dang dở.")
+    return nen[:4], tranh[:3]
+
+
 def _theme_for(conn, nhat_chu: str, can: str) -> dict[str, Any]:
     tt = tinh_thap_than(conn, nhat_chu, can)
     title, group = TEN_GOD_THEME.get(tt.ten_god, (tt.ten_god_vi, "OTHER"))
@@ -124,8 +228,7 @@ def _relationship_text(group: str, impacts: list[dict[str, Any]]) -> str:
     if pos and neg:
         return "Quan hệ có tín hiệu đan xen: có điểm dễ phối hợp nhưng cũng có điểm dễ lệch nhịp. Nên tách từng vấn đề, thống nhất việc cụ thể thay vì suy diễn ý nhau."
     if neg:
-        rels = ", ".join(dict.fromkeys(x["relation_vi"] for x in neg))
-        return f"Có tương tác {rels} với cấu trúc gốc; dễ khó đồng bộ cách làm hoặc kỳ vọng. Nên nói rõ việc, thời hạn và điều cần người kia xác nhận."
+        return "Có tương tác trực tiếp với cấu trúc gốc theo hướng dễ lệch nhịp hoặc thay đổi kỳ vọng. Nên nói rõ việc, thời hạn và điều cần người kia xác nhận."
     if pos:
         return "Có quan hệ phối hợp trực tiếp với cấu trúc gốc; thuận hơn cho trao đổi, nối lại việc dang dở và thống nhất cách làm."
     if group == "PEER":
@@ -170,8 +273,12 @@ def phan_tich_ca_nhan(conn, *, tu_tru: dict, nhat_chu: str,
             impact_plain.append(f"{x['relation_vi']} với {x['position_vi']} gốc")
         else:
             impact_plain.append(f"{x['relation_vi']} với {x['position_vi']} gốc")
-    if impact_plain:
-        headline = f"{horizon} nhấn mạnh {theme['theme'].lower()}, kèm " + "; ".join(impact_plain[:2])
+    if caution_impacts and positive_impacts:
+        headline = f"{horizon} nhấn mạnh {theme['theme'].lower()}, đồng thời có cả tín hiệu phối hợp và điểm cần điều chỉnh"
+    elif caution_impacts:
+        headline = f"{horizon} nhấn mạnh {theme['theme'].lower()}, kèm điểm dễ thay đổi hoặc lệch nhịp"
+    elif positive_impacts:
+        headline = f"{horizon} nhấn mạnh {theme['theme'].lower()}, kèm tín hiệu phối hợp trực tiếp"
     else:
         headline = f"{horizon} nhấn mạnh {theme['theme'].lower()}"
 
@@ -187,16 +294,22 @@ def phan_tich_ca_nhan(conn, *, tu_tru: dict, nhat_chu: str,
     if ctx:
         trigger_plain += " Bối cảnh phía trên: " + ctx + "."
 
+    nen_cu_the, tranh_cu_the = _actionable(
+        theme["theme_group"], bool(caution_impacts), bool(positive_impacts))
+    yeu_to_chinh = _three_factors(theme, impacts, context or [])
     interpretation = {
-        "interpretation_status": "PRODUCT_INTERPRETATION_V1_1",
-        "evidence_scope": "TEN_GOD_PLUS_ALL_NATAL_BRANCH_RELATIONS",
+        "interpretation_status": "PRODUCT_INTERPRETATION_V1_2",
+        "evidence_scope": "TEN_GOD_PLUS_ALL_NATAL_BRANCH_RELATIONS_PLUS_CONTEXT",
         "headline": headline,
         "trigger": trigger_plain,
         "chu_de_chinh": theme["theme"],
+        "yeu_to_chinh": yeu_to_chinh,
         "cong_viec": _work_text(theme["theme_group"], bool(caution_impacts), bool(positive_impacts)),
         "tai_chinh": _finance_text(theme["theme_group"], bool(caution_impacts)),
         "quan_he": _relationship_text(theme["theme_group"], impacts),
         "viec_lon": _big_task_text(theme["theme_group"], bool(caution_impacts)),
+        "nen_cu_the": nen_cu_the,
+        "tranh_cu_the": tranh_cu_the,
         "focus": [],
         "khong_suy_dien": "Không dùng riêng Thập Thần hoặc một quan hệ Địa Chi để kết luận thành bại, sức khỏe hay tài lộc tuyệt đối; việc lớn vẫn xét theo đúng loại việc.",
         "technical_trigger": "; ".join(technical_bits),
@@ -234,8 +347,8 @@ def phan_tich_ca_nhan(conn, *, tu_tru: dict, nhat_chu: str,
         "relation": rel_compat,
         "confidence": "MEDIUM" if impacts or theme.get("verification_status") == "VERIFIED" else "LOW",
         "basis": headline,
-        "recommended": list(interpretation["focus"]),
-        "caution": [interpretation["khong_suy_dien"]],
+        "recommended": list(interpretation["nen_cu_the"]),
+        "caution": list(interpretation["tranh_cu_the"]),
         "dien_giai": interpretation,
         "theme": theme,
         "branch_impacts": impacts,
@@ -291,7 +404,7 @@ def bo_sung_event_ca_nhan(event_state: dict[str, Any], personal: dict[str, Any])
         "branch_impacts": impacts,
         "headline": personal.get("dien_giai", {}).get("headline"),
         "technical_facts": personal.get("technical_facts", []),
-        "interpretation_status": "PRODUCT_INTERPRETATION_V1_1",
+        "interpretation_status": "PRODUCT_INTERPRETATION_V1_2",
     }
     reasons = list(out.get("reasons", []))
     if cautions:

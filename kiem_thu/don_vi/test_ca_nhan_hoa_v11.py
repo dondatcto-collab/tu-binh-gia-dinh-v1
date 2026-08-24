@@ -52,7 +52,7 @@ def test_bon_linh_vuc_co_noi_dung_rieng(db_da_nap):
     vals = [d["cong_viec"], d["tai_chinh"], d["quan_he"], d["viec_lon"]]
     assert all(vals)
     assert len(set(vals)) == 4
-    assert d["interpretation_status"] == "PRODUCT_INTERPRETATION_V1_1"
+    assert d["interpretation_status"] == "PRODUCT_INTERPRETATION_V1_2"
 
 
 def test_khong_bia_dung_hy_ky_hoac_diem_so(db_da_nap):
