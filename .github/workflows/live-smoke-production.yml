@@ -109,6 +109,29 @@ jobs:
           assert len(search.get("cac_ngay", [])) == 8, search
           assert all(row.get("score") is None for row in search["cac_ngay"]), search["cac_ngay"]
 
+          schema = request_json("/api/v2/schema-status")
+          assert schema.get("schema_version") == "2.4-alpha.1", schema
+          assert schema.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", schema
+          assert schema.get("numeric_score") == "LOCKED_OFF", schema
+          readiness = schema.get("hour_readiness", {})
+          assert readiness.get("hour_structure_ready") is True, readiness
+          assert readiness.get("hour_fusion_ready") is False, readiness
+          assert readiness.get("personal_hour_decision_ready") is False, readiness
+
+          hours = request_json(
+              "/api/v2/gio-ca-nhan",
+              {"profile": profile, "ngay": "2026-08-24"},
+          )
+          assert hours.get("schema_version") == "2.4-alpha.1", hours
+          assert hours.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", hours
+          assert hours.get("conclusion", {}).get("state") == "DESCRIPTIVE_ONLY", hours
+          assert hours.get("numeric_score") is None, hours
+          assert hours.get("numeric_score_status") == "LOCKED_OFF", hours
+          assert len(hours.get("hours", [])) == 12, len(hours.get("hours", []))
+          assert all(x.get("decision_state") == "DESCRIPTIVE_ONLY" for x in hours["hours"]), hours["hours"]
+          assert all(x.get("is_personal_good_hour") is None for x in hours["hours"]), hours["hours"]
+          assert all(x.get("is_personal_bad_hour") is None for x in hours["hours"]), hours["hours"]
+
           print("LIVE_SMOKE_PRODUCTION = PASS")
-          print("health=PASS dashboard=PASS hom_nay=PASS thang_nay=PASS lich_thang=PASS tim_ngay=PASS")
+          print("health=PASS V1_flows=PASS schema_v24=PASS gio_ca_nhan_v24=PASS")
           PY
