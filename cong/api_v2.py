@@ -1,15 +1,17 @@
 """API V2 chạy song song với V1.
 
-Không thay đổi engine nền. Các route gọi hàm V1 đã nghiệm thu, sau đó đi qua
-lớp domain/Result Schema V2. UI không được tự suy quyết định từ dữ liệu kỹ thuật.
+V2.5 giữ các flow cá nhân/domain hiện hành và nâng riêng Event Search qua lớp
+Hiệp Kỷ mở rộng có kiểm soát. UI không được tự suy quyết định từ dữ liệu kỹ thuật.
 """
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
 
-from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, tim_ngay, toi_dang_o_dau
-from loi.ket_qua.v2 import decade_result, event_search, finance_result, personal_result, relationship_result, schema_status, work_result
+from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay, toi_dang_o_dau
+from cong.tim_ngay_v25 import tim_ngay_v25
+from loi.ket_qua.v2 import decade_result, finance_result, personal_result, relationship_result, schema_status, work_result
 from loi.ket_qua.gio_v24 import hour_reference_result, v24_schema_overlay
+from loi.ket_qua.hiep_ky_v25_result import event_search_v25, v25_schema_overlay
 from loi.linh_vuc.cong_viec import danh_gia_cong_viec
 from loi.linh_vuc.quan_he import danh_gia_quan_he
 from loi.linh_vuc.tai_chinh import danh_gia_tai_chinh
@@ -24,7 +26,7 @@ class DomainRequest(ProfileRequest):
 
 @router.get("/schema-status")
 def v2_schema_status():
-    return v24_schema_overlay(schema_status())
+    return v25_schema_overlay(v24_schema_overlay(schema_status()))
 
 
 @router.post("/hom-nay")
@@ -59,7 +61,8 @@ def _domain_raw(v: DomainRequest):
 def v2_cong_viec(v: DomainRequest):
     raw = _domain_raw(v)
     out = work_result(danh_gia_cong_viec(raw, scope=v.scope))
-    if v.scope == "day": out["date"] = raw.get("ngay")
+    if v.scope == "day":
+        out["date"] = raw.get("ngay")
     return out
 
 
@@ -67,7 +70,8 @@ def v2_cong_viec(v: DomainRequest):
 def v2_tai_chinh(v: DomainRequest):
     raw = _domain_raw(v)
     out = finance_result(danh_gia_tai_chinh(raw, scope=v.scope))
-    if v.scope == "day": out["date"] = raw.get("ngay")
+    if v.scope == "day":
+        out["date"] = raw.get("ngay")
     return out
 
 
@@ -75,7 +79,8 @@ def v2_tai_chinh(v: DomainRequest):
 def v2_quan_he(v: DomainRequest):
     raw = _domain_raw(v)
     out = relationship_result(danh_gia_quan_he(raw, scope=v.scope))
-    if v.scope == "day": out["date"] = raw.get("ngay")
+    if v.scope == "day":
+        out["date"] = raw.get("ngay")
     return out
 
 
@@ -88,8 +93,8 @@ def v2_gio_ca_nhan(v: DayRequest):
 
 @router.post("/tim-ngay")
 def v2_tim_ngay(v: WorkRequest):
-    raw = tim_ngay(v)
-    return event_search(raw)
+    raw = tim_ngay_v25(v)
+    return event_search_v25(raw)
 
 
 def register_v2(app) -> None:

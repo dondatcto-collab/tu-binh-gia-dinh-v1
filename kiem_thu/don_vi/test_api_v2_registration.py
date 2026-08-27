@@ -21,7 +21,9 @@ def test_v2_routes_cover_core_user_flows_and_work_domain():
     assert "raw = hom_nay(v)" in text
     assert "raw = thang_nay(v)" in text
     assert "raw = toi_dang_o_dau(v)" in text
-    assert "raw = tim_ngay(v)" in text
+    assert "raw = tim_ngay_v25(v)" in text
+    assert "event_search_v25" in text
+    assert "v25_schema_overlay" in text
     assert "danh_gia_cong_viec" in text
     assert "work_result" in text
 
@@ -38,3 +40,12 @@ def test_v2_adapter_is_not_a_second_general_decision_engine():
     assert "không đổi engine" in text.lower()
     assert "NUMERIC_SCORE_STATUS = \"LOCKED_OFF\"" in text
     assert "DESCRIPTIVE_ONLY" in text
+
+
+def test_v25_pipeline_is_isolated_from_v1_endpoint():
+    text = read("cong/tim_ngay_v25.py")
+    assert "evaluate_event_v25" in text
+    assert "danh_gia_event" in text
+    assert "V25_RANKING_MODE" in text
+    api_v1 = read("cong/api.py")
+    assert "tim_ngay_v25" not in api_v1
