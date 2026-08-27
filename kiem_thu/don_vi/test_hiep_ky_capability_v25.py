@@ -1,11 +1,12 @@
 from loi.quyet_dinh.hiep_ky_capability_v25 import (
+    MONTH_BRANCH_TOKENS,
     TRUC_TOKEN_TO_CODE,
     capability_inventory,
     token_capability,
 )
 
 
-def test_exact_12_truc_are_the_only_active_calculable_tokens_now():
+def test_exact_12_truc_remain_active_calculable():
     assert set(TRUC_TOKEN_TO_CODE.values()) == {
         "KIEN", "TRU", "MAN", "BINH", "DINH", "CHAP",
         "PHA", "NGUY", "THANH", "THU", "KHAI", "BE",
@@ -17,19 +18,29 @@ def test_exact_12_truc_are_the_only_active_calculable_tokens_now():
         assert row["normalized_code"] == code
 
 
-def test_named_classical_star_without_calculator_stays_pending():
-    for token in ("天徳", "月徳", "天願", "三合", "六合", "月破", "劫煞"):
+def test_exact_five_month_branch_tokens_are_newly_active():
+    assert MONTH_BRANCH_TOKENS == frozenset({"月建", "月破", "三合", "六合", "月害"})
+    for token in MONTH_BRANCH_TOKENS:
+        row = token_capability(token)
+        assert row["calculator_status"] == "ACTIVE_CALCULABLE"
+        assert row["calculator"] == "MONTH_BRANCH_RELATIONS_V25"
+        assert row["normalized_code"] == token
+
+
+def test_named_star_without_calculator_stays_pending():
+    for token in ("天徳", "月徳", "天願", "劫煞", "災煞", "月煞", "月刑"):
         row = token_capability(token)
         assert row["calculator_status"] == "PENDING_CALCULATOR"
         assert row["calculator"] is None
         assert row["normalized_code"] is None
 
 
-def test_inventory_does_not_claim_decision_expansion_yet():
+def test_inventory_claims_only_partial_decision_expansion():
     status = capability_inventory()
-    assert status["active_calculable_count"] > 0
+    assert status["active_calculable_count"] > len(TRUC_TOKEN_TO_CODE)
     assert status["pending_calculator_count"] > 0
-    assert status["decision_expansion_status"] == "NOT_YET_ACTIVE"
+    assert status["decision_expansion_status"] == "PARTIAL_ACTIVE"
+    assert status["coverage"] == "12_TRUC_PLUS_MONTH_BRANCH_5"
     assert status["numeric_score"] is None
     assert status["numeric_score_status"] == "LOCKED_OFF"
 
