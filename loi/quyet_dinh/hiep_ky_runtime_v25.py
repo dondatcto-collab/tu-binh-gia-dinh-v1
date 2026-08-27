@@ -94,8 +94,6 @@ def evaluate_event_v25(
         "decision_effect": personal.get("state", "DESCRIPTIVE_ONLY"),
     }
     rule_ids = sorted(set(list(out.get("rule_ids") or []) + list(personal.get("rule_ids") or []) + [x.rule_id for x in matched]))
-    source_ids = sorted(set(list(personal.get("source_ids") or []) + [out.get("source_id")] + [x.source_id for x in matched] - {None})) if False else None
-    # Viết tách để tránh phép toán tập hợp khó đọc trong payload.
     src = set(personal.get("source_ids") or [])
     if out.get("source_id"):
         src.add(out["source_id"])
