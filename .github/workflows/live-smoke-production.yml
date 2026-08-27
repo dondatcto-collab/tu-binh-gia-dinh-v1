@@ -72,6 +72,10 @@ jobs:
           assert health.get("checks", {}).get("astronomy") is True, health
           assert health.get("checks", {}).get("events") == 12, health
 
+          status = request_json("/api/tinh-trang")
+          assert status.get("so_loai_viec_v1") == 12, status
+          assert status.get("numeric_score") == "LOCKED_OFF", status
+
           dashboard = request_json("/api/stateless/dashboard", {"profile": profile})
           assert all(k in dashboard for k in ("vi_tri", "thang", "hom_nay")), dashboard.keys()
 
@@ -110,23 +114,32 @@ jobs:
           assert len(search.get("cac_ngay", [])) == 8, search
           assert all(row.get("score") is None for row in search["cac_ngay"]), search["cac_ngay"]
 
-          # Production V2.4 is mandatory only after merge/push main. A PR cannot
-          # require production to contain its own unmerged code.
+          # PR checks current production only. New V2.5 production requirements
+          # become mandatory after merge/push main, never before merge.
           if event_name != "pull_request":
               schema = None
-              for _ in range(12):
+              for _ in range(18):
                   schema = request_json("/api/v2/schema-status")
-                  if schema.get("schema_version") == "2.4-alpha.1":
+                  if schema.get("schema_version") == "2.5-alpha.1":
                       break
                   time.sleep(10)
-              assert schema.get("schema_version") == "2.4-alpha.1", schema
-              assert schema.get("status") == "V2_4_HOUR_REFERENCE_ALPHA", schema
+              assert schema.get("schema_version") == "2.5-alpha.1", schema
+              assert schema.get("status") == "V2_5_HIEP_KY_PARTIAL_ACTIVE", schema
               assert schema.get("numeric_score") == "LOCKED_OFF", schema
+              hk = schema.get("hiep_ky_v25", {})
+              assert hk.get("coverage") == "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5", hk
+              assert hk.get("decision_hierarchy") == "HARD_BLOCK > EVENT > PERSONAL", hk
+              assert hk.get("full_classical_claim") is False, hk
+              cap = hk.get("capability", {})
+              assert cap.get("decision_expansion_status") == "PARTIAL_ACTIVE", cap
+              assert cap.get("coverage") == "12_TRUC_PLUS_MONTH_BRANCH_5", cap
+              assert cap.get("pending_calculator_count", 0) > 0, cap
+
+              # V2.4 hour safety contract must remain unchanged under V2.5.
               readiness = schema.get("hour_readiness", {})
               assert readiness.get("hour_structure_ready") is True, readiness
               assert readiness.get("hour_fusion_ready") is False, readiness
               assert readiness.get("personal_hour_decision_ready") is False, readiness
-
               hours = request_json(
                   "/api/v2/gio-ca-nhan",
                   {"profile": profile, "ngay": "2026-08-24"},
@@ -143,6 +156,30 @@ jobs:
               assert all(x.get("is_personal_good_hour") is None for x in hours["hours"]), hours["hours"]
               assert all(x.get("is_personal_bad_hour") is None for x in hours["hours"]), hours["hours"]
 
+              v25 = request_json(
+                  "/api/v2/tim-ngay",
+                  {
+                      "profile": profile,
+                      "viec": "KY_HOP_DONG",
+                      "tu_ngay": "2026-08-24",
+                      "den_ngay": "2026-08-31",
+                  },
+                  attempts=6,
+                  pause=10,
+              )
+              assert v25.get("schema_version") == "2.5-alpha.1", v25
+              assert v25.get("status") == "V2_5_HIEP_KY_PARTIAL_ACTIVE", v25
+              assert v25.get("ranking_mode") == "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL", v25
+              assert v25.get("hiep_ky_coverage") == "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5", v25
+              assert v25.get("numeric_score") is None, v25
+              assert v25.get("numeric_score_status") == "LOCKED_OFF", v25
+              results = v25.get("results", [])
+              assert results, v25
+              assert all(x.get("numeric_score") is None for x in results), results
+              assert all(isinstance(x.get("rules"), list) for x in results), results
+              assert all(isinstance(x.get("sources"), list) for x in results), results
+              assert all(x.get("technical", {}).get("coverage") == "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5" for x in results), results
+
           print("LIVE_SMOKE_PRODUCTION = PASS")
-          print("health=PASS V1_flows=PASS" + (" schema_v24=PASS gio_ca_nhan_v24=PASS" if event_name != "pull_request" else ""))
+          print("health=PASS V1_flows=PASS" + (" schema_v25=PASS gio_v24=PASS hiep_ky_v25=PASS" if event_name != "pull_request" else ""))
           PY
