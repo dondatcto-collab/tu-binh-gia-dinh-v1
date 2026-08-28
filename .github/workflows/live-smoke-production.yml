@@ -53,15 +53,12 @@ jobs:
               for i in range(attempts):
                   try:
                       last = req(path, attempts=1)
-                      if predicate(last):
-                          return last
+                      if predicate(last): return last
                   except Exception as exc:
                       last = {'request_error': str(exc)}
-                  if i + 1 < attempts:
-                      time.sleep(pause)
+                  if i + 1 < attempts: time.sleep(pause)
               raise AssertionError(f'{path}: contract not ready after {attempts} attempts: {last}')
 
-          # V1 safety/regression remains mandatory on PR and main.
           health = req('/api/health')
           assert health.get('ok') is True, health
           assert health.get('engine_version') == '0.5.0-zpzq-fusion', health
@@ -77,23 +74,13 @@ jobs:
           assert v1_today.get('ngay') == '2026-08-24', v1_today
           assert v1_today.get('gio_status') == 'STRUCTURAL_ONLY_PERSONAL_USE_PENDING', v1_today
 
-          v1_search = req('/api/stateless/tim-ngay', {
-              'profile': profile, 'viec': 'KY_HOP_DONG',
-              'tu_ngay': '2026-08-24', 'den_ngay': '2026-08-31'})
+          v1_search = req('/api/stateless/tim-ngay', {'profile': profile, 'viec': 'KY_HOP_DONG', 'tu_ngay': '2026-08-24', 'den_ngay': '2026-08-31'})
           assert v1_search.get('so_ngay_da_quet') == 8, v1_search
           assert v1_search.get('xep_hang_status') == 'ORDINAL_V1_1_PERSONAL', v1_search
           assert all(x.get('score') is None for x in v1_search.get('cac_ngay', [])), v1_search
 
-          # PR checks current production. After merge, wait for the NEW contract itself,
-          # not merely HTTP 200, because Vercel alias may still briefly serve the old deploy.
           if event_name != 'pull_request':
-              schema = wait_for_contract(
-                  '/api/v2/schema-status',
-                  lambda x: (
-                      x.get('schema_version') == '2.5-alpha.1'
-                      and x.get('product_schema_version') == '2.5-alpha.1'
-                  ),
-              )
+              schema = wait_for_contract('/api/v2/schema-status', lambda x: x.get('schema_version') == '2.5-alpha.1' and x.get('product_schema_version') == '2.5-alpha.1')
               assert schema.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', schema
               assert schema.get('numeric_score') == 'LOCKED_OFF', schema
               hk = schema.get('hiep_ky_v25', {})
@@ -101,7 +88,6 @@ jobs:
               assert hk.get('decision_hierarchy') == 'HARD_BLOCK > EVENT > PERSONAL', hk
               assert hk.get('full_classical_claim') is False, hk
 
-              # Once schema contract is visible, canonical alias has moved to the new app.
               today = req('/api/v2/hom-nay', {'profile': profile, 'ngay': '2026-08-24'})
               assert today.get('schema_version') == '2.5-alpha.1', today
               assert today.get('product_schema_version') == '2.5-alpha.1', today
@@ -125,15 +111,20 @@ jobs:
               assert all(x.get('is_personal_good_hour') is None for x in hours['hours']), hours
               assert all(x.get('is_personal_bad_hour') is None for x in hours['hours']), hours
 
-              v25 = req('/api/v2/tim-ngay', {
-                  'profile': profile, 'viec': 'KY_HOP_DONG',
-                  'tu_ngay': '2026-08-24', 'den_ngay': '2026-08-31'})
-              assert v25.get('schema_version') == '2.5-alpha.1', v25
-              assert v25.get('product_schema_version') == '2.5-alpha.1', v25
-              assert v25.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', v25
-              assert v25.get('ranking_mode') == 'ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL', v25
-              assert v25.get('numeric_score') is None, v25
-              assert all(x.get('numeric_score') is None for x in v25.get('results', [])), v25
+              v27 = req('/api/v2/tim-ngay', {'profile': profile, 'viec': 'KY_HOP_DONG', 'tu_ngay': '2026-08-24', 'den_ngay': '2026-08-31'})
+              assert v27.get('schema_version') == '2.5-alpha.1', v27
+              assert v27.get('product_schema_version') == '2.5-alpha.1', v27
+              assert v27.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', v27
+              assert v27.get('ranking_mode') == 'ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL', v27
+              assert v27.get('event_search_contract') == 'V2_7_COMPLETE_RESULTS', v27
+              assert v27.get('numeric_score') is None, v27
+              assert v27.get('result_count') == 8, v27
+              assert v27.get('top_result_count') == 3, v27
+              assert len(v27.get('results', [])) == 3, v27
+              assert len(v27.get('all_results', [])) == 8, v27
+              assert all(x.get('numeric_score') is None for x in v27.get('results', [])), v27
+              assert all(x.get('numeric_score') is None for x in v27.get('all_results', [])), v27
+              assert [x.get('date') for x in v27['results']] == [x.get('date') for x in v27['all_results'][:3]], v27
 
           print('LIVE_SMOKE_PRODUCTION = PASS')
           PY

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from loi.ket_qua.hiep_ky_v25_result import EVENT_SEARCH_CONTRACT, event_search_v25
@@ -56,6 +57,26 @@ def test_event_search_exposes_top_three_and_complete_ranked_set_without_scores()
     assert all(x["numeric_score"] is None for x in out["all_results"])
 
 
+def test_v27_complete_result_contract_has_payload_growth_guard_for_max_window():
+    ranked = [
+        sample(f"2026-{8 + (i // 28):02d}-{(i % 28) + 1:02d}", "Có thể cân nhắc", 3)
+        for i in range(93)
+    ]
+    raw = {
+        "viec": "KY_HOP_DONG",
+        "so_ngay_da_quet": len(ranked),
+        "xep_hang_status": "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL",
+        "top": ranked[:3],
+        "cac_ngay": ranked,
+    }
+    out = event_search_v25(raw)
+    encoded = json.dumps(out, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    assert out["result_count"] == 93
+    assert len(out["all_results"]) == 93
+    # Guard chống phình adapter: nếu vượt 512 KiB, cần chuyển all_results sang compact/lazy detail.
+    assert len(encoded) < 512 * 1024
+
+
 def test_v27_ui_uses_one_event_search_source_for_search_and_event_calendar():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
     assert ui.count("/api/v2/tim-ngay") >= 3
@@ -81,4 +102,6 @@ def test_v27_pwa_precaches_event_search_module_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
     assert "tubinh-ui-v2.7" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
+    assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
+    assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
     assert (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8") == (ROOT / "giao_dien/ui-event-search-v27.js").read_text(encoding="utf-8")
