@@ -131,3 +131,31 @@ def hour_fusion_gate(
         item["day_gate"] = "PASS_TO_HOUR_RULES"
     out["hours"] = hours
     return out
+
+
+def v29_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
+    """Công bố đúng capability V2.9A mà không đổi public schema 2.5."""
+    out = dict(base)
+    scopes = list(out.get("implemented_scopes") or [])
+    if "personal_hour_event_day_gate" not in scopes:
+        scopes.append("personal_hour_event_day_gate")
+    out["implemented_scopes"] = scopes
+    pending = list(out.get("pending_scopes") or [])
+    if "personal_hour_verified_rule_decision" not in pending:
+        pending.append("personal_hour_verified_rule_decision")
+    out["pending_scopes"] = pending
+    out["hour_fusion_v29"] = {
+        "policy_version": HOUR_FUSION_POLICY_VERSION,
+        "status": HOUR_FUSION_STATUS,
+        "event_day_gate_ready": True,
+        "verified_hour_rule_decision_ready": False,
+        "hard_block_can_be_rescued_by_hour": False,
+        "numeric_score": None,
+        "numeric_score_status": "LOCKED_OFF",
+    }
+    principles = list(out.get("principles") or [])
+    note = "V2.9A xét ngày/sự kiện trước giờ; HARD_BLOCK của ngày không thể được một giờ đảo ngược."
+    if note not in principles:
+        principles.append(note)
+    out["principles"] = principles
+    return out
