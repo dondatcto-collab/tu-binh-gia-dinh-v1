@@ -1,0 +1,25 @@
+case_id: FUS-HOUR-0003
+category: GOLD-FUS
+title_vi: "Giờ Tý đi qua ranh giới ngày — không dùng Can giờ khi TIME-0007 còn tranh luận"
+ruleset_version: "RS-2026.08-ZPZQ.2"
+review_status: PENDING
+source_id: null
+notes: >
+  Ca vàng V2.9C chờ duyệt độc lập. Khi Can giờ Tý 23:00–23:59 còn CONFLICTED,
+  lớp Hỷ/Kỵ theo Can giờ phải bị khóa; chỉ giữ evidence quan hệ Chi đã có.
+input:
+  relation_state: PERSONAL_GOOD_CANDIDATE
+  personal_transit_state: DESCRIPTIVE_ONLY
+  hour_stem_boundary_status: CONFLICTED_LATE_ZI
+  conflict_id: TIME-0007
+expected:
+  - stage: FINAL
+    stage_key: hour_decision
+    payload:
+      decision_state: PERSONAL_GOOD_CANDIDATE
+      decision_label: "Có thể ưu tiên"
+      fusion_alignment: LATE_ZI_GUARDED_RELATION_ONLY
+      hour_can: null
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
