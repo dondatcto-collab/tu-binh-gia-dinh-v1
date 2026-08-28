@@ -21,10 +21,17 @@
     });
   }
 
+  function showProductVersion(){
+    const state=document.getElementById('connection-state');
+    const version=state?.closest('.settings-row')?.querySelector('em');
+    if(version) version.textContent='V2.7';
+  }
+
   async function boot(){
     try{
       for(const [name, src] of modules) await loadModule(name, src);
       window.TU_BINH_UI_READY = true;
+      showProductVersion();
       if(typeof loadHomeDashboard === 'function') setTimeout(() => { try{ loadHomeDashboard(); }catch{} }, 0);
     }catch(err){
       window.TU_BINH_UI_READY = false;
