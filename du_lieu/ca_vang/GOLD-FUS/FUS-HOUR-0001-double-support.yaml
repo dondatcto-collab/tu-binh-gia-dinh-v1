@@ -1,0 +1,24 @@
+case_id: FUS-HOUR-0001
+category: GOLD-FUS
+title_vi: "Giờ có quan hệ Chi thuận và Hỷ/Kỵ giờ cùng hỗ trợ"
+ruleset_version: "RS-2026.08-ZPZQ.2"
+review_status: PENDING
+source_id: null
+notes: >
+  Ca vàng V2.9C chờ duyệt độc lập. Mục tiêu khóa nguyên tắc hợp lưu:
+  hai lớp cùng thuận chỉ được nâng thành 'Ưu tiên hơn', không sinh điểm số
+  và không gọi cát tuyệt đối.
+input:
+  relation_state: PERSONAL_GOOD_CANDIDATE
+  personal_transit_state: SUPPORT
+  hour_stem_boundary_status: VERIFIED_NON_LATE_ZI
+expected:
+  - stage: FINAL
+    stage_key: hour_decision
+    payload:
+      decision_state: PERSONAL_GOOD_CANDIDATE
+      decision_label: "Ưu tiên hơn"
+      fusion_alignment: DOUBLE_SUPPORT
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
