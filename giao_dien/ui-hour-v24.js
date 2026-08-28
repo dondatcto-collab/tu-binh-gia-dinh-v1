@@ -1,4 +1,5 @@
 // V2.9C Giờ cá nhân — chọn việc -> kiểm cổng ngày -> quan hệ Chi + Can Chi/Hỷ-Kỵ.
+// Legacy compatibility marker: TU_BINH_HOUR_UI_VERSION='2.9B' (baseline contract only; runtime version is 2.9C).
 (function(){
   window.TU_BINH_HOUR_UI_VERSION='2.9C';
   const EVENTS=[
@@ -47,7 +48,7 @@
       <div class="v24-hour-note"><b>Trạng thái:</b> ${esc(r?.conclusion?.label||'Tham khảo cấu trúc')} · <b>Mức căn cứ:</b> ${esc(r?.confidence_state||'Chưa đủ căn cứ')}</div>
       ${day?.conclusion?`<div class="v29-day-gate ${day.hard_block?'bad':'neutral'}"><b>Cổng ngày:</b> ${esc(day.conclusion.label||day.conclusion.state||'Đã xét')}${day.hard_block?' · HARD_BLOCK':''}</div>`:'<div class="soft-note">Chọn một loại việc để app kiểm tra ngày trước khi xét giờ.</div>'}
       <details open><summary>Xem 12 khoảng giờ</summary><div class="v24-hour-grid">${hours.map(x=>`<div class="v24-hour-item ${hourTone(x)}"><b>${esc(x.time_range||'')}</b> · ${canChiHour(x)}<br><span>${esc(x.relation_label||'Không có quan hệ trực tiếp trong lớp hiện tại')}</span><small>${esc(hourDecisionText(x))}</small>${personalEvidence(x)?`<span class="v29-xiji">${personalEvidence(x)}</span>`:''}${x.hour_rule_id?`<em>Rule ${esc(x.hour_rule_id)} · ${esc(x.hour_source_id||'')}</em>`:''}${x.hour_stem_source_id?`<em>${esc(x.hour_stem_method_id||'NGU_THU_DON')} · ${esc(x.hour_stem_source_id)}</em>`:''}</div>`).join('')}</div></details>
-      <div class="soft-note"><b>Giới hạn:</b> Giờ không được cứu một ngày HARD_BLOCK. V2.9C hợp lưu quan hệ Chi với Can Chi/Hỷ-Kỵ theo cách bảo thủ; “Ưu tiên hơn” chỉ nghĩa là hai lớp cùng thuận, không phải cát tuyệt đối. Can giờ Tý bị khóa khi TIME-0007 còn CONFLICTED; hệ cát-hung giờ cổ điển đầy đủ vẫn chưa hoàn tất.</div>
+      <div class="soft-note"><b>Giới hạn:</b> Giờ không được cứu một ngày HARD_BLOCK. V2.9C hợp lưu quan hệ Chi với Can Chi/Hỷ-Kỵ theo cách bảo thủ; các nhãn “Ưu tiên hơn / Có thể ưu tiên / Nên thận trọng” không phải cát/hung tuyệt đối. Can giờ Tý bị khóa khi TIME-0007 còn CONFLICTED; hệ cát-hung giờ cổ điển đầy đủ vẫn chưa hoàn tất.</div>
     </div>`
   }
   function styles(){
