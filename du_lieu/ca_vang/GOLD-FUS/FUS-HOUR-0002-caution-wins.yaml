@@ -1,0 +1,23 @@
+case_id: FUS-HOUR-0002
+category: GOLD-FUS
+title_vi: "Quan hệ Chi thuận nhưng Hỷ/Kỵ giờ cảnh báo — cảnh báo thắng"
+ruleset_version: "RS-2026.08-ZPZQ.2"
+review_status: PENDING
+source_id: null
+notes: >
+  Ca vàng V2.9C chờ duyệt độc lập. Không trung bình hóa hai lớp evidence;
+  khi một lớp cảnh báo thì không để lớp thuận triệt tiêu cảnh báo.
+input:
+  relation_state: PERSONAL_GOOD_CANDIDATE
+  personal_transit_state: CAUTION
+  hour_stem_boundary_status: VERIFIED_NON_LATE_ZI
+expected:
+  - stage: FINAL
+    stage_key: hour_decision
+    payload:
+      decision_state: PERSONAL_CAUTION_HOUR
+      decision_label: "Nên thận trọng"
+      fusion_alignment: MIXED_CAUTION
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
