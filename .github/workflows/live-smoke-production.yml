@@ -80,24 +80,39 @@ jobs:
           assert all(x.get('score') is None for x in v1_search.get('cac_ngay', [])), v1_search
 
           if event_name != 'pull_request':
-              schema = wait_for_contract('/api/v2/schema-status', lambda x: x.get('schema_version') == '2.5-alpha.1' and x.get('product_schema_version') == '2.5-alpha.1')
+              schema = wait_for_contract(
+                  '/api/v2/schema-status',
+                  lambda x: (
+                      x.get('schema_version') == '2.5-alpha.1'
+                      and x.get('product_schema_version') == '2.5-alpha.1'
+                      and (x.get('confidence_model') or {}).get('version') == '2.8-alpha.1'
+                  ),
+              )
               assert schema.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', schema
               assert schema.get('numeric_score') == 'LOCKED_OFF', schema
               hk = schema.get('hiep_ky_v25', {})
               assert hk.get('coverage') == 'V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5', hk
               assert hk.get('decision_hierarchy') == 'HARD_BLOCK > EVENT > PERSONAL', hk
               assert hk.get('full_classical_claim') is False, hk
+              confidence_model = schema.get('confidence_model', {})
+              assert confidence_model.get('version') == '2.8-alpha.1', confidence_model
+              assert confidence_model.get('provisional_cap') == 'Căn cứ vừa', confidence_model
+              assert confidence_model.get('numeric_score') is None, confidence_model
 
               today = req('/api/v2/hom-nay', {'profile': profile, 'ngay': '2026-08-24'})
               assert today.get('schema_version') == '2.5-alpha.1', today
               assert today.get('product_schema_version') == '2.5-alpha.1', today
               assert today.get('component_schema_version') == '2.3-alpha.1', today
               assert today.get('numeric_score') is None, today
+              assert today.get('confidence_model_version') == '2.8-alpha.1', today
+              assert isinstance(today.get('confidence_basis'), list) and today['confidence_basis'], today
 
               work = req('/api/v2/cong-viec', {'profile': profile, 'scope': 'day', 'ngay': '2026-08-24'})
               assert work.get('schema_version') == '2.5-alpha.1', work
               assert work.get('product_schema_version') == '2.5-alpha.1', work
               assert work.get('component_schema_version') == '2.3-alpha.1', work
+              assert work.get('confidence_model_version') == '2.8-alpha.1', work
+              assert isinstance(work.get('confidence_basis'), list) and work['confidence_basis'], work
 
               hours = req('/api/v2/gio-ca-nhan', {'profile': profile, 'ngay': '2026-08-24'})
               assert hours.get('schema_version') == '2.5-alpha.1', hours
@@ -106,6 +121,8 @@ jobs:
               assert hours.get('status') == 'V2_4_HOUR_REFERENCE_ALPHA', hours
               assert hours.get('conclusion', {}).get('state') == 'DESCRIPTIVE_ONLY', hours
               assert hours.get('numeric_score') is None, hours
+              assert hours.get('confidence_state') == 'Chưa đủ căn cứ', hours
+              assert hours.get('confidence_model_version') == '2.8-alpha.1', hours
               assert len(hours.get('hours', [])) == 12, hours
               assert all(x.get('decision_state') == 'DESCRIPTIVE_ONLY' for x in hours['hours']), hours
               assert all(x.get('is_personal_good_hour') is None for x in hours['hours']), hours
@@ -117,14 +134,23 @@ jobs:
               assert v27.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', v27
               assert v27.get('ranking_mode') == 'ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL', v27
               assert v27.get('event_search_contract') == 'V2_7_COMPLETE_RESULTS', v27
+              assert v27.get('confidence_model_version') == '2.8-alpha.1', v27
               assert v27.get('numeric_score') is None, v27
               assert v27.get('result_count') == 8, v27
               assert v27.get('top_result_count') == 3, v27
               assert len(v27.get('results', [])) == 3, v27
               assert len(v27.get('all_results', [])) == 8, v27
-              assert all(x.get('numeric_score') is None for x in v27.get('results', [])), v27
-              assert all(x.get('numeric_score') is None for x in v27.get('all_results', [])), v27
+              allowed = {'Căn cứ rõ', 'Căn cứ vừa', 'Chưa đủ căn cứ'}
+              assert all(x.get('confidence_model_version') == '2.8-alpha.1' for x in v27['all_results']), v27
+              assert all(x.get('confidence_state') in allowed for x in v27['all_results']), v27
+              assert all(isinstance(x.get('confidence_basis'), list) and x['confidence_basis'] for x in v27['all_results']), v27
+              assert all(x.get('numeric_score') is None for x in v27['all_results']), v27
               assert [x.get('date') for x in v27['results']] == [x.get('date') for x in v27['all_results'][:3]], v27
+
+              provisional = req('/api/v2/tim-ngay', {'profile': profile, 'viec': 'MUA_TAI_SAN', 'tu_ngay': '2026-08-24', 'den_ngay': '2026-08-31'})
+              assert provisional.get('result_count') == 8, provisional
+              assert all(x.get('confidence_state') != 'Căn cứ rõ' for x in provisional.get('all_results', [])), provisional
+              assert any(any('PROVISIONAL' in b for b in x.get('confidence_basis', [])) for x in provisional.get('all_results', [])), provisional
 
           print('LIVE_SMOKE_PRODUCTION = PASS')
           PY
