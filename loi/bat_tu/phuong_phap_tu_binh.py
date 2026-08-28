@@ -49,7 +49,7 @@ def trang_thai_hien_tai() -> TrangThaiPhuongPhap:
         hour_structure_ready=True,
         hour_fusion_ready=True,
         personal_hour_decision_ready=True,
-        decision_mode="ZPZQ_PERSONAL_LIMITED_HOUR_V29B",
+        decision_mode="ZPZQ_PERSONAL",
         reason_vi=("Engine 0.5.0 đã khóa Cách cục/Hỷ-Kỵ cho quyết định cá nhân ngày/tháng. "
                    "V2.9B đã mở hợp lưu ngày/sự kiện -> giờ và cho phép quyết định giờ giới hạn "
                    "bằng các quan hệ Địa Chi có Rule ID/Source ID. Lục hợp được dùng như giờ có thể "
