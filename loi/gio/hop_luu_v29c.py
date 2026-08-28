@@ -13,7 +13,7 @@ from loi.lich.quy_uoc_can_chi import CAN, CAN_VI, CHI, CHI_VI, tai_quy_uoc
 from loi.van import dong_thoi_gian as dtg
 
 HOUR_STEM_SOURCE_ID = "SRC-UHTB-CHEP"
-HOUR_STEM_RULE_ID = "CAL-NGU-THU-DON"
+HOUR_STEM_METHOD_ID = "NGU_THU_DON"
 LATE_ZI_CONFLICT_ID = "TIME-0007"
 
 
@@ -53,7 +53,8 @@ def build_personal_hour_context(conn, *, kq: Any, day_can: str, day_chi: str) ->
             "day_can_vi": CAN_VI[CAN.index(day_can)],
             "day_chi": day_chi,
             "day_chi_vi": CHI_VI[CHI.index(day_chi)],
-            "hour_stem_rule_id": HOUR_STEM_RULE_ID,
+            "hour_stem_method_id": HOUR_STEM_METHOD_ID,
+            "hour_stem_rule_id": None,
             "hour_stem_source_id": HOUR_STEM_SOURCE_ID,
             "numeric_score": None,
             "numeric_score_status": "LOCKED_OFF",
@@ -91,7 +92,7 @@ def build_personal_hour_context(conn, *, kq: Any, day_can: str, day_chi: str) ->
             "stem_effect": compact["stem_effect"],
             "branch_hidden_ten_gods": compact["branch_hidden_ten_gods"],
             "branch_effect": compact["branch_effect"],
-            "personal_rule_ids": sorted(set([HOUR_STEM_RULE_ID, *compact["rule_ids"]])),
+            "personal_rule_ids": sorted(set(compact["rule_ids"])),
             "personal_source_ids": sorted(set([HOUR_STEM_SOURCE_ID, *list(natal.get("source_ids") or [])])),
             "hour_stem_boundary_status": "VERIFIED_NON_LATE_ZI",
             "hour_stem_conflict_id": None,
