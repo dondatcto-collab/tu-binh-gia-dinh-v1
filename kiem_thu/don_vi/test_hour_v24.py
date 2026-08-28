@@ -15,16 +15,19 @@ def sample_raw():
     }
 
 
-def test_hour_method_gate_no_longer_claims_full_fusion():
+def test_hour_method_gate_now_allows_limited_v29b_decision_but_not_full_classical_claim():
     s = trang_thai_hien_tai()
     assert s.hour_structure_ready is True
-    # Gate gốc chỉ phản ánh calculator/rule giờ VERIFIED; V2.9A chưa thay đổi claim này.
-    assert s.hour_fusion_ready is False
-    assert s.personal_hour_decision_ready is False
-    assert cho_phep_ket_luan_gio_ca_nhan() is False
+    assert s.hour_fusion_ready is True
+    assert s.personal_hour_decision_ready is True
+    assert cho_phep_ket_luan_gio_ca_nhan() is True
+    assert s.decision_mode == "ZPZQ_PERSONAL_LIMITED_HOUR_V29B"
+    assert "chưa phải hệ cát-hung giờ cổ điển đầy đủ" in s.reason_vi
+    assert "BT-REL-0001" in s.rule_ids
+    assert "SRC-TMTH-V02-WIKISOURCE" in s.source_ids
 
 
-def test_hour_reference_never_turns_structure_into_good_bad_hour():
+def test_hour_reference_itself_remains_descriptive_without_event_context():
     out = hour_reference_result(sample_raw())
     assert out["schema_version"] == HOUR_SCHEMA_VERSION == "2.4-alpha.1"
     assert out["status"] == HOUR_STATUS
@@ -35,7 +38,7 @@ def test_hour_reference_never_turns_structure_into_good_bad_hour():
     assert out["numeric_score_status"] == "LOCKED_OFF"
 
 
-def test_hour_overlay_keeps_personal_hour_decision_pending():
+def test_legacy_v24_overlay_still_describes_reference_layer_only():
     out = v24_schema_overlay({"implemented_scopes": ["day"], "pending_scopes": ["personal_hour"], "principles": []})
     assert out["schema_version"] == "2.4-alpha.1"
     assert "personal_hour_reference" in out["implemented_scopes"]
@@ -58,7 +61,8 @@ def test_hour_ui_reads_only_v2_and_mirrors_are_identical():
     assert pub == mirror
     assert "/api/v2/gio-ca-nhan" in pub
     assert "/api/stateless/" not in pub
-    assert "Chưa phải giờ tốt/xấu cá nhân" in pub
+    assert "PERSONAL_GOOD_CANDIDATE" in pub
+    assert "không phải cát/hung tuyệt đối" in pub
 
 
 def test_hour_can_never_rescue_hard_block_in_copy_contract():
