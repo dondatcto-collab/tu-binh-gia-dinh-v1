@@ -1,0 +1,7 @@
+- [x] HARD_BLOCK cannot be rescued by hour
+- [x] Verified relation rules only
+- [x] No numeric score
+- [x] UI mirrors public/static
+- [ ] Full regression PASS
+- [ ] Vercel preview READY
+- [ ] Production live smoke PASS after merge
