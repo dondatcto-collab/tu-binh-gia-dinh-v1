@@ -86,6 +86,7 @@ jobs:
                       x.get('schema_version') == '2.5-alpha.1'
                       and x.get('product_schema_version') == '2.5-alpha.1'
                       and (x.get('confidence_model') or {}).get('version') == '2.8-alpha.1'
+                      and (x.get('hour_fusion_v29') or {}).get('policy_version') == '2.9-alpha.1'
                   ),
               )
               assert schema.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', schema
@@ -98,6 +99,13 @@ jobs:
               assert confidence_model.get('version') == '2.8-alpha.1', confidence_model
               assert confidence_model.get('provisional_cap') == 'Căn cứ vừa', confidence_model
               assert confidence_model.get('numeric_score') is None, confidence_model
+              hour_cap = schema.get('hour_fusion_v29', {})
+              assert hour_cap.get('policy_version') == '2.9-alpha.1', hour_cap
+              assert hour_cap.get('status') == 'V2_9A_EVENT_DAY_GATED_HOUR_REFERENCE', hour_cap
+              assert hour_cap.get('event_day_gate_ready') is True, hour_cap
+              assert hour_cap.get('verified_hour_rule_decision_ready') is False, hour_cap
+              assert hour_cap.get('hard_block_can_be_rescued_by_hour') is False, hour_cap
+              assert hour_cap.get('numeric_score') is None, hour_cap
 
               today = req('/api/v2/hom-nay', {'profile': profile, 'ngay': '2026-08-24'})
               assert today.get('schema_version') == '2.5-alpha.1', today
@@ -118,8 +126,13 @@ jobs:
               assert hours.get('schema_version') == '2.5-alpha.1', hours
               assert hours.get('product_schema_version') == '2.5-alpha.1', hours
               assert hours.get('component_schema_version') == '2.4-alpha.1', hours
-              assert hours.get('status') == 'V2_4_HOUR_REFERENCE_ALPHA', hours
+              assert hours.get('kind') == 'personal_hour_fusion', hours
+              assert hours.get('hour_fusion_policy_version') == '2.9-alpha.1', hours
               assert hours.get('conclusion', {}).get('state') == 'DESCRIPTIVE_ONLY', hours
+              assert hours.get('conclusion', {}).get('label') == 'Thiếu bối cảnh việc', hours
+              assert hours.get('event_day_context_present') is False, hours
+              assert hours.get('hour_fusion_ready') is False, hours
+              assert hours.get('personal_hour_decision_ready') is False, hours
               assert hours.get('numeric_score') is None, hours
               assert hours.get('confidence_state') == 'Chưa đủ căn cứ', hours
               assert hours.get('confidence_model_version') == '2.8-alpha.1', hours
@@ -151,6 +164,48 @@ jobs:
               assert provisional.get('result_count') == 8, provisional
               assert all(x.get('confidence_state') != 'Căn cứ rõ' for x in provisional.get('all_results', [])), provisional
               assert any(any('PROVISIONAL' in b for b in x.get('confidence_basis', [])) for x in provisional.get('all_results', [])), provisional
+
+              hour_days = req('/api/v2/tim-ngay', {
+                  'profile': profile, 'viec': 'KY_HOP_DONG',
+                  'tu_ngay': '2026-08-24', 'den_ngay': '2026-11-24'
+              })
+              rows = hour_days.get('all_results', [])
+              blocked = next((x for x in rows if (x.get('event_context') or {}).get('hard_block') is True), None)
+              eligible = next((x for x in rows if (x.get('event_context') or {}).get('hard_block') is not True), None)
+              assert blocked is not None, 'V2.9A smoke needs at least one HARD_BLOCK day in max window'
+              assert eligible is not None, 'V2.9A smoke needs at least one non-blocked day in max window'
+
+              blocked_hours = req('/api/v2/gio-ca-nhan', {
+                  'profile': profile, 'ngay': blocked.get('date'), 'viec': 'KY_HOP_DONG'
+              })
+              assert blocked_hours.get('kind') == 'personal_hour_fusion', blocked_hours
+              assert blocked_hours.get('hour_fusion_policy_version') == '2.9-alpha.1', blocked_hours
+              assert blocked_hours.get('event_code') == 'KY_HOP_DONG', blocked_hours
+              assert blocked_hours.get('event_day_context_present') is True, blocked_hours
+              assert blocked_hours.get('conclusion', {}).get('state') == 'BLOCKED_BY_DAY', blocked_hours
+              assert blocked_hours.get('personal_hour_decision_ready') is False, blocked_hours
+              assert blocked_hours.get('numeric_score') is None, blocked_hours
+              assert len(blocked_hours.get('hours', [])) == 12, blocked_hours
+              assert all(x.get('decision_state') == 'INELIGIBLE_BY_DAY' for x in blocked_hours['hours']), blocked_hours
+              assert all(x.get('day_gate') == 'HARD_BLOCK' for x in blocked_hours['hours']), blocked_hours
+              assert all(x.get('is_personal_good_hour') is None for x in blocked_hours['hours']), blocked_hours
+              assert all(x.get('is_personal_bad_hour') is None for x in blocked_hours['hours']), blocked_hours
+
+              eligible_hours = req('/api/v2/gio-ca-nhan', {
+                  'profile': profile, 'ngay': eligible.get('date'), 'viec': 'KY_HOP_DONG'
+              })
+              assert eligible_hours.get('kind') == 'personal_hour_fusion', eligible_hours
+              assert eligible_hours.get('hour_fusion_policy_version') == '2.9-alpha.1', eligible_hours
+              assert eligible_hours.get('event_day_context_present') is True, eligible_hours
+              assert eligible_hours.get('conclusion', {}).get('state') == 'DESCRIPTIVE_ONLY', eligible_hours
+              assert eligible_hours.get('hour_fusion_ready') is True, eligible_hours
+              assert eligible_hours.get('personal_hour_decision_ready') is False, eligible_hours
+              assert eligible_hours.get('confidence_state') == 'Chưa đủ căn cứ', eligible_hours
+              assert len(eligible_hours.get('hours', [])) == 12, eligible_hours
+              assert all(x.get('decision_state') == 'DESCRIPTIVE_ONLY' for x in eligible_hours['hours']), eligible_hours
+              assert all(x.get('day_gate') == 'PASS_TO_HOUR_RULES' for x in eligible_hours['hours']), eligible_hours
+              assert all(x.get('is_personal_good_hour') is None for x in eligible_hours['hours']), eligible_hours
+              assert all(x.get('is_personal_bad_hour') is None for x in eligible_hours['hours']), eligible_hours
 
           print('LIVE_SMOKE_PRODUCTION = PASS')
           PY
