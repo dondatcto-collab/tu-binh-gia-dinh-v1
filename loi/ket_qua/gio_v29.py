@@ -1,0 +1,161 @@
+"""V2.9A — cổng hợp lưu giờ cá nhân an toàn.
+
+Lớp này KHÔNG tự tạo giờ tốt/xấu. Nó chỉ đưa bối cảnh ngày/sự kiện vào lớp giờ
+và khóa thứ bậc quyết định trước khi V2.9B có rule giờ đã VERIFIED.
+
+Nguyên tắc bất biến:
+- HARD_BLOCK của ngày/sự kiện thắng toàn bộ giờ.
+- Một quan hệ hợp/xung của giờ không đủ để gọi giờ tốt/xấu cá nhân.
+- Không có bối cảnh việc/ngày => chỉ mô tả cấu trúc.
+- Ngày không bị chặn cũng không đồng nghĩa có giờ tốt.
+- numeric_score luôn LOCKED_OFF.
+"""
+from __future__ import annotations
+
+from copy import deepcopy
+from typing import Any
+
+HOUR_FUSION_POLICY_VERSION = "2.9-alpha.1"
+HOUR_FUSION_STATUS = "V2_9A_EVENT_DAY_GATED_HOUR_REFERENCE"
+
+
+def _is_day_hard_block(event_day: dict[str, Any] | None) -> bool:
+    if not event_day:
+        return False
+    ctx = event_day.get("event_context") or {}
+    conclusion = event_day.get("conclusion") or {}
+    return bool(
+        ctx.get("hard_block") is True
+        or conclusion.get("state") == "HARD_BLOCK"
+        or conclusion.get("label") == "Bị chặn"
+    )
+
+
+def _event_day_summary(event_day: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not event_day:
+        return None
+    return {
+        "date": event_day.get("date"),
+        "conclusion": dict(event_day.get("conclusion") or {}),
+        "hard_block": bool((event_day.get("event_context") or {}).get("hard_block")),
+        "confidence_state": event_day.get("confidence_state"),
+        "confidence_basis": list(event_day.get("confidence_basis") or []),
+        "rules": list(event_day.get("rules") or []),
+        "sources": list(event_day.get("sources") or []),
+    }
+
+
+def hour_fusion_gate(
+    hour_reference: dict[str, Any],
+    *,
+    event_code: str | None = None,
+    event_day: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Hợp lưu bối cảnh ngày vào 12 giờ mà chưa phát minh rule giờ.
+
+    V2.9A chỉ có quyền CHẶN theo ngày hoặc giữ DESCRIPTIVE_ONLY. Muốn phát sinh
+    giờ tốt/xấu cá nhân phải sang V2.9B với rule/source giờ VERIFIED và ca vàng.
+    """
+    out = deepcopy(hour_reference)
+    out["kind"] = "personal_hour_fusion"
+    out["hour_fusion_policy_version"] = HOUR_FUSION_POLICY_VERSION
+    out["hour_fusion_status"] = HOUR_FUSION_STATUS
+    out["event_code"] = event_code
+    out["event_day_context_present"] = event_day is not None
+    out["event_day"] = _event_day_summary(event_day)
+    out["numeric_score"] = None
+    out["numeric_score_status"] = "LOCKED_OFF"
+
+    hours = list(out.get("hours") or [])
+    day_blocked = _is_day_hard_block(event_day)
+
+    if day_blocked:
+        out["conclusion"] = {
+            "state": "BLOCKED_BY_DAY",
+            "label": "Ngày đã bị chặn",
+            "title": "Không xét giờ để cứu ngày đã bị chặn",
+        }
+        out["plain_explanation"] = (
+            "Lớp sự kiện đã chặn ngày này. Theo thứ bậc HARD_BLOCK > EVENT > PERSONAL, "
+            "mọi giờ trong ngày đều không đủ quyền đảo kết luận của ngày."
+        )
+        out["confidence_state"] = (event_day or {}).get("confidence_state") or "Căn cứ vừa"
+        out["confidence_basis"] = list((event_day or {}).get("confidence_basis") or [])
+        out["hour_fusion_ready"] = True
+        out["personal_hour_decision_ready"] = False
+        for item in hours:
+            item["decision_state"] = "INELIGIBLE_BY_DAY"
+            item["is_personal_good_hour"] = None
+            item["is_personal_bad_hour"] = None
+            item["day_gate"] = "HARD_BLOCK"
+        out["hours"] = hours
+        return out
+
+    if event_day is None or not event_code:
+        out["conclusion"] = {
+            "state": "DESCRIPTIVE_ONLY",
+            "label": "Thiếu bối cảnh việc",
+            "title": "Chưa đủ căn cứ để xét giờ theo việc cụ thể",
+        }
+        out["plain_explanation"] = (
+            "V2.9 cần biết loại việc và kết luận của ngày trước khi xét giờ. "
+            "Nếu thiếu bối cảnh này, ứng dụng chỉ hiển thị cấu trúc 12 giờ."
+        )
+        out["confidence_state"] = "Chưa đủ căn cứ"
+        out["confidence_basis"] = ["Thiếu loại việc hoặc kết luận ngày để áp dụng cổng V2.9A."]
+        out["hour_fusion_ready"] = False
+        out["personal_hour_decision_ready"] = False
+        return out
+
+    out["conclusion"] = {
+        "state": "DESCRIPTIVE_ONLY",
+        "label": "Ngày đủ điều kiện để xét tiếp giờ",
+        "title": "Chưa bật nhãn giờ tốt/xấu cho đến khi rule giờ được xác minh",
+    }
+    out["plain_explanation"] = (
+        "Ngày không bị HARD_BLOCK nên có thể đi tiếp tới lớp giờ. Tuy nhiên V2.9A "
+        "chưa dùng quan hệ hợp/xung đơn lẻ để gọi giờ tốt/xấu; cần rule giờ có nguồn "
+        "và trạng thái VERIFIED ở V2.9B."
+    )
+    out["confidence_state"] = "Chưa đủ căn cứ"
+    out["confidence_basis"] = [
+        "Ngày đã qua cổng HARD_BLOCK.",
+        "Chưa có rule giờ VERIFIED đủ để phát sinh nhãn giờ tốt/xấu cá nhân.",
+    ]
+    out["hour_fusion_ready"] = True
+    out["personal_hour_decision_ready"] = False
+    for item in hours:
+        item["decision_state"] = "DESCRIPTIVE_ONLY"
+        item["is_personal_good_hour"] = None
+        item["is_personal_bad_hour"] = None
+        item["day_gate"] = "PASS_TO_HOUR_RULES"
+    out["hours"] = hours
+    return out
+
+
+def v29_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
+    """Công bố đúng capability V2.9A mà không đổi public schema 2.5."""
+    out = dict(base)
+    scopes = list(out.get("implemented_scopes") or [])
+    if "personal_hour_event_day_gate" not in scopes:
+        scopes.append("personal_hour_event_day_gate")
+    out["implemented_scopes"] = scopes
+    pending = list(out.get("pending_scopes") or [])
+    if "personal_hour_verified_rule_decision" not in pending:
+        pending.append("personal_hour_verified_rule_decision")
+    out["pending_scopes"] = pending
+    out["hour_fusion_v29"] = {
+        "policy_version": HOUR_FUSION_POLICY_VERSION,
+        "status": HOUR_FUSION_STATUS,
+        "event_day_gate_ready": True,
+        "verified_hour_rule_decision_ready": False,
+        "hard_block_can_be_rescued_by_hour": False,
+        "numeric_score": None,
+        "numeric_score_status": "LOCKED_OFF",
+    }
+    principles = list(out.get("principles") or [])
+    note = "V2.9A xét ngày/sự kiện trước giờ; HARD_BLOCK của ngày không thể được một giờ đảo ngược."
+    if note not in principles:
+        principles.append(note)
+    out["principles"] = principles
+    return out
