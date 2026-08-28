@@ -1,5 +1,14 @@
-const CACHE = 'tubinh-v1-ui-0.4.0';
-const SHELL = ['/', '/static/app.css?v=0.4.0', '/static/app.js?v=0.4.0', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
+const CACHE = 'tubinh-ui-v2.6';
+const SHELL = [
+  '/',
+  '/static/app.css?v=0.5.0',
+  '/static/app.js?v=0.5.0',
+  '/static/ui-language-051.js?v=0.5.1',
+  '/static/ui-bootstrap-v26.js?v=2.6',
+  '/manifest.webmanifest',
+  '/icon-192.png',
+  '/icon-512.png'
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -27,12 +36,17 @@ self.addEventListener('fetch', event => {
   }
   if (req.mode === 'navigate') {
     event.respondWith(fetch(req, {cache: 'no-store'}).then(res => {
-      const copy = res.clone(); caches.open(CACHE).then(c => c.put('/', copy)); return res;
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put('/', copy));
+      return res;
     }).catch(() => caches.match('/')));
     return;
   }
   event.respondWith(fetch(req).then(res => {
-    if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+    if (res.ok) {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copy));
+    }
     return res;
   }).catch(() => caches.match(req)));
 });
