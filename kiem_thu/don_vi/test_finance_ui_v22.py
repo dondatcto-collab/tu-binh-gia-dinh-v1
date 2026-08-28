@@ -20,12 +20,12 @@ def test_finance_ui_mirrors_are_identical():
     assert read("public/static/ui-finance-v22.js") == read("giao_dien/ui-finance-v22.js")
 
 
-def test_index_mirrors_load_finance_after_work_layer():
-    pub = read("public/index.html")
-    mirror = read("giao_dien/index.html")
+def test_bootstrap_loads_finance_after_work_layer():
+    pub = read("public/static/ui-bootstrap-v26.js")
+    mirror = read("giao_dien/ui-bootstrap-v26.js")
     assert pub == mirror
     assert pub.index("ui-work-v21.js") < pub.index("ui-finance-v22.js")
-    assert "ui-finance-v22.js?v=2.2-alpha.1" in pub
+    assert "/static/ui-finance-v22.js?v=2.6" in pub
 
 
 def test_v2_api_has_finance_route_without_removing_work():
