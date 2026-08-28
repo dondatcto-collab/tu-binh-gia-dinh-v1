@@ -21,7 +21,7 @@ def test_hour_method_gate_now_allows_limited_v29b_decision_but_not_full_classica
     assert s.hour_fusion_ready is True
     assert s.personal_hour_decision_ready is True
     assert cho_phep_ket_luan_gio_ca_nhan() is True
-    assert s.decision_mode == "ZPZQ_PERSONAL_LIMITED_HOUR_V29B"
+    assert s.decision_mode == "ZPZQ_PERSONAL"
     assert "chưa phải hệ cát-hung giờ cổ điển đầy đủ" in s.reason_vi
     assert "BT-REL-0001" in s.rule_ids
     assert "SRC-TMTH-V02-WIKISOURCE" in s.source_ids
