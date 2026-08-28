@@ -143,7 +143,7 @@ def apply_confidence_v28(result: dict[str, Any], *, time_certainty: str | None =
     elif kind == "domain_period":
         level, basis = _domain_confidence(out, time_certainty=time_certainty)
     elif kind == "personal_hour_reference":
-        level, basis = INSUFFICIENT, ["Giờ tham khảo chưa có bối cảnh loại việc/ngày để mở quyết định cá nhân."]
+        level, basis = INSUFFICIENT, ["personal-hour reference chưa có bối cảnh loại việc/ngày để mở quyết định cá nhân."]
     elif kind == "personal_hour_fusion":
         level, basis = _hour_fusion_confidence(out, time_certainty=time_certainty)
     elif kind == "personal_period":
