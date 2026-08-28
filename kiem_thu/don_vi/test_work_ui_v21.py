@@ -11,8 +11,10 @@ def test_work_ui_layer_is_loaded_after_core_v2_ui():
     for path in ("public/index.html", "giao_dien/index.html"):
         text = read(path)
         assert "/static/ui-language-051.js?v=0.5.1" in text
-        assert "/static/ui-work-v21.js?v=2.1-alpha.1" in text
-        assert text.index("ui-language-051.js") < text.index("ui-work-v21.js")
+        assert "/static/ui-bootstrap-v26.js?v=2.6" in text
+        assert text.index("ui-language-051.js") < text.index("ui-bootstrap-v26.js")
+    bootstrap = read("public/static/ui-bootstrap-v26.js")
+    assert "/static/ui-work-v21.js?v=2.6" in bootstrap
 
 
 def test_work_ui_consumes_only_canonical_v2_work_endpoint():
