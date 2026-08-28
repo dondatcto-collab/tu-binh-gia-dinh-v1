@@ -20,11 +20,12 @@ def test_relationship_ui_reads_only_canonical_v2_endpoint():
     assert "hôn nhân" in text
 
 
-def test_relationship_ui_is_bootstrapped_without_reopening_core_ui():
-    pub = read("public/static/ui-finance-v22.js")
-    mirror = read("giao_dien/ui-finance-v22.js")
-    assert pub == mirror
-    assert "ui-relationship-v23.js?v=2.3-alpha.1" in pub
+def test_relationship_ui_is_owned_by_v26_bootstrap():
+    finance = read("public/static/ui-finance-v22.js")
+    bootstrap = read("public/static/ui-bootstrap-v26.js")
+    assert "ui-relationship-v23.js" not in finance
+    assert "/static/ui-relationship-v23.js?v=2.6" in bootstrap
+    assert bootstrap.index("ui-finance-v22.js") < bootstrap.index("ui-relationship-v23.js")
 
 
 def test_relationship_api_route_is_present_and_uses_domain_adapter():
