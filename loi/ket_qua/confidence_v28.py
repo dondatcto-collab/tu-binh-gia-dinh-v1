@@ -92,6 +92,20 @@ def _personal_confidence(result: dict[str, Any], *, time_certainty: str | None) 
     return MEDIUM, basis
 
 
+def _hour_fusion_confidence(result: dict[str, Any]) -> tuple[str, list[str]]:
+    state = str((result.get("conclusion") or {}).get("state") or "")
+    event_day = dict(result.get("event_day") or {})
+    if state == "BLOCKED_BY_DAY":
+        level = event_day.get("confidence_state") or result.get("confidence_state") or MEDIUM
+        basis = list(event_day.get("confidence_basis") or result.get("confidence_basis") or [])
+        if not basis:
+            basis = ["Giờ bị khóa bởi kết luận HARD_BLOCK của ngày; confidence kế thừa từ evidence của ngày."]
+        return level, basis
+    return INSUFFICIENT, list(result.get("confidence_basis") or [
+        "V2.9A mới khóa cổng ngày/sự kiện; chưa có rule giờ VERIFIED để phát sinh quyết định giờ cá nhân."
+    ])
+
+
 def apply_confidence_v28(result: dict[str, Any], *, time_certainty: str | None = "KNOWN") -> dict[str, Any]:
     """Trả bản sao result với confidence_state + confidence_basis V2.8.
 
@@ -112,6 +126,8 @@ def apply_confidence_v28(result: dict[str, Any], *, time_certainty: str | None =
         level, basis = _domain_confidence(out, time_certainty=time_certainty)
     elif kind == "personal_hour_reference":
         level, basis = INSUFFICIENT, ["Giờ V2.4 mới là tham khảo cấu trúc; chưa có personal-hour decision fusion."]
+    elif kind == "personal_hour_fusion":
+        level, basis = _hour_fusion_confidence(out)
     elif kind == "personal_period":
         level, basis = _personal_confidence(out, time_certainty=time_certainty)
     else:
