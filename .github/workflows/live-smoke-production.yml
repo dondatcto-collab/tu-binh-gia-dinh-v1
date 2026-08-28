@@ -48,6 +48,19 @@ jobs:
                       if i + 1 < attempts: time.sleep(pause)
               raise AssertionError(f'{path}: {last}')
 
+          def wait_for_contract(path, predicate, attempts=18, pause=10):
+              last = None
+              for i in range(attempts):
+                  try:
+                      last = req(path, attempts=1)
+                      if predicate(last):
+                          return last
+                  except Exception as exc:
+                      last = {'request_error': str(exc)}
+                  if i + 1 < attempts:
+                      time.sleep(pause)
+              raise AssertionError(f'{path}: contract not ready after {attempts} attempts: {last}')
+
           # V1 safety/regression remains mandatory on PR and main.
           health = req('/api/health')
           assert health.get('ok') is True, health
@@ -71,12 +84,16 @@ jobs:
           assert v1_search.get('xep_hang_status') == 'ORDINAL_V1_1_PERSONAL', v1_search
           assert all(x.get('score') is None for x in v1_search.get('cac_ngay', [])), v1_search
 
-          # PR checks the currently deployed production. New public-schema requirements
-          # become mandatory only after merge, when main has deployed.
+          # PR checks current production. After merge, wait for the NEW contract itself,
+          # not merely HTTP 200, because Vercel alias may still briefly serve the old deploy.
           if event_name != 'pull_request':
-              schema = req('/api/v2/schema-status', attempts=18, pause=10)
-              assert schema.get('schema_version') == '2.5-alpha.1', schema
-              assert schema.get('product_schema_version') == '2.5-alpha.1', schema
+              schema = wait_for_contract(
+                  '/api/v2/schema-status',
+                  lambda x: (
+                      x.get('schema_version') == '2.5-alpha.1'
+                      and x.get('product_schema_version') == '2.5-alpha.1'
+                  ),
+              )
               assert schema.get('status') == 'V2_5_HIEP_KY_PARTIAL_ACTIVE', schema
               assert schema.get('numeric_score') == 'LOCKED_OFF', schema
               hk = schema.get('hiep_ky_v25', {})
@@ -84,7 +101,7 @@ jobs:
               assert hk.get('decision_hierarchy') == 'HARD_BLOCK > EVENT > PERSONAL', hk
               assert hk.get('full_classical_claim') is False, hk
 
-              # Every public Result object now advertises one product schema.
+              # Once schema contract is visible, canonical alias has moved to the new app.
               today = req('/api/v2/hom-nay', {'profile': profile, 'ngay': '2026-08-24'})
               assert today.get('schema_version') == '2.5-alpha.1', today
               assert today.get('product_schema_version') == '2.5-alpha.1', today
