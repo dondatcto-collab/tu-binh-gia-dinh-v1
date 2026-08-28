@@ -73,7 +73,6 @@ def test_v27_complete_result_contract_has_payload_growth_guard_for_max_window():
     encoded = json.dumps(out, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     assert out["result_count"] == 93
     assert len(out["all_results"]) == 93
-    # Guard chống phình adapter: nếu vượt 512 KiB, cần chuyển all_results sang compact/lazy detail.
     assert len(encoded) < 512 * 1024
 
 
@@ -87,6 +86,16 @@ def test_v27_ui_uses_one_event_search_source_for_search_and_event_calendar():
     assert "Vì sao ngày này được xếp như vậy?" in ui
     assert "Lịch đang đánh giá theo đúng loại việc đã chọn" in ui
     assert "numeric_score" not in ui
+
+
+def test_v28_ui_explains_confidence_without_changing_decision_tone():
+    ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
+    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '2.8'" in ui
+    assert "confidence_basis" in ui
+    assert "Vì sao mức căn cứ là" in ui
+    assert "Mức căn cứ được đánh giá riêng theo chất lượng bằng chứng" in ui
+    assert "function tone(r)" in ui
+    assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function confidence(r)", 1)[0]
 
 
 def test_v27_event_module_is_loaded_last_by_single_bootstrap():
