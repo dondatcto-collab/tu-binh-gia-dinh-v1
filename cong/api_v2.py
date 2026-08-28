@@ -15,7 +15,7 @@ from cong.api import DayRequest, ProfileRequest, WorkRequest, hom_nay, thang_nay
 from cong.tim_ngay_v25 import tim_ngay_v25
 from loi.ket_qua.v2 import decade_result, finance_result, personal_result, relationship_result, schema_status, work_result
 from loi.ket_qua.gio_v24 import hour_reference_result, v24_schema_overlay
-from loi.ket_qua.gio_v29 import hour_fusion_gate
+from loi.ket_qua.gio_v29 import hour_fusion_gate, v29_schema_overlay
 from loi.ket_qua.hiep_ky_v25_result import event_search_v25, v25_schema_overlay
 from loi.ket_qua.schema_v25 import canonicalize_v25
 from loi.ket_qua.confidence_v28 import apply_confidence_v28, v28_schema_overlay
@@ -41,7 +41,8 @@ def _public(result: dict, *, time_certainty: str | None = "KNOWN"):
 
 @router.get("/schema-status")
 def v2_schema_status():
-    return canonicalize_v25(v28_schema_overlay(v25_schema_overlay(v24_schema_overlay(schema_status()))))
+    base = v28_schema_overlay(v25_schema_overlay(v24_schema_overlay(schema_status())))
+    return canonicalize_v25(v29_schema_overlay(base))
 
 
 @router.post("/hom-nay")
