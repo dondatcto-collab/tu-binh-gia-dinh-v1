@@ -1,7 +1,8 @@
 """V2.8 — Confidence dựa trên chất lượng bằng chứng, không dựa trên độ mạnh của nhãn.
 
 Module này KHÔNG đổi decision/ranking. Nó chỉ chuẩn hóa mức chắc của cách diễn đạt
-và trả về basis có thể truy nguyên để UI giải thích.
+và trả về basis có thể truy nguyên để UI giải thích. V2.9B mở rộng riêng confidence
+cho lớp giờ khi quyết định giờ có Rule ID/Source ID truy nguyên được.
 """
 from __future__ import annotations
 
@@ -92,7 +93,9 @@ def _personal_confidence(result: dict[str, Any], *, time_certainty: str | None) 
     return MEDIUM, basis
 
 
-def _hour_fusion_confidence(result: dict[str, Any]) -> tuple[str, list[str]]:
+def _hour_fusion_confidence(
+    result: dict[str, Any], *, time_certainty: str | None
+) -> tuple[str, list[str]]:
     state = str((result.get("conclusion") or {}).get("state") or "")
     event_day = dict(result.get("event_day") or {})
     if state == "BLOCKED_BY_DAY":
@@ -101,8 +104,23 @@ def _hour_fusion_confidence(result: dict[str, Any]) -> tuple[str, list[str]]:
         if not basis:
             basis = ["Giờ bị khóa bởi kết luận HARD_BLOCK của ngày; confidence kế thừa từ evidence của ngày."]
         return level, basis
+
+    if state == "HOUR_RULE_DECISION_READY":
+        rules = list(result.get("rules") or [])
+        sources = list(result.get("sources") or [])
+        if not rules or not sources:
+            return INSUFFICIENT, ["Quyết định giờ thiếu Rule ID hoặc Source ID truy nguyên được."]
+        basis = [
+            "Ngày đã qua cổng HARD_BLOCK trước khi xét giờ.",
+            "Các giờ có tác động được gắn Rule ID và Source ID truy nguyên được.",
+            "V2.9B chỉ là lớp quyết định giờ giới hạn; chưa tuyên bố hệ cát-hung giờ cổ điển đầy đủ.",
+        ]
+        if not _certainty_known(time_certainty):
+            basis.append("Giờ sinh chưa ở trạng thái KNOWN nên confidence của lớp cá nhân bị giới hạn.")
+        return MEDIUM, basis
+
     return INSUFFICIENT, list(result.get("confidence_basis") or [
-        "V2.9A mới khóa cổng ngày/sự kiện; chưa có rule giờ VERIFIED để phát sinh quyết định giờ cá nhân."
+        "Thiếu loại việc/ngày hợp lệ hoặc chưa có rule giờ đủ điều kiện để phát sinh quyết định."
     ])
 
 
@@ -125,9 +143,9 @@ def apply_confidence_v28(result: dict[str, Any], *, time_certainty: str | None =
     elif kind == "domain_period":
         level, basis = _domain_confidence(out, time_certainty=time_certainty)
     elif kind == "personal_hour_reference":
-        level, basis = INSUFFICIENT, ["Giờ V2.4 mới là tham khảo cấu trúc; chưa có personal-hour decision fusion."]
+        level, basis = INSUFFICIENT, ["Giờ tham khảo chưa có bối cảnh loại việc/ngày để mở quyết định cá nhân."]
     elif kind == "personal_hour_fusion":
-        level, basis = _hour_fusion_confidence(out)
+        level, basis = _hour_fusion_confidence(out, time_certainty=time_certainty)
     elif kind == "personal_period":
         level, basis = _personal_confidence(out, time_certainty=time_certainty)
     else:
