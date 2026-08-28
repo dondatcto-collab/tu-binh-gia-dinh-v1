@@ -4,6 +4,7 @@ const SHELL = [
   '/static/app.css?v=0.5.0',
   '/static/app.js?v=0.5.0',
   '/static/ui-language-051.js?v=0.5.1',
+  '/static/ui-bootstrap-v26.js?v=2.6',
   '/static/ui-bootstrap-v26.js?v=2.7',
   '/static/ui-event-search-v27.js?v=2.7',
   '/manifest.webmanifest',
