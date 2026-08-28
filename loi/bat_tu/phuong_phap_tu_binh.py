@@ -1,8 +1,8 @@
-"""Cổng phương pháp Tử Bình Chân Thuyên cho release 0.5.0 + trạng thái V2.9B.
+"""Cổng phương pháp Tử Bình Chân Thuyên cho release 0.5.0 + trạng thái V2.9C.
 
-Phân biệt rõ ba lớp: cấu trúc giờ, quyết định giờ giới hạn đã truy nguyên và hệ
-cát-hung giờ cổ điển đầy đủ. V2.9B chỉ mở lớp thứ hai; không được suy diễn rằng
-toàn bộ hệ giờ cổ điển đã hoàn tất.
+Phân biệt rõ ba lớp: cấu trúc giờ, quyết định giờ cá nhân có hợp lưu Can Chi/Hỷ-Kỵ,
+và hệ cát-hung giờ cổ điển đầy đủ. V2.9C mở sâu lớp thứ hai nhưng không được
+suy diễn rằng toàn bộ hệ giờ cổ điển đã hoàn tất.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -14,7 +14,10 @@ RULE_IDS = (
     "BT-BASE-0401","BT-USE-0401","BT-DY-0401",
     "BT-REL-0001","BT-REL-0002","BT-REL-0003","BT-REL-0004",
 )
-SOURCE_IDS = ("SRC-ZPZQ-NLC-SCAN", "SRC-ZPZQ-DONGLI", "SRC-TMTH-V02-WIKISOURCE")
+SOURCE_IDS = (
+    "SRC-ZPZQ-NLC-SCAN", "SRC-ZPZQ-DONGLI", "SRC-TMTH-V02-WIKISOURCE",
+    "SRC-UHTB-CHEP",
+)
 
 @dataclass(frozen=True)
 class TrangThaiPhuongPhap:
@@ -50,10 +53,11 @@ def trang_thai_hien_tai() -> TrangThaiPhuongPhap:
         hour_fusion_ready=True,
         personal_hour_decision_ready=True,
         decision_mode="ZPZQ_PERSONAL",
-        reason_vi=("Engine 0.5.0 đã khóa Cách cục/Hỷ-Kỵ cho quyết định cá nhân ngày/tháng. "
-                   "V2.9B đã mở hợp lưu ngày/sự kiện -> giờ và cho phép quyết định giờ giới hạn "
-                   "bằng các quan hệ Địa Chi có Rule ID/Source ID. Lục hợp được dùng như giờ có thể "
-                   "ưu tiên; Xung/Hại/Hình như tín hiệu thận trọng; không có quan hệ trực tiếp là trung tính. "
+        reason_vi=("Engine 0.5.0 đã khóa Cách cục/Hỷ-Kỵ cho quyết định cá nhân. "
+                   "V2.9C giữ cổng ngày/sự kiện của V2.9B và hợp lưu sâu thêm Can Chi giờ với "
+                   "Hỷ/Kỵ theo cùng engine ZPZQ; quan hệ Chi vẫn là một lớp evidence độc lập. "
+                   "Ngũ Thử Độn dùng nguồn VERIFIED SRC-UHTB-CHEP. Riêng Can giờ Tý 23:00–23:59 "
+                   "không được dùng để nâng/hạ quyết định vì TIME-0007 còn CONFLICTED. "
                    "Đây chưa phải hệ cát-hung giờ cổ điển đầy đủ và không dùng numeric score."),
         rule_ids=RULE_IDS, source_ids=SOURCE_IDS)
 
