@@ -18,6 +18,7 @@ def sample_raw():
 def test_hour_method_gate_no_longer_claims_full_fusion():
     s = trang_thai_hien_tai()
     assert s.hour_structure_ready is True
+    # Gate gốc chỉ phản ánh calculator/rule giờ VERIFIED; V2.9A chưa thay đổi claim này.
     assert s.hour_fusion_ready is False
     assert s.personal_hour_decision_ready is False
     assert cho_phep_ket_luan_gio_ca_nhan() is False
@@ -42,11 +43,13 @@ def test_hour_overlay_keeps_personal_hour_decision_pending():
     assert out["hour_readiness"]["hour_fusion_ready"] is False
 
 
-def test_v2_api_exposes_hour_reference_only():
+def test_v2_api_keeps_hour_reference_and_routes_it_through_v29_gate():
     text = (ROOT / "cong/api_v2.py").read_text(encoding="utf-8")
     assert '"/gio-ca-nhan"' in text
     assert "hour_reference_result" in text
-    assert "hom_nay(v)" in text
+    assert "hour_fusion_gate" in text
+    assert "HourDecisionRequest" in text
+    assert "tim_ngay_v25" in text
 
 
 def test_hour_ui_reads_only_v2_and_mirrors_are_identical():
@@ -59,5 +62,7 @@ def test_hour_ui_reads_only_v2_and_mirrors_are_identical():
 
 
 def test_hour_can_never_rescue_hard_block_in_copy_contract():
-    text = (ROOT / "loi/ket_qua/gio_v24.py").read_text(encoding="utf-8")
-    assert "Không dùng giờ để cứu một ngày đã bị chặn" in text
+    old = (ROOT / "loi/ket_qua/gio_v24.py").read_text(encoding="utf-8")
+    new = (ROOT / "loi/ket_qua/gio_v29.py").read_text(encoding="utf-8")
+    assert "Không dùng giờ để cứu một ngày đã bị chặn" in old
+    assert "Không xét giờ để cứu ngày đã bị chặn" in new
