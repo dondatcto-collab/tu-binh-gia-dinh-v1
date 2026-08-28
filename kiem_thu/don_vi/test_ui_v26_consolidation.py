@@ -9,26 +9,27 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_v26_index_uses_one_controlled_bootstrap():
+def test_v26_index_still_uses_one_controlled_bootstrap():
     index = read(PUBLIC / "index.html")
-    assert index.count("/static/ui-bootstrap-v26.js?v=2.6") == 1
+    assert index.count("/static/ui-bootstrap-v26.js") == 1
     assert "/static/ui-work-v21.js" not in index
     assert "/static/ui-finance-v22.js" not in index
     assert "/static/ui-relationship-v23.js" not in index
     assert "/static/ui-hour-v24.js" not in index
+    assert "/static/ui-event-search-v27.js" not in index
 
 
-def test_v26_bootstrap_owns_all_four_ui_modules_once():
+def test_single_bootstrap_still_owns_core_modules_once():
     bootstrap = read(PUBLIC / "static" / "ui-bootstrap-v26.js")
     for path in (
-        "/static/ui-work-v21.js?v=2.6",
-        "/static/ui-finance-v22.js?v=2.6",
-        "/static/ui-relationship-v23.js?v=2.6",
-        "/static/ui-hour-v24.js?v=2.6",
+        "/static/ui-work-v21.js",
+        "/static/ui-finance-v22.js",
+        "/static/ui-relationship-v23.js",
+        "/static/ui-hour-v24.js",
     ):
         assert bootstrap.count(path) == 1
     assert "TU_BINH_UI_READY" in bootstrap
-    assert "TU_BINH_PRODUCT_UI_VERSION = '2.6'" in bootstrap
+    assert "TU_BINH_PRODUCT_UI_VERSION" in bootstrap
 
 
 def test_modules_do_not_load_each_other_anymore():
@@ -48,7 +49,6 @@ def test_user_facing_index_has_no_legacy_v1_badges():
     assert "giới hạn V1" not in index
     assert "V1 chưa" not in index
     assert "V1 không" not in index
-    assert "<em>V2.6</em>" in index
 
 
 def test_domain_cards_hide_internal_component_versions():
@@ -63,10 +63,10 @@ def test_domain_cards_hide_internal_component_versions():
         assert visible_marker not in text
 
 
-def test_pwa_cache_rolls_to_v26_and_precaches_bootstrap():
+def test_pwa_cache_keeps_single_bootstrap_and_current_cache():
     sw = read(PUBLIC / "service-worker.js")
-    assert "tubinh-ui-v2.6" in sw
-    assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
+    assert "tubinh-ui-v2.7" in sw
+    assert "/static/ui-bootstrap-v26.js" in sw
 
 
 def test_runtime_and_source_ui_copies_stay_identical():
@@ -78,6 +78,7 @@ def test_runtime_and_source_ui_copies_stay_identical():
         (PUBLIC / "static" / "ui-finance-v22.js", SOURCE_UI / "ui-finance-v22.js"),
         (PUBLIC / "static" / "ui-relationship-v23.js", SOURCE_UI / "ui-relationship-v23.js"),
         (PUBLIC / "static" / "ui-hour-v24.js", SOURCE_UI / "ui-hour-v24.js"),
+        (PUBLIC / "static" / "ui-event-search-v27.js", SOURCE_UI / "ui-event-search-v27.js"),
     ]
     for runtime, source in pairs:
         assert read(runtime) == read(source), f"UI mirror lệch: {runtime.name}"
