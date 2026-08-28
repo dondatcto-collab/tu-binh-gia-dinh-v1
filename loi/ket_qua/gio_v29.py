@@ -31,6 +31,20 @@ def _is_day_hard_block(event_day: dict[str, Any] | None) -> bool:
     )
 
 
+def _event_day_summary(event_day: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not event_day:
+        return None
+    return {
+        "date": event_day.get("date"),
+        "conclusion": dict(event_day.get("conclusion") or {}),
+        "hard_block": bool((event_day.get("event_context") or {}).get("hard_block")),
+        "confidence_state": event_day.get("confidence_state"),
+        "confidence_basis": list(event_day.get("confidence_basis") or []),
+        "rules": list(event_day.get("rules") or []),
+        "sources": list(event_day.get("sources") or []),
+    }
+
+
 def hour_fusion_gate(
     hour_reference: dict[str, Any],
     *,
@@ -43,10 +57,12 @@ def hour_fusion_gate(
     giờ tốt/xấu cá nhân phải sang V2.9B với rule/source giờ VERIFIED và ca vàng.
     """
     out = deepcopy(hour_reference)
+    out["kind"] = "personal_hour_fusion"
     out["hour_fusion_policy_version"] = HOUR_FUSION_POLICY_VERSION
     out["hour_fusion_status"] = HOUR_FUSION_STATUS
     out["event_code"] = event_code
     out["event_day_context_present"] = event_day is not None
+    out["event_day"] = _event_day_summary(event_day)
     out["numeric_score"] = None
     out["numeric_score_status"] = "LOCKED_OFF"
 
@@ -64,6 +80,7 @@ def hour_fusion_gate(
             "mọi giờ trong ngày đều không đủ quyền đảo kết luận của ngày."
         )
         out["confidence_state"] = (event_day or {}).get("confidence_state") or "Căn cứ vừa"
+        out["confidence_basis"] = list((event_day or {}).get("confidence_basis") or [])
         out["hour_fusion_ready"] = True
         out["personal_hour_decision_ready"] = False
         for item in hours:
@@ -85,6 +102,7 @@ def hour_fusion_gate(
             "Nếu thiếu bối cảnh này, ứng dụng chỉ hiển thị cấu trúc 12 giờ."
         )
         out["confidence_state"] = "Chưa đủ căn cứ"
+        out["confidence_basis"] = ["Thiếu loại việc hoặc kết luận ngày để áp dụng cổng V2.9A."]
         out["hour_fusion_ready"] = False
         out["personal_hour_decision_ready"] = False
         return out
@@ -100,6 +118,10 @@ def hour_fusion_gate(
         "và trạng thái VERIFIED ở V2.9B."
     )
     out["confidence_state"] = "Chưa đủ căn cứ"
+    out["confidence_basis"] = [
+        "Ngày đã qua cổng HARD_BLOCK.",
+        "Chưa có rule giờ VERIFIED đủ để phát sinh nhãn giờ tốt/xấu cá nhân.",
+    ]
     out["hour_fusion_ready"] = True
     out["personal_hour_decision_ready"] = False
     for item in hours:
