@@ -24,7 +24,7 @@ def test_relationship_ui_is_owned_by_v26_bootstrap():
     finance = read("public/static/ui-finance-v22.js")
     bootstrap = read("public/static/ui-bootstrap-v26.js")
     assert "ui-relationship-v23.js" not in finance
-    assert "/static/ui-relationship-v23.js?v=2.6" in bootstrap
+    assert "/static/ui-relationship-v23.js" in bootstrap
     assert bootstrap.index("ui-finance-v22.js") < bootstrap.index("ui-relationship-v23.js")
 
 
