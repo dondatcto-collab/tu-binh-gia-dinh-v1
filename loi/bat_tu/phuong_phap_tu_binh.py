@@ -1,8 +1,8 @@
-"""Cổng phương pháp Tử Bình Chân Thuyên cho release 0.5.0 + trạng thái V2.4.
+"""Cổng phương pháp Tử Bình Chân Thuyên cho release 0.5.0 + trạng thái V2.9B.
 
-Phân biệt rõ cấu trúc giờ đã tính được với hợp lưu giờ cá nhân đã nghiệm thu.
-Không được dùng cờ readiness để gọi giờ là tốt/xấu cá nhân khi lớp hợp lưu giờ
-vẫn chưa có ca vàng riêng.
+Phân biệt rõ ba lớp: cấu trúc giờ, quyết định giờ giới hạn đã truy nguyên và hệ
+cát-hung giờ cổ điển đầy đủ. V2.9B chỉ mở lớp thứ hai; không được suy diễn rằng
+toàn bộ hệ giờ cổ điển đã hoàn tất.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -10,8 +10,11 @@ from typing import Any
 
 PHUONG_PHAP_ID = "ZPZQ-GEJU-V1"
 PHUONG_PHAP_TEN = "Tử Bình Chân Thuyên — nguyệt lệnh/cách cục"
-RULE_IDS = ("BT-BASE-0401","BT-USE-0401","BT-DY-0401")
-SOURCE_IDS = ("SRC-ZPZQ-NLC-SCAN", "SRC-ZPZQ-DONGLI")
+RULE_IDS = (
+    "BT-BASE-0401","BT-USE-0401","BT-DY-0401",
+    "BT-REL-0001","BT-REL-0002","BT-REL-0003","BT-REL-0004",
+)
+SOURCE_IDS = ("SRC-ZPZQ-NLC-SCAN", "SRC-ZPZQ-DONGLI", "SRC-TMTH-V02-WIKISOURCE")
 
 @dataclass(frozen=True)
 class TrangThaiPhuongPhap:
@@ -44,12 +47,14 @@ def trang_thai_hien_tai() -> TrangThaiPhuongPhap:
         use_favor_avoid_ready=True, transit_fusion_ready=True,
         personal_decision_ready=True,
         hour_structure_ready=True,
-        hour_fusion_ready=False,
-        personal_hour_decision_ready=False,
-        decision_mode="ZPZQ_PERSONAL",
+        hour_fusion_ready=True,
+        personal_hour_decision_ready=True,
+        decision_mode="ZPZQ_PERSONAL_LIMITED_HOUR_V29B",
         reason_vi=("Engine 0.5.0 đã khóa Cách cục/Hỷ-Kỵ cho quyết định cá nhân ngày/tháng. "
-                   "Cấu trúc 12 giờ đã tính và hiển thị được, nhưng hợp lưu Can Chi giờ + ngày + nền mệnh "
-                   "chưa có ca vàng riêng nên chưa được phép sinh nhãn giờ tốt/xấu cá nhân."),
+                   "V2.9B đã mở hợp lưu ngày/sự kiện -> giờ và cho phép quyết định giờ giới hạn "
+                   "bằng các quan hệ Địa Chi có Rule ID/Source ID. Lục hợp được dùng như giờ có thể "
+                   "ưu tiên; Xung/Hại/Hình như tín hiệu thận trọng; không có quan hệ trực tiếp là trung tính. "
+                   "Đây chưa phải hệ cát-hung giờ cổ điển đầy đủ và không dùng numeric score."),
         rule_ids=RULE_IDS, source_ids=SOURCE_IDS)
 
 def cho_phep_ket_luan_ca_nhan() -> bool:
