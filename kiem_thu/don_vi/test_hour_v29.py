@@ -13,15 +13,31 @@ def hour_ref():
         "conclusion": {"state": "DESCRIPTIVE_ONLY"},
         "hours": [
             {
-                "chi": "Tý",
+                "chi": "TY",
+                "chi_vi": "Tý",
+                "time_range": "23:00–01:00",
                 "relation": "LUC_HOP",
+                "relation_label": "Lục hợp",
                 "decision_state": "DESCRIPTIVE_ONLY",
                 "is_personal_good_hour": None,
                 "is_personal_bad_hour": None,
             },
             {
-                "chi": "Ngọ",
-                "relation": "XUNG",
+                "chi": "NGO",
+                "chi_vi": "Ngọ",
+                "time_range": "11:00–13:00",
+                "relation": "LUC_XUNG",
+                "relation_label": "Lục xung",
+                "decision_state": "DESCRIPTIVE_ONLY",
+                "is_personal_good_hour": None,
+                "is_personal_bad_hour": None,
+            },
+            {
+                "chi": "THIN",
+                "chi_vi": "Thìn",
+                "time_range": "07:00–09:00",
+                "relation": "NONE",
+                "relation_label": "Không có quan hệ trực tiếp",
                 "decision_state": "DESCRIPTIVE_ONLY",
                 "is_personal_good_hour": None,
                 "is_personal_bad_hour": None,
@@ -48,28 +64,47 @@ def event_day(*, blocked=False, confidence="Căn cứ rõ"):
     }
 
 
-def test_hard_block_day_makes_every_hour_ineligible_without_good_bad_labels():
+def test_hard_block_day_makes_every_hour_ineligible_and_cannot_be_rescued():
     out = hour_fusion_gate(hour_ref(), event_code="KY_HOP_DONG", event_day=event_day(blocked=True))
-    assert out["hour_fusion_policy_version"] == HOUR_FUSION_POLICY_VERSION == "2.9-alpha.1"
+    assert out["hour_fusion_policy_version"] == HOUR_FUSION_POLICY_VERSION == "2.9-beta.1"
     assert out["kind"] == "personal_hour_fusion"
     assert out["conclusion"]["state"] == "BLOCKED_BY_DAY"
     assert out["hour_fusion_ready"] is True
-    assert out["personal_hour_decision_ready"] is False
+    assert out["personal_hour_decision_ready"] is True
     assert all(x["decision_state"] == "INELIGIBLE_BY_DAY" for x in out["hours"])
-    assert all(x["is_personal_good_hour"] is None for x in out["hours"])
-    assert all(x["is_personal_bad_hour"] is None for x in out["hours"])
+    assert all(x["is_personal_good_hour"] is False for x in out["hours"])
     assert out["numeric_score"] is None
+    assert "Không xét giờ để cứu ngày" in out["conclusion"]["title"]
 
 
-def test_favorable_day_does_not_auto_create_good_hour_from_branch_relation():
+def test_passed_day_activates_verified_relation_hour_decision_without_numeric_score():
     out = hour_fusion_gate(hour_ref(), event_code="KY_HOP_DONG", event_day=event_day(blocked=False))
-    assert out["conclusion"]["state"] == "DESCRIPTIVE_ONLY"
+    assert out["conclusion"]["state"] == "HOUR_RULE_DECISION_READY"
     assert out["hour_fusion_ready"] is True
-    assert out["personal_hour_decision_ready"] is False
-    assert {x["relation"] for x in out["hours"]} == {"LUC_HOP", "XUNG"}
-    assert all(x["decision_state"] == "DESCRIPTIVE_ONLY" for x in out["hours"])
-    assert all(x["is_personal_good_hour"] is None for x in out["hours"])
-    assert all(x["is_personal_bad_hour"] is None for x in out["hours"])
+    assert out["personal_hour_decision_ready"] is True
+    assert out["numeric_score"] is None
+    assert out["numeric_score_status"] == "LOCKED_OFF"
+
+    good, caution, neutral = out["hours"]
+    assert good["decision_state"] == "PERSONAL_GOOD_CANDIDATE"
+    assert good["decision_label"] == "Có thể ưu tiên"
+    assert good["is_personal_good_hour"] is True
+    assert good["hour_rule_id"] == "BT-REL-0001"
+    assert good["hour_source_id"] == "SRC-TMTH-V02-WIKISOURCE"
+
+    assert caution["decision_state"] == "PERSONAL_CAUTION_HOUR"
+    assert caution["decision_label"] == "Nên thận trọng"
+    assert caution["is_personal_good_hour"] is False
+    assert caution["is_personal_bad_hour"] is False  # caution != hung tuyệt đối
+    assert caution["hour_rule_id"] == "BT-REL-0002"
+
+    assert neutral["decision_state"] == "PERSONAL_NEUTRAL_HOUR"
+    assert neutral["decision_label"] == "Trung tính"
+    assert neutral["hour_rule_id"] is None
+    assert neutral["hour_source_id"] is None
+
+    assert set(out["rules"]) == {"BT-REL-0001", "BT-REL-0002"}
+    assert out["sources"] == ["SRC-TMTH-V02-WIKISOURCE"]
 
 
 def test_missing_event_context_keeps_hour_layer_descriptive_only():
@@ -81,25 +116,12 @@ def test_missing_event_context_keeps_hour_layer_descriptive_only():
     assert out["conclusion"]["label"] == "Thiếu bối cảnh việc"
 
 
-def test_hour_relation_can_never_rescue_hard_block_day():
-    ref = hour_ref()
-    ref["hours"][0]["relation"] = "TAM_HOP"
-    out = hour_fusion_gate(ref, event_code="CUOI_HOI", event_day=event_day(blocked=True))
-    assert out["hours"][0]["decision_state"] == "INELIGIBLE_BY_DAY"
-    assert out["hours"][0]["is_personal_good_hour"] is None
-    assert "Không xét giờ để cứu ngày" in out["conclusion"]["title"]
-
-
-def test_v29_schema_publishes_gate_ready_but_verified_hour_decision_pending():
-    out = v29_schema_overlay({"implemented_scopes": [], "pending_scopes": [], "principles": []})
-    cap = out["hour_fusion_v29"]
-    assert cap["policy_version"] == "2.9-alpha.1"
-    assert cap["event_day_gate_ready"] is True
-    assert cap["verified_hour_rule_decision_ready"] is False
-    assert cap["hard_block_can_be_rescued_by_hour"] is False
-    assert cap["numeric_score"] is None
-    assert "personal_hour_event_day_gate" in out["implemented_scopes"]
-    assert "personal_hour_verified_rule_decision" in out["pending_scopes"]
+def test_v29b_confidence_is_medium_for_limited_verified_hour_decision():
+    fused = hour_fusion_gate(hour_ref(), event_code="KY_HOP_DONG", event_day=event_day(blocked=False))
+    out = apply_confidence_v28(fused, time_certainty="KNOWN")
+    assert out["confidence_state"] == "Căn cứ vừa"
+    assert any("Rule ID" in x and "Source ID" in x for x in out["confidence_basis"])
+    assert out["conclusion"]["state"] == "HOUR_RULE_DECISION_READY"
 
 
 def test_v28_confidence_preserves_event_evidence_when_hour_is_blocked_by_day():
@@ -110,12 +132,26 @@ def test_v28_confidence_preserves_event_evidence_when_hour_is_blocked_by_day():
     assert out["conclusion"]["state"] == "BLOCKED_BY_DAY"
 
 
-def test_v29_ui_selects_exact_v1_events_and_never_calls_stateless_or_numeric_score():
+def test_v29_schema_publishes_verified_hour_decision_but_not_full_classical_claim():
+    out = v29_schema_overlay({"implemented_scopes": [], "pending_scopes": ["personal_hour_verified_rule_decision"], "principles": []})
+    cap = out["hour_fusion_v29"]
+    assert cap["policy_version"] == "2.9-beta.1"
+    assert cap["event_day_gate_ready"] is True
+    assert cap["verified_hour_rule_decision_ready"] is True
+    assert cap["full_classical_hour_auspiciousness_ready"] is False
+    assert cap["hard_block_can_be_rescued_by_hour"] is False
+    assert cap["numeric_score"] is None
+    assert "personal_hour_event_day_gate" in out["implemented_scopes"]
+    assert "personal_hour_verified_rule_decision" in out["implemented_scopes"]
+    assert "personal_hour_verified_rule_decision" not in out["pending_scopes"]
+    assert "personal_hour_full_classical_auspiciousness" in out["pending_scopes"]
+
+
+def test_v29b_ui_exposes_relative_hour_decision_and_keeps_safety_language():
     pub = (ROOT / "public/static/ui-hour-v24.js").read_text(encoding="utf-8")
     mirror = (ROOT / "giao_dien/ui-hour-v24.js").read_text(encoding="utf-8")
     assert pub == mirror
-    assert "TU_BINH_HOUR_UI_VERSION='2.9A'" in pub
-    assert pub.count("['") >= 13  # placeholder + exact 12 event entries
+    assert "TU_BINH_HOUR_UI_VERSION='2.9B'" in pub
     for code in [
         "AN_TANG", "CAU_TAI", "CUOI_HOI", "DAM_PHAN", "DIEU_TRI", "DONG_THO",
         "KHAI_TRUONG", "KY_HOP_DONG", "MUA_TAI_SAN", "NHAM_CHUC", "NHAP_TRACH", "XUAT_HANH",
@@ -124,11 +160,13 @@ def test_v29_ui_selects_exact_v1_events_and_never_calls_stateless_or_numeric_sco
     assert "/api/v2/gio-ca-nhan" in pub
     assert "/api/stateless/" not in pub
     assert "numeric_score" not in pub
+    assert "PERSONAL_GOOD_CANDIDATE" in pub
+    assert "PERSONAL_CAUTION_HOUR" in pub
     assert "Giờ không được cứu một ngày HARD_BLOCK" in pub
-    assert "rule giờ có nguồn và trạng thái VERIFIED" in pub
+    assert "không phải cát/hung tuyệt đối" in pub
 
 
-def test_v29_api_contract_requires_event_search_before_hour_gate_when_event_selected():
+def test_v29_api_contract_still_requires_event_search_before_hour_fusion():
     text = (ROOT / "cong/api_v2.py").read_text(encoding="utf-8")
     assert "class HourDecisionRequest" in text
     assert "viec: str | None = None" in text
