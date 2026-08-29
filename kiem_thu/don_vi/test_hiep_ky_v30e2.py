@@ -34,7 +34,7 @@ def test_hard_block_still_wins_over_yue_de_he():
     assert "月徳合" in out["matched_yi_tokens"]; assert out["hard_block"] is True; assert out["decision_state"]=="BLOCKED"
 
 
-def test_v30e2_remains_active_after_v30e3():
-    cap=capability_inventory(); assert cap["active_calculable_count"]==23; assert cap["pending_calculator_count"]==58; assert "月徳合" in cap["active_tokens"]
-    s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE=="V3_0E3_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3"; assert "hiep_ky_v30e2_yue_de_he" in s["implemented_scopes"]
+def test_v30e2_remains_active_after_v30e4():
+    cap=capability_inventory(); assert cap["active_calculable_count"]==24; assert cap["pending_calculator_count"]==57; assert "月徳合" in cap["active_tokens"]
+    s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE=="V3_0E4_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1"; assert "hiep_ky_v30e2_yue_de_he" in s["implemented_scopes"]
     v=s["hiep_ky_v30e2"]; assert v["activated_token"]=="月徳合"; assert v["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["numeric_score"] is None
