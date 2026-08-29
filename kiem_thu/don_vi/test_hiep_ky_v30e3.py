@@ -58,18 +58,19 @@ def test_yue_en_fails_closed_without_current_stem():
     assert "月恩" not in out["active_hiep_ky_tokens"]
 
 
-def test_v30e3_capability_and_schema_are_explicit():
+def test_v30e3_capability_and_schema_are_explicit_after_v30e4():
     cap=capability_inventory()
     assert cap["token_count"]==81
-    assert cap["active_calculable_count"]==23
-    assert cap["pending_calculator_count"]==58
+    assert cap["active_calculable_count"]==24
+    assert cap["pending_calculator_count"]==57
     assert "月恩" in cap["active_tokens"]
-    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3"
-    assert cap["extension_version"]=="V3_0E3_YUE_EN"
+    assert "四相" in cap["active_tokens"]
+    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1"
+    assert cap["extension_version"]=="V3_0E4_SI_XIANG"
     assert cap["numeric_score"] is None
 
     s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]})
-    assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE=="V3_0E3_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3"
+    assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE=="V3_0E4_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1"
     assert "hiep_ky_v30e3_yue_en" in s["implemented_scopes"]
     v=s["hiep_ky_v30e3"]
     assert v["activated_token"]=="月恩"
