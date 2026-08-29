@@ -1,0 +1,31 @@
+case_id: HK-0005
+category: GOLD-HK
+title_vi: "Thời Đức và xung đột với Tai Sát"
+ruleset_version: "V3.0D-SHI-DE"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0D chờ duyệt độc lập. Tháng Thìn ngày Ngọ thuộc mùa xuân nên
+  mang 時徳; đồng thời theo bảng tháng mang 災煞. Với XUAT_HANH, 時徳 là 宜
+  và 災煞 là 忌; cảnh báo sự kiện phải thắng tín hiệu thuận.
+input:
+  month_branch: THIN
+  day_branch: NGO
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 時徳
+        - 災煞
+      matched_yi_tokens:
+        - 時徳
+      matched_ji_tokens:
+        - 災煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
