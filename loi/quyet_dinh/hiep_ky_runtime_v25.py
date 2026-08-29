@@ -1,8 +1,8 @@
 """Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
 Giữ 12 Trực V1 làm lớp quyết định gốc. V2.5 dùng 5 token tháng-ngày;
-V3.0A mở thêm 月刑 sau khi khóa nguồn và bộ tính 12 tháng.
-Tín hiệu JI bổ sung chỉ tạo CAUTION, không tự tạo HARD_BLOCK.
+V3.0A mở thêm 月刑; V3.0B mở thêm 劫煞, 災煞, 月煞 sau khi khóa nguồn
+và bảng 12 tháng. Tín hiệu JI bổ sung chỉ tạo CAUTION, không tự tạo HARD_BLOCK.
 HARD_BLOCK vẫn chỉ đến từ lớp sự kiện V1 đã nghiệm thu.
 """
 from __future__ import annotations
@@ -13,8 +13,8 @@ from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
 
-COVERAGE = "V3_0A_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_6"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害", "月刑"})
+COVERAGE = "V3_0B_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_9"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -124,7 +124,7 @@ def evaluate_event_v25(
         "rule_ids": rule_ids,
         "source_ids": sorted(src),
         "coverage": COVERAGE,
-        "hiep_ky_extension": "V3_0A_YUE_XING",
+        "hiep_ky_extension": "V3_0B_SAT_TRIO",
         "numeric_score": None,
         "score": None,
         "numeric_score_status": "LOCKED_OFF",
