@@ -1,7 +1,7 @@
 """Capability gate cho token Hiệp Kỷ.
 
 Có tên trong cổ thư != đã có bộ tính. V3.0D có 11 token quan hệ Chi tháng-ngày.
-V3.0E1 mở thêm đúng 月徳 bằng calculator Chi tháng + Can ngày.
+V3.0E1 mở 月徳; V3.0E2 mở 月徳合 bằng calculator Chi tháng + Can ngày.
 Mọi token khác vẫn PENDING_CALCULATOR.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ TRUC_TOKEN_TO_CODE = {
     "破日":"PHA","危日":"NGUY","成日":"THANH","收日":"THU","開日":"KHAI","閉日":"BE",
 }
 MONTH_BRANCH_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳"})
-MONTH_BRANCH_DAY_STEM_TOKENS = frozenset({"月徳"})
+MONTH_BRANCH_DAY_STEM_TOKENS = frozenset({"月徳","月徳合"})
 
 
 def token_capability(token: str) -> dict:
@@ -22,7 +22,7 @@ def token_capability(token: str) -> dict:
     if token in MONTH_BRANCH_TOKENS:
         return {"token":token,"calculator":"MONTH_BRANCH_RELATIONS_V25_V30D","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     if token in MONTH_BRANCH_DAY_STEM_TOKENS:
-        return {"token":token,"calculator":"MONTH_BRANCH_DAY_STEM_V30E1","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
+        return {"token":token,"calculator":"MONTH_BRANCH_DAY_STEM_V30E2","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     return {"token":token,"calculator":None,"calculator_status":"PENDING_CALCULATOR","normalized_code":None}
 
 
@@ -38,8 +38,8 @@ def capability_inventory() -> dict:
         "active_tokens":tuple(x["token"] for x in active),
         "pending_tokens":tuple(x["token"] for x in pending),
         "decision_expansion_status":"PARTIAL_ACTIVE",
-        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_1",
-        "extension_version":"V3_0E1_YUE_DE",
+        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_2",
+        "extension_version":"V3_0E2_YUE_DE_HE",
         "numeric_score":None,
         "numeric_score_status":"LOCKED_OFF",
     }

@@ -1,7 +1,7 @@
 """Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
 V3.0D giữ 11 token Chi tháng-ngày.
-V3.0E1 mở 月徳 (Nguyệt Đức) theo Chi tháng + Can ngày.
+V3.0E1 mở 月徳; V3.0E2 mở 月徳合 theo Chi tháng + Can ngày.
 V3.0E1.1 chuẩn hóa hợp đồng Can ngày bằng trường máy đọc current_stem.
 HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
@@ -15,8 +15,8 @@ from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
 from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
 
-COVERAGE = "V3_0E1_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_1"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳"})
+COVERAGE = "V3_0E2_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_2"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -37,24 +37,13 @@ def _rank(result: dict[str, Any]) -> int:
 
 
 def _effective_day_stem(personal: dict[str, Any], explicit_stem: str | None) -> str | None:
-    """Ưu tiên tham số tương thích; nếu thiếu thì dùng hợp đồng typed current_stem.
-
-    Fail-closed: giá trị ngoài bộ 10 Can không được chuyển thành rule Can-ngày.
-    """
     if explicit_stem in CAN:
         return explicit_stem
     current_stem = personal.get("current_stem")
     return current_stem if current_stem in CAN else None
 
 
-def evaluate_event_v25(
-    base_event: dict[str, Any],
-    personal: dict[str, Any],
-    *,
-    chi_thang: str,
-    chi_ngay: str,
-    can_ngay: str | None = None,
-) -> dict[str, Any]:
+def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, chi_thang: str, chi_ngay: str, can_ngay: str | None = None) -> dict[str, Any]:
     out = dict(base_event)
     event_code = out.get("event_code")
     active = set(active_month_tokens(chi_thang, chi_ngay))
@@ -78,11 +67,7 @@ def evaluate_event_v25(
     else:
         event_signal = "NEUTRAL"
 
-    decision = resolve_conflict(
-        hard_block=hard_block,
-        event_state=event_signal,
-        personal_state=_personal_signal(personal),
-    )
+    decision = resolve_conflict(hard_block=hard_block,event_state=event_signal,personal_state=_personal_signal(personal))
     if out.get("mapping_status") == "PROVISIONAL" and decision["label"] == "Ưu tiên":
         decision = {**decision, "state":"CONSIDER", "label":"Có thể cân nhắc", "authority":"EVENT_PROVISIONAL"}
 
@@ -117,24 +102,10 @@ def evaluate_event_v25(
         "active_hiep_ky_tokens": sorted(active),
         "matched_yi_tokens": [x.token for x in yi_hits],
         "matched_ji_tokens": [x.token for x in ji_hits],
-        "matched_evidence": [
-            {"rule_id":x.rule_id,"token":x.token,"polarity":x.polarity,"source_id":x.source_id,"source_location":x.source_location,"evidence_status":x.evidence_status,"decision_status":"ACTIVE"}
-            for x in matched
-        ],
-        "decision_state": decision["state"],
-        "label": decision["label"],
-        "decision_authority": decision["authority"],
-        "hard_block": hard_block,
-        "rank_group": _rank(decision),
-        "personal_v1_1": personal_context,
-        "personal_methodology": personal.get("methodology"),
-        "reasons": reasons,
-        "rule_ids": rule_ids,
-        "source_ids": sorted(src),
-        "coverage": COVERAGE,
-        "hiep_ky_extension": "V3_0E1_YUE_DE",
-        "numeric_score": None,
-        "score": None,
-        "numeric_score_status": "LOCKED_OFF",
-        "scoring_status": "NO_NUMERIC_SCORE",
+        "matched_evidence": [{"rule_id":x.rule_id,"token":x.token,"polarity":x.polarity,"source_id":x.source_id,"source_location":x.source_location,"evidence_status":x.evidence_status,"decision_status":"ACTIVE"} for x in matched],
+        "decision_state": decision["state"],"label": decision["label"],"decision_authority": decision["authority"],
+        "hard_block": hard_block,"rank_group": _rank(decision),"personal_v1_1": personal_context,"personal_methodology": personal.get("methodology"),
+        "reasons": reasons,"rule_ids": rule_ids,"source_ids": sorted(src),
+        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E2_YUE_DE_HE",
+        "numeric_score": None,"score": None,"numeric_score_status": "LOCKED_OFF","scoring_status": "NO_NUMERIC_SCORE",
     }
