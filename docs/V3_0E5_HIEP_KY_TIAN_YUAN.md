@@ -67,5 +67,9 @@ Tháng Mão + ngày Giáp Tuất + Xuất hành:
 - `hard_block = false`.
 - score = null.
 
+## Production gate
+Merge logic V3.0E5 phải được Vercel triển khai từ `main`; canonical chỉ được coi là PASS khi `/api/health` và `/api/v2/schema-status` xác nhận E5, capability 25/81, pending 56/81 và score vẫn `LOCKED_OFF`.
+Nếu merge logic không tạo deployment mới, chỉ dùng PR tài liệu nhỏ để phát lại webhook Vercel; không thay đổi rule, calculator hay dữ liệu quyết định.
+
 ## Giới hạn
 Không kích hoạt `天徳`, `天徳合` hoặc rule khác trong release này. Không tuyên bố full classical Hiệp Kỷ. Golden HK-0010 giữ `PENDING` cho tới review độc lập.
