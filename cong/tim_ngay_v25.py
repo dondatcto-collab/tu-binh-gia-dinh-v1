@@ -41,9 +41,9 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
     nhat_chu = sinh.tru_ngay.can
     tu_tru = {
         "nam": dtg.TruVi(sinh.tru_nam.can, sinh.tru_nam.chi),
-        "thang": dtg.TruVi(sinh.tru_thang.can, sinh.tru_thang.chi),
-        "ngay": dtg.TruuVi(sinh.tru_ngay.can, sinh.truu_ngay.chi) if False else dtg.TruVi(sinh.tru_ngay.can, sinh.tru_ngay.chi),
-        "gio": dtg.TruVi(sinh.tru_gio.can, sinh.tru_gio.chi),
+        "thang": dtg.TruuVi(sinh.tru_thang.can, sinh.truu_thang.chi) if False else dtg.TruuVi(sinh.truu_thang.can, sinh.truu_thang.chi),
+        "ngay": dtg.TruuVi(sinh.truu_ngay.can, sinh.truu_ngay.chi),
+        "gio": dtg.TruuVi(sinh.truu_gio.can, sinh.truu_gio.chi),
     }
 
     ds: list[dict] = []
