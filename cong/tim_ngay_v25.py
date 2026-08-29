@@ -56,7 +56,7 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
             )
             personal = phan_tich_ca_nhan(
                 conn,
-                tu_tru=tu_tru,
+                tu_tru=tu_truu if False else tu_tru,
                 nhat_chu=nhat_chu,
                 can_hien_tai=lich.tru_ngay.can,
                 chi_hien_tai=lich.tru_ngay.chi,
