@@ -2,7 +2,8 @@
 
 Có tên trong cổ thư != đã có bộ tính. V3.0D có 11 token quan hệ Chi tháng-ngày.
 V3.0E1 mở 月徳; V3.0E2 mở 月徳合; V3.0E3 mở 月恩 bằng calculator Chi tháng + Can ngày.
-V3.0E4 mở 四相 bằng calculator mùa + Can ngày. Mọi token khác vẫn PENDING_CALCULATOR.
+V3.0E4 mở 四相 bằng calculator mùa + Can ngày.
+V3.0E5 mở 天願 bằng calculator Chi tháng + đủ Can Chi ngày. Mọi token khác vẫn PENDING_CALCULATOR.
 """
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ TRUC_TOKEN_TO_CODE = {
 MONTH_BRANCH_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳"})
 MONTH_BRANCH_DAY_STEM_TOKENS = frozenset({"月徳","月徳合","月恩"})
 SEASON_DAY_STEM_TOKENS = frozenset({"四相"})
+MONTH_BRANCH_DAY_PILLAR_TOKENS = frozenset({"天願"})
 
 
 def token_capability(token: str) -> dict:
@@ -26,6 +28,8 @@ def token_capability(token: str) -> dict:
         return {"token":token,"calculator":"MONTH_BRANCH_DAY_STEM_V30E3","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     if token in SEASON_DAY_STEM_TOKENS:
         return {"token":token,"calculator":"SEASON_DAY_STEM_V30E4","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
+    if token in MONTH_BRANCH_DAY_PILLAR_TOKENS:
+        return {"token":token,"calculator":"MONTH_BRANCH_DAY_PILLAR_V30E5","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     return {"token":token,"calculator":None,"calculator_status":"PENDING_CALCULATOR","normalized_code":None}
 
 
@@ -41,8 +45,8 @@ def capability_inventory() -> dict:
         "active_tokens":tuple(x["token"] for x in active),
         "pending_tokens":tuple(x["token"] for x in pending),
         "decision_expansion_status":"PARTIAL_ACTIVE",
-        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1",
-        "extension_version":"V3_0E4_SI_XIANG",
+        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1",
+        "extension_version":"V3_0E5_TIAN_YUAN",
         "numeric_score":None,
         "numeric_score_status":"LOCKED_OFF",
     }
