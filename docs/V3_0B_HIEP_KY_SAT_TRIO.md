@@ -44,7 +44,7 @@ Bộ tính khóa trực tiếp bảng 12 tháng; không suy bảng bằng một 
 - Không token nào trong ba token mới tự tạo `HARD_BLOCK`.
 - HARD_BLOCK V1 vẫn có quyền cao nhất.
 - Nếu một ngày có tín hiệu thuận và một trong ba sát cùng lúc, cảnh báo sự kiện thắng tín hiệu thuận.
-- Ví dụ khóa regression: tháng Dần + ngày Hợi có `六合 + 劫煞`; với KHAI_TRUONG phải ra CAUTION, không được nâng thành Ưu tiên.
+- Ví dụ khóa regression: tháng Dần + ngày Hợi có `六合 + 劫煞`; với `KY_HOP_DONG` thì 六合 nằm trong 宜 còn 劫煞 nằm trong 忌, nên kết quả phải là CAUTION, không được nâng thành Ưu tiên.
 - Một ngày có thể mang nhiều evidence đồng thời; engine không được ghi đè.
 - `numeric_score = LOCKED_OFF`.
 
