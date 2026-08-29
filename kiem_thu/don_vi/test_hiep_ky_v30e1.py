@@ -16,29 +16,29 @@ def test_yue_de_locks_all_twelve_month_branch_to_day_stem_rows():
     expected={"DAN":"BINH","NGO":"BINH","TUAT":"BINH","HOI":"GIAP","MAO":"GIAP","MUI":"GIAP","THAN":"NHAM","TY":"NHAM","THIN":"NHAM","TI":"CANH","DAU":"CANH","SUU":"CANH"}
     assert YUE_DE_STEM_BY_MONTH_BRANCH==expected
     for month_branch,day_stem in expected.items():
-        assert yue_de_stem(month_branch)==day_stem; assert active_stem_tokens(month_branch,day_stem)==("月徳",)
+        assert yue_de_stem(month_branch)==day_stem; assert "月徳" in active_stem_tokens(month_branch,day_stem)
 
 
 def test_yue_de_negative_and_invalid_inputs_fail_closed():
-    assert active_stem_tokens("DAN","GIAP")==()
+    assert "月徳" not in active_stem_tokens("DAN","GIAP")
     for args in (("INVALID","BINH"),("DAN","INVALID")):
         try: active_stem_tokens(*args)
         except ValueError: pass
         else: raise AssertionError("invalid Can/Chi must fail closed")
 
 
-def test_v30e1_yue_de_remains_active_after_v30e2():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==22; assert cap["pending_calculator_count"]==59; assert "月徳" in cap["active_tokens"]; assert token_capability("月徳")["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E2"
+def test_v30e1_yue_de_remains_active_after_v30e3():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==23; assert cap["pending_calculator_count"]==58; assert "月徳" in cap["active_tokens"]; assert token_capability("月徳")["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"
 
 
 def test_yue_de_can_support_verified_neutral_event():
     out=evaluate_event_v25(_base(),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="THIN",can_ngay="BINH")
-    assert "月徳" in out["active_hiep_ky_tokens"]; assert out["matched_yi_tokens"]==["月徳"]; assert out["matched_ji_tokens"]==[]; assert out["event_signal_v25"]=="FAVORABLE"; assert out["label"]=="Ưu tiên"; assert out["numeric_score"] is None
+    assert "月徳" in out["active_hiep_ky_tokens"]; assert "月徳" in out["matched_yi_tokens"]; assert out["matched_ji_tokens"]==[]; assert out["event_signal_v25"]=="FAVORABLE"; assert out["label"]=="Ưu tiên"; assert out["numeric_score"] is None
 
 
 def test_yue_de_uses_typed_current_stem_contract_for_live_pipeline():
     out=evaluate_event_v25(_base(),_personal("SUPPORT","BINH"),chi_thang="DAN",chi_ngay="THIN")
-    assert "月徳" in out["active_hiep_ky_tokens"]; assert out["matched_yi_tokens"]==["月徳"]; assert out["personal_v1_1"]["current_stem"]=="BINH"
+    assert "月徳" in out["active_hiep_ky_tokens"]; assert "月徳" in out["matched_yi_tokens"]; assert out["personal_v1_1"]["current_stem"]=="BINH"
 
 
 def test_technical_text_is_not_parsed_for_day_stem_anymore():
@@ -53,7 +53,7 @@ def test_invalid_typed_current_stem_fails_closed():
 
 def test_explicit_day_stem_remains_backward_compatible_and_takes_precedence():
     out=evaluate_event_v25(_base(),_personal("SUPPORT","GIAP"),chi_thang="DAN",chi_ngay="THIN",can_ngay="BINH")
-    assert "月徳" in out["active_hiep_ky_tokens"]; assert out["matched_yi_tokens"]==["月徳"]
+    assert "月徳" in out["active_hiep_ky_tokens"]; assert "月徳" in out["matched_yi_tokens"]
 
 
 def test_ji_wins_when_yue_de_overlaps_zai_sha():
@@ -70,7 +70,7 @@ def test_missing_day_stem_never_implicitly_activates_yue_de():
     out=evaluate_event_v25(_base(),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="THIN"); assert "月徳" not in out["active_hiep_ky_tokens"]
 
 
-def test_v30e1_schema_remains_explicit_after_v30e2():
-    calc=calculator_status(); assert calc["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E2"; assert calc["active_tokens"]==("月徳","月徳合"); assert calc["numeric_score"] is None
+def test_v30e1_schema_remains_explicit_after_v30e3():
+    calc=calculator_status(); assert calc["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert calc["active_tokens"]==("月徳","月徳合","月恩"); assert calc["numeric_score"] is None
     s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert "hiep_ky_v30e1_yue_de" in s["implemented_scopes"]
-    v=s["hiep_ky_v30e1"]; assert v["activated_token"]=="月徳"; assert v["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E2"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["full_classical_claim"] is False; assert v["numeric_score"] is None
+    v=s["hiep_ky_v30e1"]; assert v["activated_token"]=="月徳"; assert v["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["full_classical_claim"] is False; assert v["numeric_score"] is None
