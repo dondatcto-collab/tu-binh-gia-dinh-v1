@@ -1,8 +1,9 @@
-"""V2.5 — runtime Hiệp Kỷ mở rộng có kiểm soát.
+"""Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
-Giữ 12 Trực V1 làm lớp quyết định gốc. Năm token tháng-ngày đã có bộ tính
-được dùng bổ sung: tín hiệu JI mới chỉ tạo CAUTION, không tự tạo HARD_BLOCK.
-HARD_BLOCK hiện vẫn chỉ đến từ lớp sự kiện V1 đã nghiệm thu.
+Giữ 12 Trực V1 làm lớp quyết định gốc. V2.5 dùng 5 token tháng-ngày;
+V3.0A mở thêm 月刑 sau khi khóa nguồn và bộ tính 12 tháng.
+Tín hiệu JI bổ sung chỉ tạo CAUTION, không tự tạo HARD_BLOCK.
+HARD_BLOCK vẫn chỉ đến từ lớp sự kiện V1 đã nghiệm thu.
 """
 from __future__ import annotations
 
@@ -12,8 +13,8 @@ from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
 
-COVERAGE = "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害"})
+COVERAGE = "V3_0A_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_6"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害", "月刑"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -48,7 +49,7 @@ def evaluate_event_v25(
     chi_thang: str,
     chi_ngay: str,
 ) -> dict[str, Any]:
-    """Hợp lưu event V1 + 5 token Hiệp Kỷ tháng-ngày + nền cá nhân."""
+    """Hợp lưu event V1 + token Hiệp Kỷ đã có calculator + nền cá nhân."""
     out = dict(base_event)
     event_code = out.get("event_code")
     active = set(active_month_tokens(chi_thang, chi_ngay))
@@ -80,10 +81,10 @@ def evaluate_event_v25(
 
     reasons = list(out.get("reasons") or [])
     if yi_hits:
-        reasons.append("Hiệp Kỷ V2.5 ghi nhận thêm tín hiệu phù hợp: " + ", ".join(x.token for x in yi_hits) + ".")
+        reasons.append("Hiệp Kỷ ghi nhận thêm tín hiệu phù hợp: " + ", ".join(x.token for x in yi_hits) + ".")
     if ji_hits:
-        reasons.append("Hiệp Kỷ V2.5 ghi nhận tín hiệu cần thận trọng: " + ", ".join(x.token for x in ji_hits) + "; lớp này chưa tự tạo HARD_BLOCK.")
-    reasons.append("V2.5 phân xử theo thứ bậc HARD_BLOCK > sự kiện > cá nhân; không cộng/trừ điểm.")
+        reasons.append("Hiệp Kỷ ghi nhận tín hiệu cần thận trọng: " + ", ".join(x.token for x in ji_hits) + "; lớp này chưa tự tạo HARD_BLOCK.")
+    reasons.append("Phân xử theo thứ bậc HARD_BLOCK > sự kiện > cá nhân; không cộng/trừ điểm.")
 
     personal_context = {
         "theme": personal.get("theme"),
@@ -123,6 +124,7 @@ def evaluate_event_v25(
         "rule_ids": rule_ids,
         "source_ids": sorted(src),
         "coverage": COVERAGE,
+        "hiep_ky_extension": "V3_0A_YUE_XING",
         "numeric_score": None,
         "score": None,
         "numeric_score_status": "LOCKED_OFF",
