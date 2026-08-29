@@ -1,7 +1,8 @@
 """Hiệp Kỷ — bộ tính quan hệ Chi tháng/ngày đã khóa công thức.
 
 V2.5 kích hoạt 5 token: 月建, 月破, 三合, 六合, 月害.
-V3.0A mở thêm đúng 1 token: 月刑 (Nguyệt Hình), dựa trực tiếp trên
+V3.0A mở thêm 月刑 (Nguyệt Hình).
+V3.0B mở thêm đúng 3 token: 劫煞, 災煞, 月煞, dựa trực tiếp trên
 月表一..十二 của 《欽定協紀辨方書》卷20..31.
 
 Không suy rộng sang các thần sát khác và không dùng điểm số.
@@ -17,6 +18,9 @@ SOURCE_RULES = {
     "六合": "卷六 · 六合: Chi ngày lục hợp với 月建",
     "月害": "卷六 · 月害: Chi ngày lục hại với 月建",
     "月刑": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月刑所在之支",
+    "劫煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 劫煞所在之支",
+    "災煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 災煞所在之支",
+    "月煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月煞所在之支",
 }
 
 XUNG = {
@@ -41,21 +45,27 @@ TAM_HOP_NHOM = (
     frozenset({"HOI","MAO","MUI"}),
 )
 
-# V3.0A: bảng này không suy ra từ một công thức hiện đại; nó được chép trực
-# tiếp từ 月表一..十二 (卷20..31). Khóa theo Chi tháng -> Chi ngày mang 月刑.
+# Bảng dưới đây được khóa trực tiếp từ 月表一..十二 (卷20..31), không suy
+# từ một công thức hiện đại. Mỗi bảng ánh xạ Chi tháng -> Chi ngày mang thần sát.
 YUE_XING_BY_MONTH_BRANCH = {
-    "DAN": "TI",      # 正月: 月建寅，月刑巳
-    "MAO": "TY",      # 二月: 月建卯，月刑子
-    "THIN": "THIN",   # 三月: 月建辰，月刑辰
-    "TI": "THAN",     # 四月: 月建巳，月刑申
-    "NGO": "NGO",     # 五月: 月建午，月刑午
-    "MUI": "SUU",     # 六月: 月建未，月刑丑
-    "THAN": "DAN",    # 七月: 月建申，月刑寅
-    "DAU": "DAU",     # 八月: 月建酉，月刑酉
-    "TUAT": "MUI",    # 九月: 月建戌，月刑未
-    "HOI": "HOI",     # 十月: 月建亥，月刑亥
-    "TY": "MAO",      # 十一月: 月建子，月刑卯
-    "SUU": "TUAT",    # 十二月: 月建丑，月刑戌
+    "DAN": "TI", "MAO": "TY", "THIN": "THIN", "TI": "THAN",
+    "NGO": "NGO", "MUI": "SUU", "THAN": "DAN", "DAU": "DAU",
+    "TUAT": "MUI", "HOI": "HOI", "TY": "MAO", "SUU": "TUAT",
+}
+JIE_SHA_BY_MONTH_BRANCH = {
+    "DAN": "HOI", "MAO": "THAN", "THIN": "TI", "TI": "DAN",
+    "NGO": "HOI", "MUI": "THAN", "THAN": "TI", "DAU": "DAN",
+    "TUAT": "HOI", "HOI": "THAN", "TY": "TI", "SUU": "DAN",
+}
+ZAI_SHA_BY_MONTH_BRANCH = {
+    "DAN": "TY", "MAO": "DAU", "THIN": "NGO", "TI": "MAO",
+    "NGO": "TY", "MUI": "DAU", "THAN": "NGO", "DAU": "MAO",
+    "TUAT": "TY", "HOI": "DAU", "TY": "NGO", "SUU": "MAO",
+}
+YUE_SHA_BY_MONTH_BRANCH = {
+    "DAN": "SUU", "MAO": "TUAT", "THIN": "MUI", "TI": "THIN",
+    "NGO": "SUU", "MUI": "TUAT", "THAN": "MUI", "DAU": "THIN",
+    "TUAT": "SUU", "HOI": "TUAT", "TY": "MUI", "SUU": "THIN",
 }
 
 
@@ -75,8 +85,19 @@ def tam_hop_partners(chi_thang: str) -> frozenset[str]:
 
 
 def yue_xing_branch(chi_thang: str) -> str:
-    """Trả Chi ngày mang 月刑 của Chi tháng theo bảng Hiệp Kỷ V3.0A."""
     return YUE_XING_BY_MONTH_BRANCH[_chuan(chi_thang)]
+
+
+def jie_sha_branch(chi_thang: str) -> str:
+    return JIE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
+
+
+def zai_sha_branch(chi_thang: str) -> str:
+    return ZAI_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
+
+
+def yue_sha_branch(chi_thang: str) -> str:
+    return YUE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
 
 
 def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
@@ -98,15 +119,21 @@ def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
         out.append("月害")
     if d == YUE_XING_BY_MONTH_BRANCH[m]:
         out.append("月刑")
+    if d == JIE_SHA_BY_MONTH_BRANCH[m]:
+        out.append("劫煞")
+    if d == ZAI_SHA_BY_MONTH_BRANCH[m]:
+        out.append("災煞")
+    if d == YUE_SHA_BY_MONTH_BRANCH[m]:
+        out.append("月煞")
     return tuple(out)
 
 
 def calculator_status() -> dict:
     return {
-        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30A",
-        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑"),
+        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30B",
+        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞"),
         "source_rules": SOURCE_RULES,
-        "extension_version": "V3_0A_YUE_XING",
+        "extension_version": "V3_0B_SAT_TRIO",
         "numeric_score": None,
         "numeric_score_status": "LOCKED_OFF",
     }
