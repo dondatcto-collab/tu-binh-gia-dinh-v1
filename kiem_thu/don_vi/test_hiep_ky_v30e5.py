@@ -50,7 +50,7 @@ def test_tian_yuan_event_inventory_is_yi_only_where_classical_event_lists_it():
         assert all(x.token!="天願" for x in evidence_for_event(event_code))
 
 
-def test_tian_yuan_positive_gate_for_verified_opening_event():
+def test_tian_yuan_positive_support_gate_for_verified_opening_event():
     out=evaluate_event_v25(_base(),_personal("SUPPORT","GIAP"),chi_thang="DAN",chi_ngay="NGO")
     assert "天願" in out["matched_yi_tokens"]
     assert out["matched_ji_tokens"]==[]
@@ -93,15 +93,16 @@ def test_provisional_event_cannot_be_promoted_to_absolute_priority_by_tian_yuan(
     assert out["decision_authority"]=="EVENT_PROVISIONAL"
 
 
-def test_v30e5_capability_schema_and_score_are_explicit():
+def test_v30e5_capability_schema_and_score_are_explicit_after_v30e6():
     cap=capability_inventory()
     assert cap["token_count"]==81
-    assert cap["active_calculable_count"]==25
-    assert cap["pending_calculator_count"]==56
+    assert cap["active_calculable_count"]==26
+    assert cap["pending_calculator_count"]==55
     assert "天願" in cap["active_tokens"]
+    assert "天赦" in cap["active_tokens"]
     assert token_capability("天願")["calculator"]=="MONTH_BRANCH_DAY_PILLAR_V30E5"
-    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1"
-    assert cap["extension_version"]=="V3_0E5_TIAN_YUAN"
+    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1"
+    assert cap["extension_version"]=="V3_0E6_TIAN_SHE"
     assert cap["numeric_score"] is None
 
     calc=calculator_status()

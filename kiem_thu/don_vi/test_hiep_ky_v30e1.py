@@ -27,8 +27,8 @@ def test_yue_de_negative_and_invalid_inputs_fail_closed():
         else: raise AssertionError("invalid Can/Chi must fail closed")
 
 
-def test_v30e1_yue_de_remains_active_after_v30e5():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==25; assert cap["pending_calculator_count"]==56; assert "月徳" in cap["active_tokens"]; assert token_capability("月徳")["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"
+def test_v30e1_yue_de_remains_active_after_v30e6():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==26; assert cap["pending_calculator_count"]==55; assert "月徳" in cap["active_tokens"]; assert token_capability("月徳")["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"
 
 
 def test_yue_de_can_support_verified_neutral_event():
@@ -70,7 +70,7 @@ def test_missing_day_stem_never_implicitly_activates_yue_de():
     out=evaluate_event_v25(_base(),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="THIN"); assert "月徳" not in out["active_hiep_ky_tokens"]
 
 
-def test_v30e1_schema_remains_explicit_after_v30e5():
+def test_v30e1_schema_remains_explicit_after_v30e6():
     calc=calculator_status(); assert calc["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert calc["active_tokens"]==("月徳","月徳合","月恩"); assert calc["numeric_score"] is None
     s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert "hiep_ky_v30e1_yue_de" in s["implemented_scopes"]
     v=s["hiep_ky_v30e1"]; assert v["activated_token"]=="月徳"; assert v["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["full_classical_claim"] is False; assert v["numeric_score"] is None

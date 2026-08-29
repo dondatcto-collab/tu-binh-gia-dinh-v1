@@ -4,6 +4,7 @@ V3.0D giữ 11 token Chi tháng-ngày.
 V3.0E1 mở 月徳; V3.0E2 mở 月徳合; V3.0E3 mở 月恩 theo Chi tháng + Can ngày.
 V3.0E4 mở 四相 theo mùa + Can ngày.
 V3.0E5 mở 天願 theo Chi tháng + đủ Can Chi ngày.
+V3.0E6 mở 天赦 theo mùa + đủ Can Chi ngày.
 V3.0E1.1 chuẩn hóa hợp đồng Can ngày bằng trường máy đọc current_stem.
 HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
@@ -16,11 +17,12 @@ from loi.quyet_dinh.hiep_ky_day_pillar_v30e5 import active_day_pillar_tokens
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
+from loi.quyet_dinh.hiep_ky_season_day_pillar_v30e6 import active_season_day_pillar_tokens
 from loi.quyet_dinh.hiep_ky_season_stem_v30e4 import active_season_stem_tokens
 from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
 
-COVERAGE = "V3_0E5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合","月恩","四相","天願"})
+COVERAGE = "V3_0E6_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合","月恩","四相","天願","天赦"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -56,6 +58,7 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
         active.update(active_stem_tokens(chi_thang, effective_can_ngay))
         active.update(active_season_stem_tokens(chi_thang, effective_can_ngay))
         active.update(active_day_pillar_tokens(chi_thang, effective_can_ngay, chi_ngay))
+        active.update(active_season_day_pillar_tokens(chi_thang, effective_can_ngay, chi_ngay))
 
     evidence = tuple(evidence_for_event(event_code)) if event_code else ()
     matched = [x for x in evidence if x.token in active and x.token in ACTIVE_EXTRA_TOKENS]
@@ -112,6 +115,6 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
         "decision_state": decision["state"],"label": decision["label"],"decision_authority": decision["authority"],
         "hard_block": hard_block,"rank_group": _rank(decision),"personal_v1_1": personal_context,"personal_methodology": personal.get("methodology"),
         "reasons": reasons,"rule_ids": rule_ids,"source_ids": sorted(src),
-        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E5_TIAN_YUAN",
+        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E6_TIAN_SHE",
         "numeric_score": None,"score": None,"numeric_score_status": "LOCKED_OFF","scoring_status": "NO_NUMERIC_SCORE",
     }
