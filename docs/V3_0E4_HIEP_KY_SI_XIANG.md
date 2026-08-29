@@ -57,5 +57,8 @@ Tháng Dần + ngày Đinh Hợi + Xuất hành:
 - `hard_block = false`
 - score = null.
 
+## Production gate
+Merge logic V3.0E4 chỉ được coi là release PASS khi Vercel triển khai từ `main` và canonical `/api/health` + `/api/v2/schema-status` xác nhận `V3_0E4_SI_XIANG`, capability 24/81 active, 57/81 pending và score vẫn `LOCKED_OFF`. PR tài liệu redeploy không thay đổi rule, calculator hay quyết định.
+
 ## Giới hạn
 Không kích hoạt `天徳`, `天徳合` hoặc rule khác trong release này. Không tuyên bố full classical Hiệp Kỷ. Golden HK-0009 giữ `PENDING` cho tới review độc lập.
