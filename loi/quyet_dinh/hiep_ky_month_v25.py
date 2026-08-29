@@ -1,7 +1,10 @@
-"""V2.5 — bộ tính Hiệp Kỷ theo Chi tháng/ngày đã khóa công thức.
+"""Hiệp Kỷ — bộ tính quan hệ Chi tháng/ngày đã khóa công thức.
 
-Phạm vi ACTIVE chỉ gồm 5 token có công thức quan hệ tháng-ngày rõ và trực tiếp:
-月建, 月破, 三合, 六合, 月害. Không suy rộng sang các thần sát khác.
+V2.5 kích hoạt 5 token: 月建, 月破, 三合, 六合, 月害.
+V3.0A mở thêm đúng 1 token: 月刑 (Nguyệt Hình), dựa trực tiếp trên
+月表一..十二 của 《欽定協紀辨方書》卷20..31.
+
+Không suy rộng sang các thần sát khác và không dùng điểm số.
 """
 from __future__ import annotations
 
@@ -13,6 +16,7 @@ SOURCE_RULES = {
     "三合": "卷六 · 三合: mỗi tháng lấy hai Chi cùng tam hợp với 月建",
     "六合": "卷六 · 六合: Chi ngày lục hợp với 月建",
     "月害": "卷六 · 月害: Chi ngày lục hại với 月建",
+    "月刑": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月刑所在之支",
 }
 
 XUNG = {
@@ -37,6 +41,23 @@ TAM_HOP_NHOM = (
     frozenset({"HOI","MAO","MUI"}),
 )
 
+# V3.0A: bảng này không suy ra từ một công thức hiện đại; nó được chép trực
+# tiếp từ 月表一..十二 (卷20..31). Khóa theo Chi tháng -> Chi ngày mang 月刑.
+YUE_XING_BY_MONTH_BRANCH = {
+    "DAN": "TI",      # 正月: 月建寅，月刑巳
+    "MAO": "TY",      # 二月: 月建卯，月刑子
+    "THIN": "THIN",   # 三月: 月建辰，月刑辰
+    "TI": "THAN",     # 四月: 月建巳，月刑申
+    "NGO": "NGO",     # 五月: 月建午，月刑午
+    "MUI": "SUU",     # 六月: 月建未，月刑丑
+    "THAN": "DAN",    # 七月: 月建申，月刑寅
+    "DAU": "DAU",     # 八月: 月建酉，月刑酉
+    "TUAT": "MUI",    # 九月: 月建戌，月刑未
+    "HOI": "HOI",     # 十月: 月建亥，月刑亥
+    "TY": "MAO",      # 十一月: 月建子，月刑卯
+    "SUU": "TUAT",    # 十二月: 月建丑，月刑戌
+}
+
 
 def _chuan(chi: str) -> str:
     x = str(chi or "").strip().upper()
@@ -53,8 +74,16 @@ def tam_hop_partners(chi_thang: str) -> frozenset[str]:
     raise AssertionError("TAM_HOP_GROUP_MISSING")
 
 
+def yue_xing_branch(chi_thang: str) -> str:
+    """Trả Chi ngày mang 月刑 của Chi tháng theo bảng Hiệp Kỷ V3.0A."""
+    return YUE_XING_BY_MONTH_BRANCH[_chuan(chi_thang)]
+
+
 def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
-    """Trả token ACTIVE theo đúng quan hệ Chi tháng-ngày, không tính điểm."""
+    """Trả token ACTIVE theo quan hệ Chi tháng-ngày, không tính điểm.
+
+    Một ngày có thể đồng thời khớp nhiều token; không được ghi đè evidence.
+    """
     m, d = _chuan(chi_thang), _chuan(chi_ngay)
     out: list[str] = []
     if d == m:
@@ -67,14 +96,17 @@ def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
         out.append("六合")
     if d == LUC_HAI[m]:
         out.append("月害")
+    if d == YUE_XING_BY_MONTH_BRANCH[m]:
+        out.append("月刑")
     return tuple(out)
 
 
 def calculator_status() -> dict:
     return {
-        "calculator": "MONTH_BRANCH_RELATIONS_V25",
-        "active_tokens": ("月建", "月破", "三合", "六合", "月害"),
+        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30A",
+        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑"),
         "source_rules": SOURCE_RULES,
+        "extension_version": "V3_0A_YUE_XING",
         "numeric_score": None,
         "numeric_score_status": "LOCKED_OFF",
     }

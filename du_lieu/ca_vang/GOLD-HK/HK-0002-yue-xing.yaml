@@ -1,0 +1,33 @@
+case_id: HK-0002
+category: GOLD-HK
+title_vi: "Nguyệt Hình — bảng Chi tháng sang Chi ngày"
+ruleset_version: "V3.0A-YUE-XING"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+source_location: "卷20–31 · 月表一至十二; 卷十一 · 立券交易"
+notes: >
+  Ca vàng V3.0A khóa calculator 月刑 theo 月表一至十二 của
+  《欽定協紀辨方書》卷20–31 và hiệu lực đối với KY_HOP_DONG theo 卷十一.
+  Để PENDING cho tới khi có lượt duyệt độc lập; PENDING không được dùng
+  để tuyên bố golden-approved hoặc làm tăng tỷ lệ PASS.
+input:
+  month_branch: DAN
+  day_branch: TI
+  event_code: KY_HOP_DONG
+expected:
+  - stage: INTERMEDIATE
+    stage_key: active_month_tokens
+    payload:
+      contains: "月刑"
+      overlap_allowed: true
+    review_status: PENDING
+    source_id: null
+  - stage: FINAL
+    stage_key: event_decision_effect
+    payload:
+      event_signal: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
