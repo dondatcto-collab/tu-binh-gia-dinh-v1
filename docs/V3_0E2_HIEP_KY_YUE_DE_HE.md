@@ -41,5 +41,11 @@ Tháng Dần + ngày Tân Hợi + Xuất hành:
 - kết quả phải là `CAUTION / Không ưu tiên`
 - `hard_block = false`
 
+## Gate phát hành
+- PR logic phải PASS full regression trước merge.
+- Main phải PASS live-smoke và full regression.
+- Canonical production chỉ được gọi PASS khi `/api/v2/schema-status` trả `V3_0E2_YUE_DE_HE`, capability 22/81 và score vẫn `LOCKED_OFF`.
+- Nếu Git integration bỏ sót webhook merge, dùng một PR tài liệu không đổi logic để kích hoạt lại deployment; không sửa trực tiếp rule trên main.
+
 ## Giới hạn
 Không kích hoạt `月恩`, `四相`, `天徳` hoặc rule khác trong release này. Không tuyên bố full classical Hiệp Kỷ.
