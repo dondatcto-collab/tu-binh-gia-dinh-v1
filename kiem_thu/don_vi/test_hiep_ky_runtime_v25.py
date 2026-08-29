@@ -36,18 +36,32 @@ def test_new_yi_token_can_support_neutral_event_without_score():
     assert r["numeric_score_status"] == "LOCKED_OFF"
 
 
-def test_new_ji_token_is_caution_not_new_hard_block():
-    # KY_HOP_DONG có 月害 trong 忌; tháng Dần, ngày Tị là 月害.
+def test_v30a_yue_hai_and_yue_xing_both_survive_as_caution_evidence():
+    # KY_HOP_DONG: tháng Dần/ngày Tị đồng thời 月害 + 月刑; không được ghi đè.
     r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="DAN", chi_ngay="TI")
-    assert r["matched_ji_tokens"] == ["月害"]
+    assert set(r["matched_ji_tokens"]) == {"月害", "月刑"}
     assert r["event_signal_v25"] == "CAUTION"
     assert r["hard_block"] is False
     assert r["label"] == "Không ưu tiên"
     assert r["decision_authority"] == "EVENT"
+    assert len([x for x in r["matched_evidence"] if x["token"] in {"月害", "月刑"}]) == 2
+
+
+def test_v30a_yue_xing_alone_is_caution_not_hard_block():
+    # Tháng Tý, ngày Mão mang 月刑; KY_HOP_DONG không có token ACTIVE khác tại cặp này.
+    r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="TY", chi_ngay="MAO")
+    assert r["matched_ji_tokens"] == ["月刑"]
+    assert r["event_signal_v25"] == "CAUTION"
+    assert r["hard_block"] is False
+    assert r["decision_state"] != "BLOCKED"
+    ev = r["matched_evidence"][0]
+    assert ev["rule_id"].startswith("HK25-KY_HOP_DONG-JI-")
+    assert ev["source_id"] == "SRC-HK-QD-V11-WIKISOURCE"
+    assert ev["source_location"] == "卷十一 · 立券交易"
 
 
 def test_personal_cannot_rescue_event_caution():
-    r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="DAN", chi_ngay="TI")
+    r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="TY", chi_ngay="MAO")
     assert r["label"] == "Không ưu tiên"
     assert r["rank_group"] == 4
 
@@ -67,4 +81,5 @@ def test_runtime_is_traceable_and_coverage_is_explicitly_partial():
     assert ev["source_id"]
     assert ev["source_location"]
     assert ev["decision_status"] == "ACTIVE"
-    assert r["coverage"] == COVERAGE == "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5"
+    assert r["coverage"] == COVERAGE == "V3_0A_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_6"
+    assert r["hiep_ky_extension"] == "V3_0A_YUE_XING"
