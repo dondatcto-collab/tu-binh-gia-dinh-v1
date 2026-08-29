@@ -66,3 +66,8 @@ Không kích hoạt `天徳`, `天徳合` hoặc rule khác trong release này. 
 
 ## Production gate
 Chỉ gọi V3.0E6 CLOSED khi PR smoke + full regression PASS, merge main PASS, Vercel production READY đúng commit, canonical schema trả `V3_0E6_TIAN_SHE`, active 26 / pending 55 và main smoke + regression cuối đều PASS.
+
+## Redeploy gate
+Merge logic E6 `63408d1c…` đã PASS main smoke/regression nhưng không tạo deployment production mới trên Vercel.
+PR tài liệu này chỉ phát lại webhook deploy; không thay đổi rule, calculator, event evidence hay chính sách quyết định.
+Sau merge phải xác nhận deployment `READY` từ `main`, canonical schema là E6 và score vẫn `LOCKED_OFF`.
