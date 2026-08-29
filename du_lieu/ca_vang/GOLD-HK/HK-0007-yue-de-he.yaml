@@ -1,0 +1,26 @@
+case_id: HK-0007
+review_status: PENDING
+release: V3.0E2
+source_scope:
+  - "欽定協紀辨方書 卷五 · 月徳合"
+  - "御定星曆考原 卷三 · 月徳合"
+input:
+  month_branch: DAN
+  day_stem: TAN
+  day_branch: HOI
+  event_code: XUAT_HANH
+expected:
+  active_tokens_include:
+    - 月徳合
+    - 劫煞
+  matched_yi_tokens:
+    - 月徳合
+  matched_ji_tokens:
+    - 劫煞
+  event_signal_v25: CAUTION
+  label: Không ưu tiên
+  hard_block: false
+  numeric_score: null
+policy_notes:
+  - "JI thắng 月徳合; cát thần không cứu cảnh báo sự kiện."
+  - "Ca vàng mới giữ PENDING cho tới review độc lập."
