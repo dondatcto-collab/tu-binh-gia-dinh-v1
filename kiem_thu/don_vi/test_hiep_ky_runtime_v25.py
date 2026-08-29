@@ -27,7 +27,6 @@ def test_hard_block_v1_still_wins_everything():
 
 
 def test_new_yi_token_can_support_neutral_event_without_score():
-    # KY_HOP_DONG có 六合 trong 宜; tháng Thìn, ngày Dậu là 六合 và không trùng bộ ba sát V3.0B.
     r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="THIN", chi_ngay="DAU")
     assert r["matched_yi_tokens"] == ["六合"]
     assert r["event_signal_v25"] == "FAVORABLE"
@@ -58,6 +57,18 @@ def test_v30a_yue_xing_alone_is_caution_not_hard_block():
     assert ev["source_location"] == "卷十一 · 立券交易"
 
 
+def test_v30c_yue_yan_is_caution_not_hard_block():
+    # Tháng Dần ngày Tuất: 月厭; KY_HOP_DONG ghi 月厭 trong 忌.
+    r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="DAN", chi_ngay="TUAT")
+    assert "月厭" in r["matched_ji_tokens"]
+    assert r["event_signal_v25"] == "CAUTION"
+    assert r["hard_block"] is False
+    assert r["label"] == "Không ưu tiên"
+    ev = next(x for x in r["matched_evidence"] if x["token"] == "月厭")
+    assert ev["rule_id"].startswith("HK25-KY_HOP_DONG-JI-")
+    assert ev["source_id"] == "SRC-HK-QD-V11-WIKISOURCE"
+
+
 def test_personal_cannot_rescue_event_caution():
     r = evaluate_event_v25(_base(), _personal("SUPPORT"), chi_thang="TY", chi_ngay="MAO")
     assert r["label"] == "Không ưu tiên"
@@ -65,7 +76,6 @@ def test_personal_cannot_rescue_event_caution():
 
 
 def test_provisional_mapping_cannot_be_promoted_to_priority_by_new_signal():
-    # DAM_PHAN có 六合 trong 宜; chọn cặp Thìn/Dậu để không trùng bộ ba sát.
     r = evaluate_event_v25(_base(event_code="DAM_PHAN", mapping="PROVISIONAL"), _personal("SUPPORT"), chi_thang="THIN", chi_ngay="DAU")
     assert "六合" in r["matched_yi_tokens"]
     assert r["label"] == "Có thể cân nhắc"
@@ -80,5 +90,5 @@ def test_runtime_is_traceable_and_coverage_is_explicitly_partial():
     assert ev["source_id"]
     assert ev["source_location"]
     assert ev["decision_status"] == "ACTIVE"
-    assert r["coverage"] == COVERAGE == "V3_0B_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_9"
-    assert r["hiep_ky_extension"] == "V3_0B_SAT_TRIO"
+    assert r["coverage"] == COVERAGE == "V3_0C_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_10"
+    assert r["hiep_ky_extension"] == "V3_0C_YUE_YAN"

@@ -2,8 +2,9 @@
 
 V2.5 kích hoạt 5 token: 月建, 月破, 三合, 六合, 月害.
 V3.0A mở thêm 月刑 (Nguyệt Hình).
-V3.0B mở thêm đúng 3 token: 劫煞, 災煞, 月煞, dựa trực tiếp trên
-月表一..十二 của 《欽定協紀辨方書》卷20..31.
+V3.0B mở thêm 劫煞, 災煞, 月煞.
+V3.0C mở thêm 月厭 (Nguyệt Yếm), khóa trực tiếp từ 月表一..十二
+của 《欽定協紀辨方書》卷20..31.
 
 Không suy rộng sang các thần sát khác và không dùng điểm số.
 """
@@ -21,6 +22,7 @@ SOURCE_RULES = {
     "劫煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 劫煞所在之支",
     "災煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 災煞所在之支",
     "月煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月煞所在之支",
+    "月厭": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月厭所在之支",
 }
 
 XUNG = {
@@ -45,8 +47,8 @@ TAM_HOP_NHOM = (
     frozenset({"HOI","MAO","MUI"}),
 )
 
-# Bảng dưới đây được khóa trực tiếp từ 月表一..十二 (卷20..31), không suy
-# từ một công thức hiện đại. Mỗi bảng ánh xạ Chi tháng -> Chi ngày mang thần sát.
+# Các bảng dưới đây khóa trực tiếp từ 月表一..十二 (卷20..31), không suy
+# từ công thức hiện đại. Mỗi bảng ánh xạ Chi tháng -> Chi ngày mang thần sát.
 YUE_XING_BY_MONTH_BRANCH = {
     "DAN": "TI", "MAO": "TY", "THIN": "THIN", "TI": "THAN",
     "NGO": "NGO", "MUI": "SUU", "THAN": "DAN", "DAU": "DAU",
@@ -66,6 +68,11 @@ YUE_SHA_BY_MONTH_BRANCH = {
     "DAN": "SUU", "MAO": "TUAT", "THIN": "MUI", "TI": "THIN",
     "NGO": "SUU", "MUI": "TUAT", "THAN": "MUI", "DAU": "THIN",
     "TUAT": "SUU", "HOI": "TUAT", "TY": "MUI", "SUU": "THIN",
+}
+YUE_YAN_BY_MONTH_BRANCH = {
+    "DAN": "TUAT", "MAO": "DAU", "THIN": "THAN", "TI": "MUI",
+    "NGO": "NGO", "MUI": "TI", "THAN": "THIN", "DAU": "MAO",
+    "TUAT": "DAN", "HOI": "SUU", "TY": "TY", "SUU": "HOI",
 }
 
 
@@ -100,6 +107,10 @@ def yue_sha_branch(chi_thang: str) -> str:
     return YUE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
 
 
+def yue_yan_branch(chi_thang: str) -> str:
+    return YUE_YAN_BY_MONTH_BRANCH[_chuan(chi_thang)]
+
+
 def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
     """Trả token ACTIVE theo quan hệ Chi tháng-ngày, không tính điểm.
 
@@ -125,15 +136,17 @@ def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
         out.append("災煞")
     if d == YUE_SHA_BY_MONTH_BRANCH[m]:
         out.append("月煞")
+    if d == YUE_YAN_BY_MONTH_BRANCH[m]:
+        out.append("月厭")
     return tuple(out)
 
 
 def calculator_status() -> dict:
     return {
-        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30B",
-        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞"),
+        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30C",
+        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞", "月厭"),
         "source_rules": SOURCE_RULES,
-        "extension_version": "V3_0B_SAT_TRIO",
+        "extension_version": "V3_0C_YUE_YAN",
         "numeric_score": None,
         "numeric_score_status": "LOCKED_OFF",
     }

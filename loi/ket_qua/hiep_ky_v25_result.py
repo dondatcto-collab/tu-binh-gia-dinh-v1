@@ -1,9 +1,8 @@
 """Result Schema overlay cho Hiệp Kỷ mở rộng có kiểm soát.
 
-Giữ schema và trường coverage V2.5 để tương thích. V3.0A công bố riêng
-capability của 月刑. V3.0B mở thêm 劫煞, 災煞, 月煞 theo bảng 12 tháng;
-không đổi thứ bậc, không tạo HARD_BLOCK mới và không dùng numeric score.
-V2.7 vẫn là contract Event Search đầy đủ top 3 + toàn bộ ngày.
+Giữ schema và trường coverage V2.5 để tương thích. V3.0A công bố 月刑;
+V3.0B công bố 劫煞, 災煞, 月煞; V3.0C mở thêm 月厭 theo bảng 12 tháng.
+Không đổi thứ bậc, không tạo HARD_BLOCK mới và không dùng numeric score.
 """
 from __future__ import annotations
 
@@ -23,7 +22,12 @@ LEGACY_V25_COVERAGE = "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5"
 def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
     out = dict(base)
     implemented = list(out.get("implemented_scopes") or [])
-    for scope in ("expanded_hiep_ky_event_search", "hiep_ky_v30a_yue_xing", "hiep_ky_v30b_sat_trio"):
+    for scope in (
+        "expanded_hiep_ky_event_search",
+        "hiep_ky_v30a_yue_xing",
+        "hiep_ky_v30b_sat_trio",
+        "hiep_ky_v30c_yue_yan",
+    ):
         if scope not in implemented:
             implemented.append(scope)
     pending = [x for x in (out.get("pending_scopes") or []) if x != "expanded_hiep_ky_event_search"]
@@ -42,13 +46,12 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
             "decision_hierarchy": "HARD_BLOCK > EVENT > PERSONAL",
             "full_classical_claim": False,
         },
-        # Giữ field V3.0A để không phá consumer đã đọc capability này.
         "hiep_ky_v30a": {
             "extension_version": "V3_0A_YUE_XING",
             "status": "PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE",
             "activated_token": "月刑",
             "activated_token_vi": "Nguyệt Hình",
-            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30B",
+            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30C",
             "source_scope": "欽定協紀辨方書 卷20–31 · 月表一至十二",
             "coverage": COVERAGE,
             "decision_effect": "CAUTION_ONLY",
@@ -62,7 +65,21 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
             "status": "PARTIAL_ACTIVE_THREE_ADDITIONAL_RULES",
             "activated_tokens": ["劫煞", "災煞", "月煞"],
             "activated_tokens_vi": ["Kiếp Sát", "Tai Sát", "Nguyệt Sát"],
-            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30B",
+            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30C",
+            "source_scope": "欽定協紀辨方書 卷20–31 · 月表一至十二",
+            "coverage": COVERAGE,
+            "decision_effect": "CAUTION_ONLY",
+            "creates_hard_block": False,
+            "full_classical_claim": False,
+            "numeric_score": None,
+            "numeric_score_status": "LOCKED_OFF",
+        },
+        "hiep_ky_v30c": {
+            "extension_version": "V3_0C_YUE_YAN",
+            "status": "PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE",
+            "activated_token": "月厭",
+            "activated_token_vi": "Nguyệt Yếm",
+            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30C",
             "source_scope": "欽定協紀辨方書 卷20–31 · 月表一至十二",
             "coverage": COVERAGE,
             "decision_effect": "CAUTION_ONLY",
@@ -78,6 +95,7 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
         "Hiệp Kỷ chỉ kích hoạt rule đã có bộ tính; không coi inventory cổ thư là rule đã tính được.",
         "V3.0A mở Nguyệt Hình (月刑) từ bảng 12 tháng; tín hiệu này tạo thận trọng, không tự tạo HARD_BLOCK.",
         "V3.0B mở Kiếp Sát, Tai Sát, Nguyệt Sát (劫煞、災煞、月煞) từ bảng 12 tháng; cả ba chỉ tạo thận trọng, không tự tạo HARD_BLOCK và không cộng điểm.",
+        "V3.0C mở Nguyệt Yếm (月厭) từ bảng 12 tháng; chỉ tạo thận trọng, không tự tạo HARD_BLOCK và không cộng điểm.",
     )
     for note in notes:
         if note not in principles:
@@ -114,7 +132,7 @@ def event_search_v25(raw: dict[str, Any]) -> dict[str, Any]:
     out["status"] = STATUS
     out["ranking_mode"] = "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL"
     out["hiep_ky_coverage"] = COVERAGE
-    out["hiep_ky_extension"] = "V3_0B_SAT_TRIO"
+    out["hiep_ky_extension"] = "V3_0C_YUE_YAN"
     out["event_search_contract"] = EVENT_SEARCH_CONTRACT
 
     top_sources = list(raw.get("top") or [])

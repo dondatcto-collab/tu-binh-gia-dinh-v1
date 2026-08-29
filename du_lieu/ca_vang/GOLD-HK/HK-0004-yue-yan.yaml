@@ -1,0 +1,28 @@
+case_id: HK-0004
+category: GOLD-HK
+title_vi: "Nguyệt Yếm theo bảng tháng"
+ruleset_version: "V3.0C-YUE-YAN"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0C chờ duyệt độc lập. Tháng Dần ngày Tuất mang 月厭 theo
+  月表一. Với KY_HOP_DONG, 月厭 nằm trong nhóm kỵ nên lớp sự kiện phải
+  tạo CAUTION/Không ưu tiên; không sinh HARD_BLOCK và không có điểm số.
+input:
+  month_branch: DAN
+  day_branch: TUAT
+  event_code: KY_HOP_DONG
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 月厭
+      matched_ji_tokens:
+        - 月厭
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
