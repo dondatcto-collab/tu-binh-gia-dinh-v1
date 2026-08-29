@@ -1,7 +1,7 @@
 """V2.5+ event search pipeline.
 
 Tách khỏi endpoint V1 để V1 giữ nguyên hành vi đã nghiệm thu. Runtime Hiệp Kỷ
-nhận đủ Chi tháng, Chi ngày và từ V3.0E1 thêm Can ngày cho các cát thần Can-ngày.
+nhận Chi tháng, Chi ngày và từ V3.0E1 thêm Can ngày cho rule Can-ngày đã xác minh.
 """
 from __future__ import annotations
 
@@ -41,8 +41,8 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
     nhat_chu = sinh.tru_ngay.can
     tu_tru = {
         "nam": dtg.TruVi(sinh.tru_nam.can, sinh.tru_nam.chi),
-        "thang": dtg.TruuVi(sinh.tru_thang.can, sinh.truu_thang.chi) if False else dtg.TruVi(sinh.tru_thang.can, sinh.tru_thang.chi),
-        "ngay": dtg.TruVi(sinh.tru_ngay.can, sinh.tru_ngay.chi),
+        "thang": dtg.TruVi(sinh.tru_thang.can, sinh.tru_thang.chi),
+        "ngay": dtg.TruuVi(sinh.tru_ngay.can, sinh.truu_ngay.chi) if False else dtg.TruVi(sinh.tru_ngay.can, sinh.tru_ngay.chi),
         "gio": dtg.TruVi(sinh.tru_gio.can, sinh.tru_gio.chi),
     }
 
