@@ -2,6 +2,7 @@ from loi.quyet_dinh.hiep_ky_month_v25 import (
     JIE_SHA_BY_MONTH_BRANCH,
     YUE_SHA_BY_MONTH_BRANCH,
     YUE_XING_BY_MONTH_BRANCH,
+    YUE_YAN_BY_MONTH_BRANCH,
     ZAI_SHA_BY_MONTH_BRANCH,
     active_month_tokens,
     calculator_status,
@@ -9,6 +10,7 @@ from loi.quyet_dinh.hiep_ky_month_v25 import (
     tam_hop_partners,
     yue_sha_branch,
     yue_xing_branch,
+    yue_yan_branch,
     zai_sha_branch,
 )
 
@@ -27,9 +29,7 @@ def test_month_build_and_break_are_exact():
 
 def test_sanhe_liuhe_yuehai_are_not_confused():
     assert active_month_tokens("DAN", "NGO") == ("三合",)
-    # V3.0B: tháng Dần ngày Hợi vừa 六合 vừa 劫煞; phải giữ đủ evidence.
     assert active_month_tokens("DAN", "HOI") == ("六合", "劫煞")
-    # V3.0A: tháng Dần ngày Tị vừa 月害 vừa 月刑; phải giữ cả hai evidence.
     assert active_month_tokens("DAN", "TI") == ("月害", "月刑")
 
 
@@ -73,6 +73,26 @@ def test_v30b_sat_trio_locks_all_twelve_month_tables():
         assert "月煞" in active_month_tokens(month_branch, expected_yue[month_branch])
 
 
+def test_v30c_yue_yan_locks_all_twelve_month_tables():
+    expected = {
+        "DAN":"TUAT", "MAO":"DAU", "THIN":"THAN", "TI":"MUI",
+        "NGO":"NGO", "MUI":"TI", "THAN":"THIN", "DAU":"MAO",
+        "TUAT":"DAN", "HOI":"SUU", "TY":"TY", "SUU":"HOI",
+    }
+    assert YUE_YAN_BY_MONTH_BRANCH == expected
+    for month_branch, day_branch in expected.items():
+        assert yue_yan_branch(month_branch) == day_branch
+        assert "月厭" in active_month_tokens(month_branch, day_branch)
+
+
+def test_v30c_overlapping_tokens_are_all_retained():
+    # Tháng Ngọ, ngày Ngọ: 月建 + 月刑 + 月厭 cùng hiện diện theo bảng nguồn.
+    tokens = active_month_tokens("NGO", "NGO")
+    assert "月建" in tokens
+    assert "月刑" in tokens
+    assert "月厭" in tokens
+
+
 def test_v30a_self_punishment_months_do_not_overwrite_month_build():
     for branch in ("THIN", "NGO", "DAU", "HOI"):
         tokens = active_month_tokens(branch, branch)
@@ -82,9 +102,9 @@ def test_v30a_self_punishment_months_do_not_overwrite_month_build():
 
 def test_calculator_scope_is_explicit_and_no_score():
     s = calculator_status()
-    assert set(s["active_tokens"]) == {"月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞"}
-    assert s["extension_version"] == "V3_0B_SAT_TRIO"
-    assert s["calculator"] == "MONTH_BRANCH_RELATIONS_V25_V30B"
+    assert set(s["active_tokens"]) == {"月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞", "月厭"}
+    assert s["extension_version"] == "V3_0C_YUE_YAN"
+    assert s["calculator"] == "MONTH_BRANCH_RELATIONS_V25_V30C"
     assert s["numeric_score"] is None
     assert s["numeric_score_status"] == "LOCKED_OFF"
 
