@@ -13,9 +13,11 @@ def _base(state="NEUTRAL"):
     return {"event_code":"XUAT_HANH","event_state":state,"mapping_status":"VERIFIED","rule_ids":[],"reasons":[],"source_id":"SRC-HK-QD-V11-WIKISOURCE"}
 
 
-def _personal(state="SUPPORT", can_vi=None):
-    facts=[f"Can {can_vi} đối với Nhật chủ là kiểm thử"] if can_vi else []
-    return {"state":state,"rule_ids":[],"source_ids":[],"branch_impacts":[],"theme":{},"dien_giai":{},"technical_facts":facts}
+def _personal(state="SUPPORT", current_stem=None, technical_facts=None):
+    return {
+        "state":state,"rule_ids":[],"source_ids":[],"branch_impacts":[],"theme":{},"dien_giai":{},
+        "current_stem":current_stem,"current_branch":"THIN","technical_facts":list(technical_facts or []),
+    }
 
 
 def test_yue_de_locks_all_twelve_month_branch_to_day_stem_rows():
@@ -63,8 +65,31 @@ def test_yue_de_can_support_verified_neutral_event():
     assert out["numeric_score"] is None
 
 
-def test_yue_de_is_inferred_from_current_personal_stem_for_live_pipeline():
-    out=evaluate_event_v25(_base(),_personal("SUPPORT","Bính"),chi_thang="DAN",chi_ngay="THIN")
+def test_yue_de_uses_typed_current_stem_contract_for_live_pipeline():
+    out=evaluate_event_v25(_base(),_personal("SUPPORT","BINH"),chi_thang="DAN",chi_ngay="THIN")
+    assert "月徳" in out["active_hiep_ky_tokens"]
+    assert out["matched_yi_tokens"]==["月徳"]
+    assert out["personal_v1_1"]["current_stem"]=="BINH"
+
+
+def test_technical_text_is_not_parsed_for_day_stem_anymore():
+    out=evaluate_event_v25(
+        _base(),
+        _personal("SUPPORT",None,["Can Bính đối với Nhật chủ là kiểm thử"]),
+        chi_thang="DAN",chi_ngay="THIN",
+    )
+    assert "月徳" not in out["active_hiep_ky_tokens"]
+    assert out["matched_yi_tokens"]==[]
+
+
+def test_invalid_typed_current_stem_fails_closed():
+    out=evaluate_event_v25(_base(),_personal("SUPPORT","INVALID"),chi_thang="DAN",chi_ngay="THIN")
+    assert "月徳" not in out["active_hiep_ky_tokens"]
+    assert out["matched_yi_tokens"]==[]
+
+
+def test_explicit_day_stem_remains_backward_compatible_and_takes_precedence():
+    out=evaluate_event_v25(_base(),_personal("SUPPORT","GIAP"),chi_thang="DAN",chi_ngay="THIN",can_ngay="BINH")
     assert "月徳" in out["active_hiep_ky_tokens"]
     assert out["matched_yi_tokens"]==["月徳"]
 
