@@ -1,0 +1,33 @@
+case_id: HK-0006
+category: GOLD-HK
+title_vi: "Nguyệt Đức không cứu Tai Sát"
+ruleset_version: "V3.0E1-YUE-DE"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E1 chờ duyệt độc lập. Tháng Dần, ngày Bính Tý mang 月徳
+  theo quy tắc 卷五 và đồng thời mang 災煞 theo bảng tháng. Với XUAT_HANH,
+  月徳 thuộc 宜 nhưng 災煞 thuộc 忌; phải giữ cả hai evidence và kết luận
+  CAUTION/Không ưu tiên. Không sinh HARD_BLOCK và không có điểm số.
+input:
+  month_branch: DAN
+  day_stem: BINH
+  day_branch: TY
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 月徳
+        - 災煞
+      matched_yi_tokens:
+        - 月徳
+      matched_ji_tokens:
+        - 災煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
