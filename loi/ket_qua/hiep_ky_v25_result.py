@@ -1,7 +1,7 @@
 """Result Schema overlay cho Hiệp Kỷ mở rộng có kiểm soát.
 
-Giữ schema V2.5 để tương thích. V3.0A chỉ mở rộng capability học thuật bằng
-月刑 đã có nguồn + calculator; không đổi thứ bậc quyết định hay numeric score.
+Giữ schema và trường coverage V2.5 để tương thích. V3.0A công bố riêng
+capability/effective coverage của 月刑; không đổi thứ bậc hay numeric score.
 V2.7 vẫn là contract Event Search đầy đủ top 3 + toàn bộ ngày.
 """
 from __future__ import annotations
@@ -16,6 +16,7 @@ from loi.quyet_dinh.hiep_ky_runtime_v25 import COVERAGE
 SCHEMA_VERSION = "2.5-alpha.1"
 STATUS = "V2_5_HIEP_KY_PARTIAL_ACTIVE"
 EVENT_SEARCH_CONTRACT = "V2_7_COMPLETE_RESULTS"
+LEGACY_V25_COVERAGE = "V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5"
 
 
 def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
@@ -35,7 +36,9 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
         "implemented_scopes": implemented,
         "pending_scopes": pending,
         "hiep_ky_v25": {
-            "coverage": COVERAGE,
+            # Compatibility contract: không đổi giá trị trường V2.5 cũ.
+            "coverage": LEGACY_V25_COVERAGE,
+            "effective_coverage": COVERAGE,
             "capability": cap,
             "decision_hierarchy": "HARD_BLOCK > EVENT > PERSONAL",
             "full_classical_claim": False,
@@ -47,6 +50,7 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
             "activated_token_vi": "Nguyệt Hình",
             "calculator": "MONTH_BRANCH_RELATIONS_V25_V30A",
             "source_scope": "欽定協紀辨方書 卷20–31 · 月表一至十二",
+            "coverage": COVERAGE,
             "decision_effect": "CAUTION_ONLY",
             "creates_hard_block": False,
             "full_classical_claim": False,
