@@ -1,5 +1,5 @@
 from loi.quyet_dinh.hiep_ky_capability_v25 import (
-    MONTH_BRANCH_DAY_STEM_TOKENS, MONTH_BRANCH_TOKENS, TRUC_TOKEN_TO_CODE,
+    MONTH_BRANCH_DAY_STEM_TOKENS, MONTH_BRANCH_TOKENS, SEASON_DAY_STEM_TOKENS, TRUC_TOKEN_TO_CODE,
     capability_inventory, token_capability,
 )
 
@@ -22,13 +22,18 @@ def test_v30e3_opens_exactly_three_day_stem_tokens():
         row=token_capability(token); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert row["normalized_code"]==token
 
 
+def test_v30e4_opens_exactly_one_season_day_stem_token():
+    assert SEASON_DAY_STEM_TOKENS==frozenset({"四相"})
+    row=token_capability("四相"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="SEASON_DAY_STEM_V30E4"; assert row["normalized_code"]=="四相"
+
+
 def test_other_named_stars_without_calculator_stay_pending():
-    for token in ("天徳","天願","天醫","四相"):
+    for token in ("天徳","天願","天醫"):
         row=token_capability(token); assert row["calculator_status"]=="PENDING_CALCULATOR"; assert row["calculator"] is None
 
 
 def test_inventory_claims_only_partial_decision_expansion():
-    s=capability_inventory(); assert s["token_count"]==81; assert s["active_calculable_count"]==23; assert s["pending_calculator_count"]==58; assert s["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3"; assert s["extension_version"]=="V3_0E3_YUE_EN"; assert s["numeric_score"] is None; assert s["numeric_score_status"]=="LOCKED_OFF"
+    s=capability_inventory(); assert s["token_count"]==81; assert s["active_calculable_count"]==24; assert s["pending_calculator_count"]==57; assert s["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1"; assert s["extension_version"]=="V3_0E4_SI_XIANG"; assert s["numeric_score"] is None; assert s["numeric_score_status"]=="LOCKED_OFF"
 
 
 def test_no_unknown_token_can_be_implicitly_activated():
