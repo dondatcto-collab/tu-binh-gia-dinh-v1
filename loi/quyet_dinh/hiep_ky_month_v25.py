@@ -1,12 +1,11 @@
 """Hiệp Kỷ — bộ tính quan hệ Chi tháng/ngày đã khóa công thức.
 
 V2.5 kích hoạt 5 token: 月建, 月破, 三合, 六合, 月害.
-V3.0A mở thêm 月刑 (Nguyệt Hình).
-V3.0B mở thêm 劫煞, 災煞, 月煞.
-V3.0C mở thêm 月厭 (Nguyệt Yếm), khóa trực tiếp từ 月表一..十二
-của 《欽定協紀辨方書》卷20..31.
+V3.0A mở 月刑; V3.0B mở 劫煞, 災煞, 月煞; V3.0C mở 月厭.
+V3.0D mở 時徳 (Thời Đức) theo quy tắc bốn mùa trực tiếp từ 卷五:
+春午、夏辰、秋子、冬寅.
 
-Không suy rộng sang các thần sát khác và không dùng điểm số.
+Không suy rộng sang thần sát khác và không dùng điểm số.
 """
 from __future__ import annotations
 
@@ -23,57 +22,20 @@ SOURCE_RULES = {
     "災煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 災煞所在之支",
     "月煞": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月煞所在之支",
     "月厭": "卷20–31 · 月表一至十二: từng tháng ghi trực tiếp 月厭所在之支",
+    "時徳": "卷五 · 總要歴/歴例: 春午、夏辰、秋子、冬寅",
 }
 
-XUNG = {
-    "TY":"NGO", "NGO":"TY", "SUU":"MUI", "MUI":"SUU",
-    "DAN":"THAN", "THAN":"DAN", "MAO":"DAU", "DAU":"MAO",
-    "THIN":"TUAT", "TUAT":"THIN", "TI":"HOI", "HOI":"TI",
-}
-LUC_HOP = {
-    "TY":"SUU", "SUU":"TY", "DAN":"HOI", "HOI":"DAN",
-    "MAO":"TUAT", "TUAT":"MAO", "THIN":"DAU", "DAU":"THIN",
-    "TI":"THAN", "THAN":"TI", "NGO":"MUI", "MUI":"NGO",
-}
-LUC_HAI = {
-    "TY":"MUI", "MUI":"TY", "SUU":"NGO", "NGO":"SUU",
-    "DAN":"TI", "TI":"DAN", "MAO":"THIN", "THIN":"MAO",
-    "THAN":"HOI", "HOI":"THAN", "DAU":"TUAT", "TUAT":"DAU",
-}
-TAM_HOP_NHOM = (
-    frozenset({"DAN","NGO","TUAT"}),
-    frozenset({"TI","DAU","SUU"}),
-    frozenset({"THAN","TY","THIN"}),
-    frozenset({"HOI","MAO","MUI"}),
-)
+XUNG = {"TY":"NGO","NGO":"TY","SUU":"MUI","MUI":"SUU","DAN":"THAN","THAN":"DAN","MAO":"DAU","DAU":"MAO","THIN":"TUAT","TUAT":"THIN","TI":"HOI","HOI":"TI"}
+LUC_HOP = {"TY":"SUU","SUU":"TY","DAN":"HOI","HOI":"DAN","MAO":"TUAT","TUAT":"MAO","THIN":"DAU","DAU":"THIN","TI":"THAN","THAN":"TI","NGO":"MUI","MUI":"NGO"}
+LUC_HAI = {"TY":"MUI","MUI":"TY","SUU":"NGO","NGO":"SUU","DAN":"TI","TI":"DAN","MAO":"THIN","THIN":"MAO","THAN":"HOI","HOI":"THAN","DAU":"TUAT","TUAT":"DAU"}
+TAM_HOP_NHOM = (frozenset({"DAN","NGO","TUAT"}),frozenset({"TI","DAU","SUU"}),frozenset({"THAN","TY","THIN"}),frozenset({"HOI","MAO","MUI"}))
 
-# Các bảng dưới đây khóa trực tiếp từ 月表一..十二 (卷20..31), không suy
-# từ công thức hiện đại. Mỗi bảng ánh xạ Chi tháng -> Chi ngày mang thần sát.
-YUE_XING_BY_MONTH_BRANCH = {
-    "DAN": "TI", "MAO": "TY", "THIN": "THIN", "TI": "THAN",
-    "NGO": "NGO", "MUI": "SUU", "THAN": "DAN", "DAU": "DAU",
-    "TUAT": "MUI", "HOI": "HOI", "TY": "MAO", "SUU": "TUAT",
-}
-JIE_SHA_BY_MONTH_BRANCH = {
-    "DAN": "HOI", "MAO": "THAN", "THIN": "TI", "TI": "DAN",
-    "NGO": "HOI", "MUI": "THAN", "THAN": "TI", "DAU": "DAN",
-    "TUAT": "HOI", "HOI": "THAN", "TY": "TI", "SUU": "DAN",
-}
-ZAI_SHA_BY_MONTH_BRANCH = {
-    "DAN": "TY", "MAO": "DAU", "THIN": "NGO", "TI": "MAO",
-    "NGO": "TY", "MUI": "DAU", "THAN": "NGO", "DAU": "MAO",
-    "TUAT": "TY", "HOI": "DAU", "TY": "NGO", "SUU": "MAO",
-}
-YUE_SHA_BY_MONTH_BRANCH = {
-    "DAN": "SUU", "MAO": "TUAT", "THIN": "MUI", "TI": "THIN",
-    "NGO": "SUU", "MUI": "TUAT", "THAN": "MUI", "DAU": "THIN",
-    "TUAT": "SUU", "HOI": "TUAT", "TY": "MUI", "SUU": "THIN",
-}
-YUE_YAN_BY_MONTH_BRANCH = {
-    "DAN": "TUAT", "MAO": "DAU", "THIN": "THAN", "TI": "MUI",
-    "NGO": "NGO", "MUI": "TI", "THAN": "THIN", "DAU": "MAO",
-    "TUAT": "DAN", "HOI": "SUU", "TY": "TY", "SUU": "HOI",
-}
+YUE_XING_BY_MONTH_BRANCH = {"DAN":"TI","MAO":"TY","THIN":"THIN","TI":"THAN","NGO":"NGO","MUI":"SUU","THAN":"DAN","DAU":"DAU","TUAT":"MUI","HOI":"HOI","TY":"MAO","SUU":"TUAT"}
+JIE_SHA_BY_MONTH_BRANCH = {"DAN":"HOI","MAO":"THAN","THIN":"TI","TI":"DAN","NGO":"HOI","MUI":"THAN","THAN":"TI","DAU":"DAN","TUAT":"HOI","HOI":"THAN","TY":"TI","SUU":"DAN"}
+ZAI_SHA_BY_MONTH_BRANCH = {"DAN":"TY","MAO":"DAU","THIN":"NGO","TI":"MAO","NGO":"TY","MUI":"DAU","THAN":"NGO","DAU":"MAO","TUAT":"TY","HOI":"DAU","TY":"NGO","SUU":"MAO"}
+YUE_SHA_BY_MONTH_BRANCH = {"DAN":"SUU","MAO":"TUAT","THIN":"MUI","TI":"THIN","NGO":"SUU","MUI":"TUAT","THAN":"MUI","DAU":"THIN","TUAT":"SUU","HOI":"TUAT","TY":"MUI","SUU":"THIN"}
+YUE_YAN_BY_MONTH_BRANCH = {"DAN":"TUAT","MAO":"DAU","THIN":"THAN","TI":"MUI","NGO":"NGO","MUI":"TI","THAN":"THIN","DAU":"MAO","TUAT":"DAN","HOI":"SUU","TY":"TY","SUU":"HOI"}
+SHI_DE_BY_MONTH_BRANCH = {"DAN":"NGO","MAO":"NGO","THIN":"NGO","TI":"THIN","NGO":"THIN","MUI":"THIN","THAN":"TY","DAU":"TY","TUAT":"TY","HOI":"DAN","TY":"DAN","SUU":"DAN"}
 
 
 def _chuan(chi: str) -> str:
@@ -91,62 +53,30 @@ def tam_hop_partners(chi_thang: str) -> frozenset[str]:
     raise AssertionError("TAM_HOP_GROUP_MISSING")
 
 
-def yue_xing_branch(chi_thang: str) -> str:
-    return YUE_XING_BY_MONTH_BRANCH[_chuan(chi_thang)]
-
-
-def jie_sha_branch(chi_thang: str) -> str:
-    return JIE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
-
-
-def zai_sha_branch(chi_thang: str) -> str:
-    return ZAI_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
-
-
-def yue_sha_branch(chi_thang: str) -> str:
-    return YUE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
-
-
-def yue_yan_branch(chi_thang: str) -> str:
-    return YUE_YAN_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def yue_xing_branch(chi_thang: str) -> str: return YUE_XING_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def jie_sha_branch(chi_thang: str) -> str: return JIE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def zai_sha_branch(chi_thang: str) -> str: return ZAI_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def yue_sha_branch(chi_thang: str) -> str: return YUE_SHA_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def yue_yan_branch(chi_thang: str) -> str: return YUE_YAN_BY_MONTH_BRANCH[_chuan(chi_thang)]
+def shi_de_branch(chi_thang: str) -> str: return SHI_DE_BY_MONTH_BRANCH[_chuan(chi_thang)]
 
 
 def active_month_tokens(chi_thang: str, chi_ngay: str) -> tuple[str, ...]:
-    """Trả token ACTIVE theo quan hệ Chi tháng-ngày, không tính điểm.
-
-    Một ngày có thể đồng thời khớp nhiều token; không được ghi đè evidence.
-    """
     m, d = _chuan(chi_thang), _chuan(chi_ngay)
     out: list[str] = []
-    if d == m:
-        out.append("月建")
-    if d == XUNG[m]:
-        out.append("月破")
-    if d in tam_hop_partners(m):
-        out.append("三合")
-    if d == LUC_HOP[m]:
-        out.append("六合")
-    if d == LUC_HAI[m]:
-        out.append("月害")
-    if d == YUE_XING_BY_MONTH_BRANCH[m]:
-        out.append("月刑")
-    if d == JIE_SHA_BY_MONTH_BRANCH[m]:
-        out.append("劫煞")
-    if d == ZAI_SHA_BY_MONTH_BRANCH[m]:
-        out.append("災煞")
-    if d == YUE_SHA_BY_MONTH_BRANCH[m]:
-        out.append("月煞")
-    if d == YUE_YAN_BY_MONTH_BRANCH[m]:
-        out.append("月厭")
+    if d == m: out.append("月建")
+    if d == XUNG[m]: out.append("月破")
+    if d in tam_hop_partners(m): out.append("三合")
+    if d == LUC_HOP[m]: out.append("六合")
+    if d == LUC_HAI[m]: out.append("月害")
+    if d == YUE_XING_BY_MONTH_BRANCH[m]: out.append("月刑")
+    if d == JIE_SHA_BY_MONTH_BRANCH[m]: out.append("劫煞")
+    if d == ZAI_SHA_BY_MONTH_BRANCH[m]: out.append("災煞")
+    if d == YUE_SHA_BY_MONTH_BRANCH[m]: out.append("月煞")
+    if d == YUE_YAN_BY_MONTH_BRANCH[m]: out.append("月厭")
+    if d == SHI_DE_BY_MONTH_BRANCH[m]: out.append("時徳")
     return tuple(out)
 
 
 def calculator_status() -> dict:
-    return {
-        "calculator": "MONTH_BRANCH_RELATIONS_V25_V30C",
-        "active_tokens": ("月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞", "月厭"),
-        "source_rules": SOURCE_RULES,
-        "extension_version": "V3_0C_YUE_YAN",
-        "numeric_score": None,
-        "numeric_score_status": "LOCKED_OFF",
-    }
+    return {"calculator":"MONTH_BRANCH_RELATIONS_V25_V30D","active_tokens":("月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳"),"source_rules":SOURCE_RULES,"extension_version":"V3_0D_SHI_DE","numeric_score":None,"numeric_score_status":"LOCKED_OFF"}
