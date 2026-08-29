@@ -1,26 +1,33 @@
 case_id: HK-0007
+category: GOLD-HK
+title_vi: "Nguyệt Đức Hợp không cứu Kiếp Sát"
+ruleset_version: "V3.0E2-YUE-DE-HE"
+calendar_ruleset_id: CAL-V1
 review_status: PENDING
-release: V3.0E2
-source_scope:
-  - "欽定協紀辨方書 卷五 · 月徳合"
-  - "御定星曆考原 卷三 · 月徳合"
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E2 chờ duyệt độc lập. Tháng Dần, ngày Tân Hợi mang 月徳合
+  theo quy tắc 卷五/御定星曆考原卷三 và đồng thời mang 劫煞 theo bảng tháng.
+  Với XUAT_HANH, 月徳合 thuộc 宜 nhưng 劫煞 thuộc 忌; phải giữ cả hai evidence
+  và kết luận CAUTION/Không ưu tiên. Không sinh HARD_BLOCK và không có điểm số.
 input:
   month_branch: DAN
   day_stem: TAN
   day_branch: HOI
   event_code: XUAT_HANH
 expected:
-  active_tokens_include:
-    - 月徳合
-    - 劫煞
-  matched_yi_tokens:
-    - 月徳合
-  matched_ji_tokens:
-    - 劫煞
-  event_signal_v25: CAUTION
-  label: Không ưu tiên
-  hard_block: false
-  numeric_score: null
-policy_notes:
-  - "JI thắng 月徳合; cát thần không cứu cảnh báo sự kiện."
-  - "Ca vàng mới giữ PENDING cho tới review độc lập."
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 月徳合
+        - 劫煞
+      matched_yi_tokens:
+        - 月徳合
+      matched_ji_tokens:
+        - 劫煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
