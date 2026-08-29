@@ -1,8 +1,9 @@
 """Capability gate cho token Hiệp Kỷ.
 
 Có tên trong cổ thư != đã có bộ tính. V2.5 ACTIVE gồm 12 Trực và 5 token
-quan hệ Chi tháng-ngày. V3.0A mở thêm đúng 月刑 sau khi đã khóa bảng 12 tháng
-và bộ tính; mọi token khác vẫn PENDING_CALCULATOR.
+quan hệ Chi tháng-ngày. V3.0A mở thêm 月刑. V3.0B mở thêm đúng bộ ba
+劫煞, 災煞, 月煞 sau khi khóa bảng 12 tháng và bộ tính; mọi token khác vẫn
+PENDING_CALCULATOR.
 """
 from __future__ import annotations
 
@@ -22,7 +23,7 @@ TRUC_TOKEN_TO_CODE = {
     "開日": "KHAI",
     "閉日": "BE",
 }
-MONTH_BRANCH_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害", "月刑"})
+MONTH_BRANCH_TOKENS = frozenset({"月建", "月破", "三合", "六合", "月害", "月刑", "劫煞", "災煞", "月煞"})
 
 
 def token_capability(token: str) -> dict:
@@ -36,7 +37,7 @@ def token_capability(token: str) -> dict:
     if token in MONTH_BRANCH_TOKENS:
         return {
             "token": token,
-            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30A",
+            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30B",
             "calculator_status": "ACTIVE_CALCULABLE",
             "normalized_code": token,
         }
@@ -60,8 +61,8 @@ def capability_inventory() -> dict:
         "active_tokens": tuple(x["token"] for x in active),
         "pending_tokens": tuple(x["token"] for x in pending),
         "decision_expansion_status": "PARTIAL_ACTIVE",
-        "coverage": "12_TRUC_PLUS_MONTH_BRANCH_6",
-        "extension_version": "V3_0A_YUE_XING",
+        "coverage": "12_TRUC_PLUS_MONTH_BRANCH_9",
+        "extension_version": "V3_0B_SAT_TRIO",
         "numeric_score": None,
         "numeric_score_status": "LOCKED_OFF",
     }
