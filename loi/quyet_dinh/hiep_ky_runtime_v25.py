@@ -1,7 +1,7 @@
 """Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
 V3.0D giữ 11 token Chi tháng-ngày.
-V3.0E1 mở 月徳; V3.0E2 mở 月徳合 theo Chi tháng + Can ngày.
+V3.0E1 mở 月徳; V3.0E2 mở 月徳合; V3.0E3 mở 月恩 theo Chi tháng + Can ngày.
 V3.0E1.1 chuẩn hóa hợp đồng Can ngày bằng trường máy đọc current_stem.
 HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
@@ -15,8 +15,8 @@ from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
 from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
 
-COVERAGE = "V3_0E2_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_2"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合"})
+COVERAGE = "V3_0E3_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合","月恩"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -106,6 +106,6 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
         "decision_state": decision["state"],"label": decision["label"],"decision_authority": decision["authority"],
         "hard_block": hard_block,"rank_group": _rank(decision),"personal_v1_1": personal_context,"personal_methodology": personal.get("methodology"),
         "reasons": reasons,"rule_ids": rule_ids,"source_ids": sorted(src),
-        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E2_YUE_DE_HE",
+        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E3_YUE_EN",
         "numeric_score": None,"score": None,"numeric_score_status": "LOCKED_OFF","scoring_status": "NO_NUMERIC_SCORE",
     }
