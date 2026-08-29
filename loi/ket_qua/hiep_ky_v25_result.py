@@ -1,7 +1,8 @@
-"""Result Schema overlay cho V2.5 Hiệp Kỷ mở rộng có kiểm soát.
+"""Result Schema overlay cho Hiệp Kỷ mở rộng có kiểm soát.
 
-V2.7 không đổi engine/ranking; chỉ mở rộng contract Event Search để UI có thể
-hiển thị top 3 và toàn bộ ngày đã xét từ cùng một nguồn quyết định.
+Giữ schema V2.5 để tương thích. V3.0A chỉ mở rộng capability học thuật bằng
+月刑 đã có nguồn + calculator; không đổi thứ bậc quyết định hay numeric score.
+V2.7 vẫn là contract Event Search đầy đủ top 3 + toàn bộ ngày.
 """
 from __future__ import annotations
 
@@ -22,9 +23,12 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
     implemented = list(out.get("implemented_scopes") or [])
     if "expanded_hiep_ky_event_search" not in implemented:
         implemented.append("expanded_hiep_ky_event_search")
+    if "hiep_ky_v30a_yue_xing" not in implemented:
+        implemented.append("hiep_ky_v30a_yue_xing")
     pending = [x for x in (out.get("pending_scopes") or []) if x != "expanded_hiep_ky_event_search"]
     if "full_classical_hiep_ky" not in pending:
         pending.append("full_classical_hiep_ky")
+    cap = capability_inventory()
     out.update({
         "schema_version": SCHEMA_VERSION,
         "status": STATUS,
@@ -32,16 +36,32 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
         "pending_scopes": pending,
         "hiep_ky_v25": {
             "coverage": COVERAGE,
-            "capability": capability_inventory(),
+            "capability": cap,
             "decision_hierarchy": "HARD_BLOCK > EVENT > PERSONAL",
             "full_classical_claim": False,
+        },
+        "hiep_ky_v30a": {
+            "extension_version": "V3_0A_YUE_XING",
+            "status": "PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE",
+            "activated_token": "月刑",
+            "activated_token_vi": "Nguyệt Hình",
+            "calculator": "MONTH_BRANCH_RELATIONS_V25_V30A",
+            "source_scope": "欽定協紀辨方書 卷20–31 · 月表一至十二",
+            "decision_effect": "CAUTION_ONLY",
+            "creates_hard_block": False,
+            "full_classical_claim": False,
+            "numeric_score": None,
+            "numeric_score_status": "LOCKED_OFF",
         },
         "numeric_score": "LOCKED_OFF",
     })
     principles = list(out.get("principles") or [])
-    note = "Hiệp Kỷ V2.5 chỉ kích hoạt rule đã có bộ tính; không coi inventory cổ thư là rule đã tính được."
+    note = "Hiệp Kỷ chỉ kích hoạt rule đã có bộ tính; không coi inventory cổ thư là rule đã tính được."
     if note not in principles:
         principles.append(note)
+    v30_note = "V3.0A chỉ mở thêm Nguyệt Hình (月刑) từ bảng 12 tháng; tín hiệu này tạo thận trọng, không tự tạo HARD_BLOCK."
+    if v30_note not in principles:
+        principles.append(v30_note)
     out["principles"] = principles
     return out
 
@@ -53,6 +73,7 @@ def _enrich_item(item: dict[str, Any], src: dict[str, Any]) -> dict[str, Any]:
     technical = dict(item.get("technical") or {})
     technical.update({
         "coverage": src.get("coverage"),
+        "hiep_ky_extension": src.get("hiep_ky_extension"),
         "decision_authority": src.get("decision_authority"),
         "event_state_v1": src.get("event_state_v1"),
         "event_signal_v25": src.get("event_signal_v25"),
@@ -73,6 +94,7 @@ def event_search_v25(raw: dict[str, Any]) -> dict[str, Any]:
     out["status"] = STATUS
     out["ranking_mode"] = "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL"
     out["hiep_ky_coverage"] = COVERAGE
+    out["hiep_ky_extension"] = "V3_0A_YUE_XING"
     out["event_search_contract"] = EVENT_SEARCH_CONTRACT
 
     top_sources = list(raw.get("top") or [])
