@@ -19,10 +19,10 @@ def test_v30b_capability_moves_exactly_three_tokens_to_active():
 
 
 def test_v30b_favorable_relation_cannot_override_jie_sha_caution():
-    # Tháng Dần + ngày Hợi: 六合 là YI cho KHAI_TRUONG, đồng thời 劫煞 là JI.
+    # Tháng Dần + ngày Hợi: 六合 là YI cho KY_HOP_DONG, đồng thời 劫煞 là JI.
     # JI của sự kiện phải thắng tín hiệu thuận; không được nâng thành Ưu tiên.
     base = {
-        "event_code": "KHAI_TRUONG",
+        "event_code": "KY_HOP_DONG",
         "event_state": "NEUTRAL",
         "mapping_status": "VERIFIED",
         "rule_ids": [],
@@ -42,7 +42,7 @@ def test_v30b_favorable_relation_cannot_override_jie_sha_caution():
 
 def test_v30b_existing_hard_block_still_wins():
     base = {
-        "event_code": "KHAI_TRUONG",
+        "event_code": "KY_HOP_DONG",
         "event_state": "JI",
         "mapping_status": "VERIFIED",
         "rule_ids": [],
