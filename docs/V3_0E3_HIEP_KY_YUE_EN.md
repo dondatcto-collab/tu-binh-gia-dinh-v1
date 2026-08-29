@@ -56,5 +56,8 @@ Tháng Dần + ngày Bính Hợi + Xuất hành:
 - kết quả phải là `CAUTION / Không ưu tiên`
 - `hard_block = false`
 
+## Production gate
+Merge logic V3.0E3 phải được Vercel triển khai từ `main`; canonical chỉ được coi là PASS khi `/api/health` và `/api/v2/schema-status` xác nhận E3, capability 23/81 và score vẫn `LOCKED_OFF`.
+
 ## Giới hạn
 Không kích hoạt `四相`, `天徳`, `天徳合` hoặc rule khác trong release này. Không tuyên bố full classical Hiệp Kỷ. Golden HK-0008 giữ `PENDING` cho tới review độc lập.
