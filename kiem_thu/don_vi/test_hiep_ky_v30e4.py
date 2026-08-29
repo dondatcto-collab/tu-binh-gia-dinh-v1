@@ -87,16 +87,17 @@ def test_provisional_event_cannot_be_promoted_to_absolute_priority():
     assert out["decision_authority"]=="EVENT_PROVISIONAL"
 
 
-def test_v30e4_capability_schema_and_score_are_explicit_after_v30e5():
+def test_v30e4_capability_schema_and_score_are_explicit_after_v30e6():
     cap=capability_inventory()
     assert cap["token_count"]==81
-    assert cap["active_calculable_count"]==25
-    assert cap["pending_calculator_count"]==56
+    assert cap["active_calculable_count"]==26
+    assert cap["pending_calculator_count"]==55
     assert "四相" in cap["active_tokens"]
     assert "天願" in cap["active_tokens"]
+    assert "天赦" in cap["active_tokens"]
     assert token_capability("四相")["calculator"]=="SEASON_DAY_STEM_V30E4"
-    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1"
-    assert cap["extension_version"]=="V3_0E5_TIAN_YUAN"
+    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1"
+    assert cap["extension_version"]=="V3_0E6_TIAN_SHE"
     assert cap["numeric_score"] is None
 
     calc=calculator_status()
