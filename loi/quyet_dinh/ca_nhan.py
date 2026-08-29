@@ -58,6 +58,7 @@ def phan_tich_ca_nhan(conn, *, tu_tru: dict, nhat_chu: str, can_hien_tai: str, c
 
     return {
         "scope":scope,"state":state,"label":label,"confidence":"HIGH" if natal.get("status")=="READY" else "LOW",
+        "current_stem":can_hien_tai,"current_branch":chi_hien_tai,
         "basis":headline,"recommended":recommended,"caution":caution,
         "theme":theme,"natal_pattern":natal,"transit":transit,
         "branch_impacts":[{**x,"decision_effect":decision_effect} for x in impacts],
@@ -73,7 +74,7 @@ def bo_sung_event_ca_nhan(event_state: dict[str, Any], personal: dict[str, Any])
     """Gate 3: hợp lưu thứ bậc; không trung bình hóa và không có numeric score."""
     out=dict(event_state); pstate=personal.get("state","DESCRIPTIVE_ONLY")
     out["personal_methodology"]=personal.get("methodology") or gate_payload()
-    out["personal_v1_1"]={"theme":personal.get("theme"),"branch_impacts":personal.get("branch_impacts",[]),"headline":personal.get("dien_giai",{}).get("headline"),"technical_facts":personal.get("technical_facts",[]),"interpretation_status":"ZPZQ_PERSONAL_0_5","decision_effect":pstate}
+    out["personal_v1_1"]={"current_stem":personal.get("current_stem"),"current_branch":personal.get("current_branch"),"theme":personal.get("theme"),"branch_impacts":personal.get("branch_impacts",[]),"headline":personal.get("dien_giai",{}).get("headline"),"technical_facts":personal.get("technical_facts",[]),"interpretation_status":"ZPZQ_PERSONAL_0_5","decision_effect":pstate}
     reasons=list(out.get("reasons",[])); reasons.append("Hợp lưu 0.5.0 dùng thứ bậc: HARD_BLOCK > lớp sự kiện > nền cá nhân; không trung bình hóa.")
     ev=out.get("event_state")
     if ev=="JI":
