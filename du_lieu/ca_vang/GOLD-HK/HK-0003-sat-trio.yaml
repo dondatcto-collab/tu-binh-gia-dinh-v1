@@ -1,0 +1,29 @@
+case_id: HK-0003
+category: GOLD-HK
+title_vi: "Bộ ba Kiếp Sát - Tai Sát - Nguyệt Sát theo bảng tháng"
+ruleset_version: "V3.0B-SAT-TRIO"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0B chờ duyệt độc lập. Mục tiêu khóa xung đột tháng Dần ngày Hợi:
+  六合 là tín hiệu thuận nhưng 劫煞 thuộc nhóm kỵ của KHAI_TRUONG, vì vậy lớp
+  sự kiện phải kết luận CAUTION/Không ưu tiên; không sinh HARD_BLOCK và không có điểm số.
+input:
+  month_branch: DAN
+  day_branch: HOI
+  event_code: KHAI_TRUONG
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 六合
+        - 劫煞
+      matched_ji_tokens:
+        - 劫煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
