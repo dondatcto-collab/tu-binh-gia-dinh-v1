@@ -1,0 +1,33 @@
+case_id: HK-0008
+category: GOLD-HK
+title_vi: "Nguyệt Ân không cứu Kiếp Sát"
+ruleset_version: "V3.0E3-YUE-EN"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E3 chờ duyệt độc lập. Tháng Dần, ngày Bính Hợi mang 月恩
+  theo quy tắc 御定星曆考原卷三 và đồng thời mang 劫煞 theo bảng tháng.
+  Với XUAT_HANH, 月恩 thuộc 宜 nhưng 劫煞 thuộc 忌; phải giữ cả hai evidence
+  và kết luận CAUTION/Không ưu tiên. Không sinh HARD_BLOCK và không có điểm số.
+input:
+  month_branch: DAN
+  day_stem: BINH
+  day_branch: HOI
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 月恩
+        - 劫煞
+      matched_yi_tokens:
+        - 月恩
+      matched_ji_tokens:
+        - 劫煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
