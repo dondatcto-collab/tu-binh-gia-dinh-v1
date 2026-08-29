@@ -2,12 +2,14 @@
 
 V3.0D giữ 11 token Chi tháng-ngày.
 V3.0E1 mở 月徳 (Nguyệt Đức) theo Chi tháng + Can ngày.
+V3.0E1.1 chuẩn hóa hợp đồng Can ngày bằng trường máy đọc current_stem.
 HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
 from __future__ import annotations
 
 from typing import Any
 
+from loi.lich.quy_uoc_can_chi import CAN
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
@@ -15,10 +17,6 @@ from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
 
 COVERAGE = "V3_0E1_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_1"
 ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳"})
-CAN_VI_TO_CODE = {
-    "Giáp":"GIAP","Ất":"AT","Bính":"BINH","Đinh":"DINH","Mậu":"MAU",
-    "Kỷ":"KY","Canh":"CANH","Tân":"TAN","Nhâm":"NHAM","Quý":"QUY",
-}
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -38,19 +36,15 @@ def _rank(result: dict[str, Any]) -> int:
     return 3
 
 
-def _infer_can_ngay(personal: dict[str, Any]) -> str | None:
-    """Lấy Can hiện tại từ technical fact do lớp cá nhân vừa sinh.
+def _effective_day_stem(personal: dict[str, Any], explicit_stem: str | None) -> str | None:
+    """Ưu tiên tham số tương thích; nếu thiếu thì dùng hợp đồng typed current_stem.
 
-    Fail-closed: nếu format không đúng hoặc thiếu dữ liệu thì không kích hoạt rule Can-ngày.
+    Fail-closed: giá trị ngoài bộ 10 Can không được chuyển thành rule Can-ngày.
     """
-    for fact in personal.get("technical_facts") or []:
-        text = str(fact)
-        if not text.startswith("Can "):
-            continue
-        parts = text.split(" ", 2)
-        if len(parts) >= 2:
-            return CAN_VI_TO_CODE.get(parts[1])
-    return None
+    if explicit_stem in CAN:
+        return explicit_stem
+    current_stem = personal.get("current_stem")
+    return current_stem if current_stem in CAN else None
 
 
 def evaluate_event_v25(
@@ -64,7 +58,7 @@ def evaluate_event_v25(
     out = dict(base_event)
     event_code = out.get("event_code")
     active = set(active_month_tokens(chi_thang, chi_ngay))
-    effective_can_ngay = can_ngay or _infer_can_ngay(personal)
+    effective_can_ngay = _effective_day_stem(personal, can_ngay)
     if effective_can_ngay is not None:
         active.update(active_stem_tokens(chi_thang, effective_can_ngay))
 
@@ -100,6 +94,8 @@ def evaluate_event_v25(
     reasons.append("Phân xử theo thứ bậc HARD_BLOCK > sự kiện > cá nhân; không cộng/trừ điểm.")
 
     personal_context = {
+        "current_stem": personal.get("current_stem"),
+        "current_branch": personal.get("current_branch"),
         "theme": personal.get("theme"),
         "branch_impacts": personal.get("branch_impacts", []),
         "headline": personal.get("dien_giai", {}).get("headline"),
