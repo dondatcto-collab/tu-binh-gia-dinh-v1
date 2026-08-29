@@ -1,16 +1,18 @@
 """Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
-V3.0D mở thêm 時徳 (Thời Đức) như tín hiệu YI đã có calculator.
-HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI vẫn thắng YI; không dùng điểm số.
+V3.0D giữ 11 token Chi tháng-ngày.
+V3.0E1 mở 月徳 (Nguyệt Đức) theo Chi tháng + Can ngày.
+HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
 from __future__ import annotations
 from typing import Any
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_month_v25 import active_month_tokens
+from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
 from loi.quyet_dinh.hiep_ky_policy_v25 import resolve_conflict
 
-COVERAGE = "V3_0D_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳"})
+COVERAGE = "V3_0E1_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_1"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -30,9 +32,18 @@ def _rank(result: dict[str, Any]) -> int:
     return 3
 
 
-def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, chi_thang: str, chi_ngay: str) -> dict[str, Any]:
+def evaluate_event_v25(
+    base_event: dict[str, Any],
+    personal: dict[str, Any],
+    *,
+    chi_thang: str,
+    chi_ngay: str,
+    can_ngay: str | None = None,
+) -> dict[str, Any]:
     out=dict(base_event); event_code=out.get("event_code")
     active=set(active_month_tokens(chi_thang,chi_ngay))
+    if can_ngay is not None:
+        active.update(active_stem_tokens(chi_thang,can_ngay))
     evidence=tuple(evidence_for_event(event_code)) if event_code else ()
     matched=[x for x in evidence if x.token in active and x.token in ACTIVE_EXTRA_TOKENS]
     yi_hits=[x for x in matched if x.polarity=="YI"]; ji_hits=[x for x in matched if x.polarity=="JI"]
@@ -53,4 +64,18 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
     src=set(personal.get("source_ids") or [])
     if out.get("source_id"): src.add(out["source_id"])
     src.update(x.source_id for x in matched)
-    return {**out,"event_state_v1":base_state,"event_state":"JI" if hard_block else ("YI" if event_signal=="FAVORABLE" else ("CAUTION" if event_signal=="CAUTION" else "NEUTRAL")),"event_signal_v25":event_signal,"active_hiep_ky_tokens":sorted(active),"matched_yi_tokens":[x.token for x in yi_hits],"matched_ji_tokens":[x.token for x in ji_hits],"matched_evidence":[{"rule_id":x.rule_id,"token":x.token,"polarity":x.polarity,"source_id":x.source_id,"source_location":x.source_location,"evidence_status":x.evidence_status,"decision_status":"ACTIVE"} for x in matched],"decision_state":decision["state"],"label":decision["label"],"decision_authority":decision["authority"],"hard_block":hard_block,"rank_group":_rank(decision),"personal_v1_1":personal_context,"personal_methodology":personal.get("methodology"),"reasons":reasons,"rule_ids":rule_ids,"source_ids":sorted(src),"coverage":COVERAGE,"hiep_ky_extension":"V3_0D_SHI_DE","numeric_score":None,"score":None,"numeric_score_status":"LOCKED_OFF","scoring_status":"NO_NUMERIC_SCORE"}
+    return {
+        **out,
+        "event_state_v1":base_state,
+        "event_state":"JI" if hard_block else ("YI" if event_signal=="FAVORABLE" else ("CAUTION" if event_signal=="CAUTION" else "NEUTRAL")),
+        "event_signal_v25":event_signal,
+        "active_hiep_ky_tokens":sorted(active),
+        "matched_yi_tokens":[x.token for x in yi_hits],
+        "matched_ji_tokens":[x.token for x in ji_hits],
+        "matched_evidence":[{"rule_id":x.rule_id,"token":x.token,"polarity":x.polarity,"source_id":x.source_id,"source_location":x.source_location,"evidence_status":x.evidence_status,"decision_status":"ACTIVE"} for x in matched],
+        "decision_state":decision["state"],"label":decision["label"],"decision_authority":decision["authority"],
+        "hard_block":hard_block,"rank_group":_rank(decision),"personal_v1_1":personal_context,"personal_methodology":personal.get("methodology"),
+        "reasons":reasons,"rule_ids":rule_ids,"source_ids":sorted(src),
+        "coverage":COVERAGE,"hiep_ky_extension":"V3_0E1_YUE_DE",
+        "numeric_score":None,"score":None,"numeric_score_status":"LOCKED_OFF","scoring_status":"NO_NUMERIC_SCORE",
+    }
