@@ -1,7 +1,7 @@
 """V2.5+ event search pipeline.
 
-Tách khỏi endpoint V1 để V1 giữ nguyên hành vi đã nghiệm thu. Runtime Hiệp Kỷ
-nhận Chi tháng, Chi ngày và từ V3.0E1 thêm Can ngày cho rule Can-ngày đã xác minh.
+Tách khỏi endpoint V1 để V1 giữ nguyên hành vi đã nghiệm thu. V3.0E1 truyền
+Can ngày vào runtime Hiệp Kỷ để tính các rule Can-ngày đã xác minh.
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
         "so_ngay_da_quet": len(ds),
         "co_xep_hang_duoc_khong": True,
         "xep_hang_status": V25_RANKING_MODE,
-        "ghi_chu": "Hiệp Kỷ partial: 12 Trực + quan hệ Chi tháng-ngày + rule Can-ngày đã có calculator; HARD_BLOCK > sự kiện > cá nhân; không dùng điểm 0–10.",
+        "ghi_chu": "Hiệp Kỷ partial: rule chỉ tác động khi đã có calculator; HARD_BLOCK > sự kiện > cá nhân; không dùng điểm 0–10.",
         "canh_bao_an_toan": (
             "Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế xác nhận có thể linh hoạt; không trì hoãn cấp cứu."
             if v.viec == "DIEU_TRI" else None
