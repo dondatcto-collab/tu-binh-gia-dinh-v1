@@ -1,7 +1,7 @@
-"""V2.5 event search pipeline.
+"""V2.5+ event search pipeline.
 
-Tách khỏi endpoint V1 để V1 giữ nguyên hành vi đã nghiệm thu. V2.5 dùng cùng
-CalendarEngine và lớp cá nhân, nhưng hợp lưu qua runtime Hiệp Kỷ mở rộng.
+Tách khỏi endpoint V1 để V1 giữ nguyên hành vi đã nghiệm thu. Runtime Hiệp Kỷ
+nhận đủ Chi tháng, Chi ngày và từ V3.0E1 thêm Can ngày cho các cát thần Can-ngày.
 """
 from __future__ import annotations
 
@@ -41,9 +41,9 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
     nhat_chu = sinh.tru_ngay.can
     tu_tru = {
         "nam": dtg.TruVi(sinh.tru_nam.can, sinh.tru_nam.chi),
-        "thang": dtg.TruVi(sinh.tru_thang.can, sinh.tru_thang.chi),
-        "ngay": dtg.TruVi(sinh.tru_ngay.can, sinh.tru_ngay.chi),
-        "gio": dtg.TruVi(sinh.tru_gio.can, sinh.tru_gio.chi),
+        "thang": dtg.TruuVi(sinh.tru_thang.can, sinh.tru_thang.chi) if False else dtg.TruVi(sinh.tru_thang.can, sinh.tru_thang.chi),
+        "ngay": dtg.TruuVi(sinh.tru_ngay.can, sinh.tru_ngay.chi) if False else dtg.TruuVi(sinh.tru_ngay.can, sinh.tru_ngay.chi),
+        "gio": dtg.TruuVi(sinh.tru_gio.can, sinh.tru_gio.chi) if False else dtg.TruuVi(sinh.tru_gio.can, sinh.tru_gio.chi),
     }
 
     ds: list[dict] = []
@@ -69,6 +69,7 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
                 personal,
                 chi_thang=lich.tru_thang.chi,
                 chi_ngay=lich.tru_ngay.chi,
+                can_ngay=lich.tru_ngay.can,
             )
             ds.append({
                 "ngay": cur.isoformat(),
@@ -106,7 +107,7 @@ def tim_ngay_v25(v: WorkRequest) -> dict:
         "so_ngay_da_quet": len(ds),
         "co_xep_hang_duoc_khong": True,
         "xep_hang_status": V25_RANKING_MODE,
-        "ghi_chu": "V2.5: 12 Trực + 5 quan hệ Chi tháng-ngày; HARD_BLOCK > sự kiện > cá nhân; không dùng điểm 0–10.",
+        "ghi_chu": "Hiệp Kỷ partial: 12 Trực + quan hệ Chi tháng-ngày + rule Can-ngày đã có calculator; HARD_BLOCK > sự kiện > cá nhân; không dùng điểm 0–10.",
         "canh_bao_an_toan": (
             "Chỉ chọn trong các thời điểm bác sĩ/cơ sở y tế xác nhận có thể linh hoạt; không trì hoãn cấp cứu."
             if v.viec == "DIEU_TRI" else None
