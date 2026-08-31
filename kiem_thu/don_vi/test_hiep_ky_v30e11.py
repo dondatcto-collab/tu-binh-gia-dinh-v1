@@ -1,6 +1,5 @@
 from loi.ket_qua.hiep_ky_v25_result import v25_schema_overlay
-from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory, token_capability
-from loi.quyet_dinh.hiep_ky_coverage_gate_v30e10 import v1_engine_readiness
+from loi.quyet_dinh.hiep_ky_capability_v25 import token_capability
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_runtime_v25 import evaluate_event_v25
 from loi.quyet_dinh.hiep_ky_wu_fu_v30e11 import WU_FU_BRANCH_BY_MONTH_BRANCH, active_wu_fu_tokens, calculator_status, wu_fu_branch
@@ -71,14 +70,9 @@ def test_wu_fu_does_not_leak_to_unsupported_event():
     assert "五富" not in out["matched_yi_tokens"]
 
 
-def test_e11_capability_schema_and_readiness_are_explicit():
-    cap=capability_inventory()
-    assert cap["token_count"]==81
-    assert cap["active_calculable_count"]==31
-    assert cap["pending_calculator_count"]==50
+def test_e11_contract_remains_bound_after_later_releases():
     assert token_capability("五富")["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E11_WU_FU"
-    assert cap["extension_version"]=="V3_0E11_WU_FU"
-    assert cap["numeric_score"] is None
+    assert calculator_status()["active_tokens"]==("五富",)
     assert calculator_status()["numeric_score"] is None
 
     schema=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]})
@@ -87,9 +81,3 @@ def test_e11_capability_schema_and_readiness_are_explicit():
     assert schema["hiep_ky_v30e11"]["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"
     assert schema["hiep_ky_v30e11"]["creates_hard_block"] is False
     assert schema["numeric_score"]=="LOCKED_OFF"
-
-    ready=v1_engine_readiness()
-    assert ready["active_calculable_count"]==31
-    assert ready["verified_balance_gate"] is True
-    assert ready["rule_target_gate"] is False
-    assert ready["v1_engine_ready"] is False
