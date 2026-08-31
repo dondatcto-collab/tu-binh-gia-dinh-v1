@@ -35,7 +35,7 @@ def test_provisional_mapping_cannot_be_promoted_to_priority_by_new_signal():
 
 
 def test_runtime_is_traceable_and_coverage_is_explicitly_partial():
-    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI"); assert r["matched_evidence"]; ev=r["matched_evidence"][0]; assert ev["rule_id"] and ev["source_id"] and ev["source_location"]; assert ev["decision_status"]=="ACTIVE"; assert r["coverage"]==COVERAGE=="V3_0E8_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1"; assert r["hiep_ky_extension"]=="V3_0E8_WU_HE"
+    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI"); assert r["matched_evidence"]; ev=r["matched_evidence"][0]; assert ev["rule_id"] and ev["source_id"] and ev["source_location"]; assert ev["decision_status"]=="ACTIVE"; assert r["coverage"]==COVERAGE=="V3_0E9_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1"; assert r["hiep_ky_extension"]=="V3_0E9_TIAN_YI"
 
 
 def test_day_stem_rules_fail_closed_but_branch_only_rules_do_not():
@@ -49,3 +49,9 @@ def test_wu_he_branch_only_rule_does_not_require_day_stem():
     r=evaluate_event_v25(_base(event_code="KY_HOP_DONG"),_personal("SUPPORT"),chi_thang="THIN",chi_ngay="DAN")
     assert "五合" in r["active_hiep_ky_tokens"]
     assert "五合" in r["matched_yi_tokens"]
+
+
+def test_tian_yi_month_day_branch_rule_does_not_require_day_stem():
+    r=evaluate_event_v25(_base(event_code="DIEU_TRI"),_personal("SUPPORT"),chi_thang="MAO",chi_ngay="HOI")
+    assert "天醫" in r["active_hiep_ky_tokens"]
+    assert "天醫" in r["matched_yi_tokens"]
