@@ -1,6 +1,6 @@
 from loi.quyet_dinh.hiep_ky_capability_v25 import (
     DAY_BRANCH_TOKENS, MONTH_BRANCH_DAY_BRANCH_TOKENS, MONTH_BRANCH_DAY_PILLAR_TOKENS, MONTH_BRANCH_DAY_STEM_TOKENS, MONTH_BRANCH_TOKENS,
-    SEASON_DAY_BRANCH_TOKENS, SEASON_DAY_PILLAR_TOKENS, SEASON_DAY_STEM_TOKENS, TRUC_TOKEN_TO_CODE,
+    PAIRED_MONTH_DAY_BRANCH_TOKENS, SEASON_DAY_BRANCH_TOKENS, SEASON_DAY_PILLAR_TOKENS, SEASON_DAY_STEM_TOKENS, TRUC_TOKEN_TO_CODE,
     capability_inventory, token_capability,
 )
 
@@ -17,40 +17,25 @@ def test_v30d_eleven_month_branch_tokens_remain_active():
         row=token_capability(token); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_RELATIONS_V25_V30D"
 
 
-def test_v30e3_opens_exactly_three_day_stem_tokens():
+def test_typed_calculator_groups_are_exact():
     assert MONTH_BRANCH_DAY_STEM_TOKENS==frozenset({"月徳","月徳合","月恩"})
-    for token in MONTH_BRANCH_DAY_STEM_TOKENS:
-        row=token_capability(token); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert row["normalized_code"]==token
-
-
-def test_v30e4_opens_exactly_one_season_day_stem_token():
     assert SEASON_DAY_STEM_TOKENS==frozenset({"四相"})
-    row=token_capability("四相"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="SEASON_DAY_STEM_V30E4"; assert row["normalized_code"]=="四相"
-
-
-def test_v30e5_opens_exactly_one_month_day_pillar_token():
     assert MONTH_BRANCH_DAY_PILLAR_TOKENS==frozenset({"天願"})
-    row=token_capability("天願"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_DAY_PILLAR_V30E5"; assert row["normalized_code"]=="天願"
-
-
-def test_v30e6_opens_exactly_one_season_day_pillar_token():
     assert SEASON_DAY_PILLAR_TOKENS==frozenset({"天赦"})
-    row=token_capability("天赦"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="SEASON_DAY_PILLAR_V30E6"; assert row["normalized_code"]=="天赦"
-
-
-def test_v30e7_opens_exactly_one_season_day_branch_token():
     assert SEASON_DAY_BRANCH_TOKENS==frozenset({"天喜"})
-    row=token_capability("天喜"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="SEASON_DAY_BRANCH_V30E7"; assert row["normalized_code"]=="天喜"
-
-
-def test_v30e8_opens_exactly_one_day_branch_token():
     assert DAY_BRANCH_TOKENS==frozenset({"五合"})
-    row=token_capability("五合"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="DAY_BRANCH_V30E8"; assert row["normalized_code"]=="五合"
-
-
-def test_v30e9_opens_exactly_one_month_day_branch_token():
     assert MONTH_BRANCH_DAY_BRANCH_TOKENS==frozenset({"天醫"})
-    row=token_capability("天醫"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E9"; assert row["normalized_code"]=="天醫"
+    assert PAIRED_MONTH_DAY_BRANCH_TOKENS==frozenset({"解神"})
+
+
+def test_known_calculators_remain_bound_to_their_tokens():
+    expected={
+        "月徳":"MONTH_BRANCH_DAY_STEM_V30E3","月徳合":"MONTH_BRANCH_DAY_STEM_V30E3","月恩":"MONTH_BRANCH_DAY_STEM_V30E3",
+        "四相":"SEASON_DAY_STEM_V30E4","天願":"MONTH_BRANCH_DAY_PILLAR_V30E5","天赦":"SEASON_DAY_PILLAR_V30E6",
+        "天喜":"SEASON_DAY_BRANCH_V30E7","五合":"DAY_BRANCH_V30E8","天醫":"MONTH_BRANCH_DAY_BRANCH_V30E9","解神":"MONTH_BRANCH_DAY_BRANCH_V30E10_GIAI_THAN",
+    }
+    for token, calculator in expected.items():
+        row=token_capability(token); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]==calculator; assert row["normalized_code"]==token
 
 
 def test_other_named_stars_without_calculator_stay_pending():
@@ -58,8 +43,14 @@ def test_other_named_stars_without_calculator_stay_pending():
         row=token_capability(token); assert row["calculator_status"]=="PENDING_CALCULATOR"; assert row["calculator"] is None
 
 
-def test_inventory_claims_only_partial_decision_expansion():
-    s=capability_inventory(); assert s["token_count"]==81; assert s["active_calculable_count"]==29; assert s["pending_calculator_count"]==52; assert s["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1"; assert s["extension_version"]=="V3_0E9_TIAN_YI"; assert s["numeric_score"] is None; assert s["numeric_score_status"]=="LOCKED_OFF"
+def test_current_global_capability_is_checked_only_here():
+    s=capability_inventory()
+    assert s["token_count"]==81
+    assert s["active_calculable_count"]==30
+    assert s["pending_calculator_count"]==51
+    assert s["extension_version"]=="V3_0E10_GIAI_THAN"
+    assert s["numeric_score"] is None
+    assert s["numeric_score_status"]=="LOCKED_OFF"
 
 
 def test_no_unknown_token_can_be_implicitly_activated():
