@@ -1,6 +1,6 @@
 """Runtime Hiệp Kỷ mở rộng có kiểm soát.
 
-V3.0E11 mở 五富 theo Chi tháng + Chi ngày; không phụ thuộc Can ngày.
+V3.0E12 mở 王日 theo mùa + Chi ngày.
 HARD_BLOCK > EVENT > PERSONAL giữ nguyên; JI thắng YI; không dùng điểm số.
 """
 from __future__ import annotations
@@ -19,10 +19,11 @@ from loi.quyet_dinh.hiep_ky_season_branch_v30e7 import active_season_branch_toke
 from loi.quyet_dinh.hiep_ky_season_day_pillar_v30e6 import active_season_day_pillar_tokens
 from loi.quyet_dinh.hiep_ky_season_stem_v30e4 import active_season_stem_tokens
 from loi.quyet_dinh.hiep_ky_stem_v30e import active_stem_tokens
+from loi.quyet_dinh.hiep_ky_wang_ri_v30e12 import active_wang_ri_tokens
 from loi.quyet_dinh.hiep_ky_wu_fu_v30e11 import active_wu_fu_tokens
 
-COVERAGE = "V3_0E11_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1_PLUS_PAIRED_MONTH_DAY_BRANCH_1_PLUS_QUARTERED_MONTH_DAY_BRANCH_1"
-ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合","月恩","四相","天願","天赦","天喜","五合","天醫","解神","五富"})
+COVERAGE = "V3_0E12_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1_PLUS_PAIRED_MONTH_DAY_BRANCH_1_PLUS_QUARTERED_MONTH_DAY_BRANCH_1_PLUS_WANG_RI_1"
+ACTIVE_EXTRA_TOKENS = frozenset({"月建","月破","三合","六合","月害","月刑","劫煞","災煞","月煞","月厭","時徳","月徳","月徳合","月恩","四相","天願","天赦","天喜","五合","天醫","解神","五富","王日"})
 
 
 def _personal_signal(personal: dict[str, Any]) -> str:
@@ -58,6 +59,7 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
     active.update(active_month_day_branch_tokens(chi_thang, chi_ngay))
     active.update(active_giai_than_tokens(chi_thang, chi_ngay))
     active.update(active_wu_fu_tokens(chi_thang, chi_ngay))
+    active.update(active_wang_ri_tokens(chi_thang, chi_ngay))
     effective_can_ngay = _effective_day_stem(personal, can_ngay)
     if effective_can_ngay is not None:
         active.update(active_stem_tokens(chi_thang, effective_can_ngay))
@@ -120,6 +122,6 @@ def evaluate_event_v25(base_event: dict[str, Any], personal: dict[str, Any], *, 
         "decision_state": decision["state"],"label": decision["label"],"decision_authority": decision["authority"],
         "hard_block": hard_block,"rank_group": _rank(decision),"personal_v1_1": personal_context,"personal_methodology": personal.get("methodology"),
         "reasons": reasons,"rule_ids": rule_ids,"source_ids": sorted(src),
-        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E11_WU_FU",
+        "coverage": COVERAGE,"hiep_ky_extension": "V3_0E12_WANG_RI",
         "numeric_score": None,"score": None,"numeric_score_status": "LOCKED_OFF","scoring_status": "NO_NUMERIC_SCORE",
     }
