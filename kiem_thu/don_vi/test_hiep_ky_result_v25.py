@@ -1,4 +1,5 @@
 from loi.ket_qua.hiep_ky_v25_result import SCHEMA_VERSION, STATUS, event_search_v25, v25_schema_overlay
+from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory
 from loi.quyet_dinh.hiep_ky_runtime_v25 import COVERAGE
 
 
@@ -34,7 +35,7 @@ def test_schema_overlay_declares_partial_not_full_classical_coverage():
 def test_event_search_result_keeps_rules_sources_and_no_score():
     raw={"viec":"KY_HOP_DONG","so_ngay_da_quet":1,"xep_hang_status":"ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL","top":[{"ngay":"2026-09-01","label":"Không ưu tiên","decision_state":"CAUTION","hard_block":False,"rank_group":4,"event_state":"CAUTION","personal_v1_1":{},"reasons":["reason"],"mapping_status":"VERIFIED","coverage":COVERAGE,"hiep_ky_extension":"V3_0E10_GIAI_THAN","rule_ids":["HK25-X"],"source_ids":["SRC-HK-QD-V11-WIKISOURCE"],"matched_evidence":[{"rule_id":"HK25-X","source_id":"SRC-HK-QD-V11-WIKISOURCE"}],"active_hiep_ky_tokens":["月厭"],"matched_yi_tokens":[],"matched_ji_tokens":["月厭"],"decision_authority":"EVENT","event_state_v1":"NEUTRAL","event_signal_v25":"CAUTION"}]}
     out=event_search_v25(raw); item=out["results"][0]
-    assert out["hiep_ky_extension"]=="V3_0E10_GIAI_THAN"
+    assert out["hiep_ky_extension"]==capability_inventory()["extension_version"]
     assert out["numeric_score"] is None
     assert item["rules"]==["HK25-X"]
     assert item["sources"]==["SRC-HK-QD-V11-WIKISOURCE"]
