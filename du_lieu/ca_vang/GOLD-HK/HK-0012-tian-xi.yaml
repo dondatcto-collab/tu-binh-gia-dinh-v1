@@ -1,0 +1,34 @@
+case_id: HK-0012
+category: GOLD-HK
+review_status: PENDING
+title: "Thiên Hỷ gặp Nguyệt Sát — 忌 thắng 宜"
+release: V3.0E7
+source_formula:
+  token: "天喜"
+  source: "御定星曆考原 卷三 · 天喜"
+  formula: "春午、夏丑、秋辰、冬未"
+input:
+  month_branch: NGO
+  day_branch: SUU
+  day_stem: null
+  event_code: CUOI_HOI
+  personal_state: SUPPORT
+expected:
+  active_tokens_include:
+    - "天喜"
+    - "月煞"
+  matched_yi_tokens_include:
+    - "天喜"
+  matched_ji_tokens_include:
+    - "月煞"
+  event_signal_v25: CAUTION
+  label: "Không ưu tiên"
+  hard_block: false
+  numeric_score: null
+policy:
+  effect: FAVORABLE_SUPPORT_ONLY
+  conflict: "JI wins over YI"
+  requires_day_stem: false
+notes:
+  - "Ca này cố ý kiểm xung đột: mùa Hạ + ngày Sửu kích hoạt 天喜, đồng thời tháng Ngọ + ngày Sửu kích hoạt 月煞."
+  - "Giữ PENDING cho tới review độc lập; không tự coi là golden đã duyệt."
