@@ -21,12 +21,12 @@ def _rule_block(version: str, status: str, token: str, vi: str, calculator: str,
 def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
     out = dict(base)
     implemented = list(out.get("implemented_scopes") or [])
-    for scope in ("expanded_hiep_ky_event_search","hiep_ky_v30a_yue_xing","hiep_ky_v30b_sat_trio","hiep_ky_v30c_yue_yan","hiep_ky_v30d_shi_de","hiep_ky_v30e1_yue_de","hiep_ky_v30e2_yue_de_he","hiep_ky_v30e3_yue_en","hiep_ky_v30e4_si_xiang","hiep_ky_v30e5_tian_yuan","hiep_ky_v30e6_tian_she"):
+    for scope in ("expanded_hiep_ky_event_search","hiep_ky_v30a_yue_xing","hiep_ky_v30b_sat_trio","hiep_ky_v30c_yue_yan","hiep_ky_v30d_shi_de","hiep_ky_v30e1_yue_de","hiep_ky_v30e2_yue_de_he","hiep_ky_v30e3_yue_en","hiep_ky_v30e4_si_xiang","hiep_ky_v30e5_tian_yuan","hiep_ky_v30e6_tian_she","hiep_ky_v30e7_tian_xi"):
         if scope not in implemented: implemented.append(scope)
     pending = [x for x in (out.get("pending_scopes") or []) if x != "expanded_hiep_ky_event_search"]
     if "full_classical_hiep_ky" not in pending: pending.append("full_classical_hiep_ky")
 
-    cap = capability_inventory(); month_calc = "MONTH_BRANCH_RELATIONS_V25_V30D"; stem_calc = "MONTH_BRANCH_DAY_STEM_V30E3"; season_calc = "SEASON_DAY_STEM_V30E4"; pillar_calc = "MONTH_BRANCH_DAY_PILLAR_V30E5"; season_pillar_calc = "SEASON_DAY_PILLAR_V30E6"
+    cap = capability_inventory(); month_calc = "MONTH_BRANCH_RELATIONS_V25_V30D"; stem_calc = "MONTH_BRANCH_DAY_STEM_V30E3"; season_calc = "SEASON_DAY_STEM_V30E4"; pillar_calc = "MONTH_BRANCH_DAY_PILLAR_V30E5"; season_pillar_calc = "SEASON_DAY_PILLAR_V30E6"; season_branch_calc = "SEASON_DAY_BRANCH_V30E7"
     out.update({
         "schema_version":SCHEMA_VERSION,"status":STATUS,"implemented_scopes":implemented,"pending_scopes":pending,
         "hiep_ky_v25":{"coverage":LEGACY_V25_COVERAGE,"effective_coverage":COVERAGE,"capability":cap,"decision_hierarchy":"HARD_BLOCK > EVENT > PERSONAL","full_classical_claim":False},
@@ -40,6 +40,7 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
         "hiep_ky_v30e4":_rule_block("V3_0E4_SI_XIANG","PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE","四相","Tứ Tướng",season_calc,"御定星曆考原 卷三 · 四相; 欽定協紀辨方書 卷五 · 四相","FAVORABLE_SUPPORT_ONLY"),
         "hiep_ky_v30e5":_rule_block("V3_0E5_TIAN_YUAN","PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE","天願","Thiên Nguyện",pillar_calc,"欽定協紀辨方書 卷五 · 天願; 御定星曆考原 卷三 · 天願","FAVORABLE_SUPPORT_ONLY"),
         "hiep_ky_v30e6":_rule_block("V3_0E6_TIAN_SHE","PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE","天赦","Thiên Xá",season_pillar_calc,"御定星曆考原 卷三 · 天赦; 欽定協紀辨方書 卷五 · 天赦","FAVORABLE_SUPPORT_ONLY"),
+        "hiep_ky_v30e7":_rule_block("V3_0E7_TIAN_XI","PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE","天喜","Thiên Hỷ",season_branch_calc,"御定星曆考原 卷三 · 天喜: 春午、夏丑、秋辰、冬未","FAVORABLE_SUPPORT_ONLY"),
         "numeric_score":"LOCKED_OFF",
     })
     principles=list(out.get("principles") or [])
@@ -52,6 +53,7 @@ def v25_schema_overlay(base: dict[str, Any]) -> dict[str, Any]:
         "V3.0E4 mở Tứ Tướng (四相) theo mùa + Can ngày; xuân Bính/Đinh, hạ Mậu/Kỷ, thu Nhâm/Quý, đông Giáp/Ất; chỉ hỗ trợ khi loại việc ghi 四相 trong 宜, JI vẫn thắng và không cộng điểm.",
         "V3.0E5 mở Thiên Nguyện (天願) theo Chi tháng + đủ Can Chi ngày; chỉ hỗ trợ khi loại việc ghi 天願 trong 宜, JI/HARD_BLOCK vẫn thắng và không cộng điểm.",
         "V3.0E6 mở Thiên Xá (天赦) theo mùa + đủ Can Chi ngày: xuân Mậu Dần, hạ Giáp Ngọ, thu Mậu Thân, đông Giáp Tý; chỉ hỗ trợ khi loại việc ghi 天赦 trong 宜, JI/HARD_BLOCK vẫn thắng và không cộng điểm.",
+        "V3.0E7 mở Thiên Hỷ (天喜) theo mùa + Chi ngày: xuân Ngọ, hạ Sửu, thu Thìn, đông Mùi; không cần Can ngày, chỉ hỗ trợ khi loại việc ghi 天喜 trong 宜, JI/HARD_BLOCK vẫn thắng và không cộng điểm.",
     ):
         if note not in principles: principles.append(note)
     out["principles"]=principles
@@ -66,7 +68,7 @@ def _enrich_item(item: dict[str, Any], src: dict[str, Any]) -> dict[str, Any]:
 
 
 def event_search_v25(raw: dict[str, Any]) -> dict[str, Any]:
-    out=event_search(raw); out["schema_version"]=SCHEMA_VERSION; out["status"]=STATUS; out["ranking_mode"]="ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL"; out["hiep_ky_coverage"]=COVERAGE; out["hiep_ky_extension"]="V3_0E6_TIAN_SHE"; out["event_search_contract"]=EVENT_SEARCH_CONTRACT
+    out=event_search(raw); out["schema_version"]=SCHEMA_VERSION; out["status"]=STATUS; out["ranking_mode"]="ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL"; out["hiep_ky_coverage"]=COVERAGE; out["hiep_ky_extension"]="V3_0E7_TIAN_XI"; out["event_search_contract"]=EVENT_SEARCH_CONTRACT
     top_sources=list(raw.get("top") or [])
     for idx,item in enumerate(out.get("results") or []):
         if idx>=len(top_sources): break

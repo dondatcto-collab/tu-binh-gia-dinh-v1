@@ -35,8 +35,10 @@ def test_provisional_mapping_cannot_be_promoted_to_priority_by_new_signal():
 
 
 def test_runtime_is_traceable_and_coverage_is_explicitly_partial():
-    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI"); assert r["matched_evidence"]; ev=r["matched_evidence"][0]; assert ev["rule_id"] and ev["source_id"] and ev["source_location"]; assert ev["decision_status"]=="ACTIVE"; assert r["coverage"]==COVERAGE=="V3_0E6_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1"; assert r["hiep_ky_extension"]=="V3_0E6_TIAN_SHE"
+    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI"); assert r["matched_evidence"]; ev=r["matched_evidence"][0]; assert ev["rule_id"] and ev["source_id"] and ev["source_location"]; assert ev["decision_status"]=="ACTIVE"; assert r["coverage"]==COVERAGE=="V3_0E7_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1"; assert r["hiep_ky_extension"]=="V3_0E7_TIAN_XI"
 
 
-def test_day_stem_rule_fails_closed_when_current_stem_is_unknown():
-    r=evaluate_event_v25(_base(event_code="XUAT_HANH"),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="THIN"); assert "月徳" not in r["active_hiep_ky_tokens"]; assert "月徳合" not in r["active_hiep_ky_tokens"]; assert "月恩" not in r["active_hiep_ky_tokens"]; assert "四相" not in r["active_hiep_ky_tokens"]; assert "天願" not in r["active_hiep_ky_tokens"]; assert "天赦" not in r["active_hiep_ky_tokens"]
+def test_day_stem_rules_fail_closed_but_branch_only_tian_xi_does_not():
+    r=evaluate_event_v25(_base(event_code="XUAT_HANH"),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="NGO")
+    assert "月徳" not in r["active_hiep_ky_tokens"]; assert "月徳合" not in r["active_hiep_ky_tokens"]; assert "月恩" not in r["active_hiep_ky_tokens"]; assert "四相" not in r["active_hiep_ky_tokens"]; assert "天願" not in r["active_hiep_ky_tokens"]; assert "天赦" not in r["active_hiep_ky_tokens"]
+    assert "天喜" in r["active_hiep_ky_tokens"]
