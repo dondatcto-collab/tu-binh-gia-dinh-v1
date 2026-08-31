@@ -1,0 +1,30 @@
+case_id: HK-0017
+category: GOLD-HK
+title_vi: "Vương Nhật hỗ trợ Xuất hành"
+ruleset_version: "V3.0E12-WANG-RI"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E12 chờ duyệt độc lập. Theo 欽定協紀辨方書卷五,
+  王日 dùng phép cổ xuân Dần, hạ Tỵ, thu Thân, đông Hợi.
+  Với tháng Dần + ngày Dần, 王日 thuộc 宜 của 行幸遣使〈出行同〉.
+  Rule chỉ hỗ trợ thuận, không cứu JI/HARD_BLOCK và không dùng điểm số.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: DAN
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 王日
+      matched_yi_tokens:
+        - 王日
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
