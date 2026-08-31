@@ -1,3 +1,4 @@
+from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory
 from loi.quyet_dinh.hiep_ky_runtime_v25 import COVERAGE, evaluate_event_v25
 
 
@@ -34,8 +35,14 @@ def test_provisional_mapping_cannot_be_promoted_to_priority_by_new_signal():
     r=evaluate_event_v25(_base(event_code="DAM_PHAN",mapping="PROVISIONAL"),_personal("SUPPORT"),chi_thang="THIN",chi_ngay="DAU"); assert "六合" in r["matched_yi_tokens"]; assert r["label"]=="Có thể cân nhắc"; assert r["decision_authority"]=="EVENT_PROVISIONAL"
 
 
-def test_runtime_is_traceable_and_coverage_is_explicitly_partial():
-    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI"); assert r["matched_evidence"]; ev=r["matched_evidence"][0]; assert ev["rule_id"] and ev["source_id"] and ev["source_location"]; assert ev["decision_status"]=="ACTIVE"; assert r["coverage"]==COVERAGE=="V3_0E9_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1"; assert r["hiep_ky_extension"]=="V3_0E9_TIAN_YI"
+def test_runtime_is_traceable_and_uses_current_contract_without_version_churn():
+    r=evaluate_event_v25(_base(),_personal(),chi_thang="DAN",chi_ngay="HOI")
+    assert r["matched_evidence"]
+    ev=r["matched_evidence"][0]
+    assert ev["rule_id"] and ev["source_id"] and ev["source_location"]
+    assert ev["decision_status"]=="ACTIVE"
+    assert r["coverage"]==COVERAGE
+    assert r["hiep_ky_extension"]==capability_inventory()["extension_version"]
 
 
 def test_day_stem_rules_fail_closed_but_branch_only_rules_do_not():
@@ -55,3 +62,9 @@ def test_tian_yi_month_day_branch_rule_does_not_require_day_stem():
     r=evaluate_event_v25(_base(event_code="DIEU_TRI"),_personal("SUPPORT"),chi_thang="MAO",chi_ngay="HOI")
     assert "天醫" in r["active_hiep_ky_tokens"]
     assert "天醫" in r["matched_yi_tokens"]
+
+
+def test_giai_than_month_day_branch_rule_does_not_require_day_stem():
+    r=evaluate_event_v25(_base(event_code="DIEU_TRI"),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="THAN")
+    assert "解神" in r["active_hiep_ky_tokens"]
+    assert "解神" in r["matched_yi_tokens"]
