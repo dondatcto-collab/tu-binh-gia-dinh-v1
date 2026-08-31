@@ -1,0 +1,33 @@
+case_id: HK-0013
+category: GOLD-HK
+title_vi: "Ngũ Hợp không cứu Nguyệt Hại"
+ruleset_version: "V3.0E8-WU-HE"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E8 chờ duyệt độc lập. Ngày Dần kích hoạt 五合 theo
+  欽定協紀辨方書卷五 · 歷例曰五合者寅卯日也. Với tháng Tỵ và sự kiện
+  KY_HOP_DONG, ngày Dần đồng thời gặp 月害 trong 忌; phải giữ cả hai evidence,
+  kết luận CAUTION/Không ưu tiên, không sinh HARD_BLOCK và không có điểm số.
+input:
+  month_branch: TI
+  day_stem: null
+  day_branch: DAN
+  event_code: KY_HOP_DONG
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 五合
+        - 月害
+      matched_yi_tokens:
+        - 五合
+      matched_ji_tokens:
+        - 月害
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
