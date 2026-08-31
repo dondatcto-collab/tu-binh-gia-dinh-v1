@@ -16,8 +16,7 @@ def _personal(state="SUPPORT", stem=None):
 def test_tian_yi_locks_all_twelve_month_rows():
     expected={"DAN":"TUAT","MAO":"HOI","THIN":"TY","TI":"SUU","NGO":"DAN","MUI":"MAO","THAN":"THIN","DAU":"TI","TUAT":"NGO","HOI":"MUI","TY":"THAN","SUU":"DAU"}
     assert TIAN_YI_BRANCH_BY_MONTH_BRANCH==expected
-    for month, day_branch in expected.items():
-        assert tian_yi_branch(month)==day_branch; assert active_month_day_branch_tokens(month,day_branch)==("天醫",)
+    for month, day_branch in expected.items(): assert tian_yi_branch(month)==day_branch; assert active_month_day_branch_tokens(month,day_branch)==("天醫",)
 
 
 def test_tian_yi_negative_and_invalid_inputs_fail_closed():
@@ -59,8 +58,8 @@ def test_tian_yi_does_not_leak_to_unsupported_event():
     assert "天醫" in out["active_hiep_ky_tokens"]; assert "天醫" not in out["matched_yi_tokens"]
 
 
-def test_v30e9_capability_schema_and_score_are_explicit():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==29; assert cap["pending_calculator_count"]==52; assert "天醫" in cap["active_tokens"]; assert token_capability("天醫")["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E9"; assert cap["extension_version"]=="V3_0E9_TIAN_YI"; assert cap["numeric_score"] is None
+def test_v30e9_capability_schema_and_score_remain_explicit_after_later_releases():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert "天醫" in cap["active_tokens"]; assert token_capability("天醫")["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E9"; assert cap["numeric_score"] is None
     calc=calculator_status(); assert calc["active_tokens"]==("天醫",); assert calc["numeric_score"] is None
     schema=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert schema["hiep_ky_v25"]["effective_coverage"]==COVERAGE; assert "hiep_ky_v30e9_tian_yi" in schema["implemented_scopes"]
     v=schema["hiep_ky_v30e9"]; assert v["activated_token"]=="天醫"; assert v["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E9"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["full_classical_claim"] is False; assert v["numeric_score"] is None
