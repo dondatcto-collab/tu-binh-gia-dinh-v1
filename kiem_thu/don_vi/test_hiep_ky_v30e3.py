@@ -37,7 +37,7 @@ def test_yue_en_fails_closed_without_current_stem():
     out=evaluate_event_v25(_base(),_personal("SUPPORT",None),chi_thang="DAN",chi_ngay="MAO"); assert "月恩" not in out["active_hiep_ky_tokens"]
 
 
-def test_v30e3_capability_and_schema_are_explicit_after_v30e9():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==29; assert cap["pending_calculator_count"]==52; assert {"月恩","四相","天願","天赦","天喜","五合","天醫"}.issubset(set(cap["active_tokens"])); assert cap["extension_version"]=="V3_0E9_TIAN_YI"; assert cap["numeric_score"] is None
+def test_v30e3_capability_and_schema_remain_explicit_after_later_releases():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert "月恩" in cap["active_tokens"]; assert cap["numeric_score"] is None
     s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE; assert "hiep_ky_v30e3_yue_en" in s["implemented_scopes"]
     v=s["hiep_ky_v30e3"]; assert v["activated_token"]=="月恩"; assert v["calculator"]=="MONTH_BRANCH_DAY_STEM_V30E3"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["numeric_score"] is None

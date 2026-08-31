@@ -58,8 +58,8 @@ def test_provisional_event_cannot_be_promoted_to_absolute_priority_by_tian_yuan(
     out=evaluate_event_v25(_base(event_code="DAM_PHAN",mapping="PROVISIONAL"),_personal("SUPPORT","GIAP"),chi_thang="DAN",chi_ngay="NGO"); assert "天願" in out["matched_yi_tokens"]; assert out["label"]=="Có thể cân nhắc"; assert out["decision_authority"]=="EVENT_PROVISIONAL"
 
 
-def test_v30e5_capability_schema_and_score_are_explicit_after_v30e9():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==29; assert cap["pending_calculator_count"]==52; assert {"天願","天赦","天喜","五合","天醫"}.issubset(set(cap["active_tokens"])); assert token_capability("天願")["calculator"]=="MONTH_BRANCH_DAY_PILLAR_V30E5"; assert cap["extension_version"]=="V3_0E9_TIAN_YI"; assert cap["numeric_score"] is None
+def test_v30e5_capability_schema_and_score_remain_explicit_after_later_releases():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert "天願" in cap["active_tokens"]; assert token_capability("天願")["calculator"]=="MONTH_BRANCH_DAY_PILLAR_V30E5"; assert cap["numeric_score"] is None
     calc=calculator_status(); assert calc["active_tokens"]==("天願",); assert calc["numeric_score"] is None
     schema=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert schema["hiep_ky_v25"]["effective_coverage"]==COVERAGE; assert "hiep_ky_v30e5_tian_yuan" in schema["implemented_scopes"]
     v=schema["hiep_ky_v30e5"]; assert v["activated_token"]=="天願"; assert v["calculator"]=="MONTH_BRANCH_DAY_PILLAR_V30E5"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["full_classical_claim"] is False; assert v["numeric_score"] is None

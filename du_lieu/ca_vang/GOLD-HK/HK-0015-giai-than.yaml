@@ -1,0 +1,34 @@
+case_id: HK-0015
+category: GOLD-HK
+title_vi: "Giải Thần không cứu Kiếp Sát"
+ruleset_version: "V3.0E10-GIAI-THAN"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E10 chờ duyệt độc lập. Theo 欽定協紀辨方書卷五,
+  解神 ở tháng 1-2 ngày Thân, tháng 3-4 ngày Tuất, tháng 5-6 ngày Tý,
+  tháng 7-8 ngày Dần, tháng 9-10 ngày Thìn, tháng 11-12 ngày Ngọ.
+  Với tháng Mão + ngày Thân, 解神 thuộc 宜 của 求醫療病 nhưng 劫煞 thuộc 忌;
+  phải giữ cả hai evidence và kết luận CAUTION/Không ưu tiên. Không dùng điểm số.
+input:
+  month_branch: MAO
+  day_stem: null
+  day_branch: THAN
+  event_code: DIEU_TRI
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 解神
+        - 劫煞
+      matched_yi_tokens:
+        - 解神
+      matched_ji_tokens:
+        - 劫煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
