@@ -96,15 +96,15 @@ def test_provisional_event_cannot_be_promoted_to_absolute_priority_by_tian_xi():
     assert out["decision_authority"]=="EVENT_PROVISIONAL"
 
 
-def test_v30e7_capability_schema_and_score_are_explicit():
+def test_v30e7_capability_schema_and_score_are_explicit_after_v30e8():
     cap=capability_inventory()
     assert cap["token_count"]==81
-    assert cap["active_calculable_count"]==27
-    assert cap["pending_calculator_count"]==54
-    assert "天喜" in cap["active_tokens"]
+    assert cap["active_calculable_count"]==28
+    assert cap["pending_calculator_count"]==53
+    assert {"天喜","五合"}.issubset(set(cap["active_tokens"]))
     assert token_capability("天喜")["calculator"]=="SEASON_DAY_BRANCH_V30E7"
-    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1"
-    assert cap["extension_version"]=="V3_0E7_TIAN_XI"
+    assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1"
+    assert cap["extension_version"]=="V3_0E8_WU_HE"
     assert cap["numeric_score"] is None
 
     calc=calculator_status()
