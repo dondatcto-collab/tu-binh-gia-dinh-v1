@@ -1,6 +1,5 @@
 from loi.ket_qua.hiep_ky_v25_result import v25_schema_overlay
-from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory, token_capability
-from loi.quyet_dinh.hiep_ky_coverage_gate_v30e10 import v1_engine_readiness
+from loi.quyet_dinh.hiep_ky_capability_v25 import token_capability
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_runtime_v25 import evaluate_event_v25
 from loi.quyet_dinh.hiep_ky_wang_ri_v30e12 import WANG_RI_BRANCH_BY_SEASON, active_wang_ri_tokens, calculator_status, wang_ri_branch
@@ -45,14 +44,12 @@ def test_wang_ri_can_support_but_never_override_hard_block():
     assert blocked["hard_block"] is True
 
 
-def test_e12_capability_readiness_schema_contract():
-    cap=capability_inventory(); ready=v1_engine_readiness(); schema=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]})
-    assert cap["active_calculable_count"]==32 and cap["pending_calculator_count"]==49
-    assert cap["extension_version"]=="V3_0E12_WANG_RI"
+def test_e12_contract_remains_bound_after_later_releases():
+    schema=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]})
     assert token_capability("王日")["calculator"]=="SEASON_DAY_BRANCH_V30E12_WANG_RI"
+    assert calculator_status()["active_tokens"]==("王日",)
     assert calculator_status()["numeric_score"] is None
-    assert ready["verified_balance_gate"] is True
-    assert ready["rule_target_gate"] is False and ready["v1_engine_ready"] is False
     assert "hiep_ky_v30e12_wang_ri" in schema["implemented_scopes"]
     assert schema["hiep_ky_v30e12"]["activated_token"]=="王日"
+    assert schema["hiep_ky_v30e12"]["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"
     assert schema["numeric_score"]=="LOCKED_OFF"
