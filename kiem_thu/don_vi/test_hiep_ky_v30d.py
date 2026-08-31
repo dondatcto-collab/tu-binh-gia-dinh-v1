@@ -11,8 +11,8 @@ def _base(code="XUAT_HANH",state="NEUTRAL",mapping="VERIFIED"):
     return {"event_code":code,"event_state":state,"mapping_status":mapping,"rule_ids":[],"reasons":[],"source_id":"SRC-HK-QD-V11-WIKISOURCE"}
 
 
-def test_v30d_shi_de_remains_active_after_v30e8():
-    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==28; assert cap["pending_calculator_count"]==53; assert {"時徳","月徳","月徳合","月恩","四相","天願","天赦","天喜","五合"}.issubset(set(cap["active_tokens"])); assert cap["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1"; assert cap["extension_version"]=="V3_0E8_WU_HE"
+def test_v30d_shi_de_remains_active_after_v30e9():
+    cap=capability_inventory(); assert cap["token_count"]==81; assert cap["active_calculable_count"]==29; assert cap["pending_calculator_count"]==52; assert {"時徳","月徳","月徳合","月恩","四相","天願","天赦","天喜","五合","天醫"}.issubset(set(cap["active_tokens"])); assert cap["extension_version"]=="V3_0E9_TIAN_YI"
 
 
 def test_v30d_shi_de_can_support_verified_neutral_event():
@@ -27,5 +27,5 @@ def test_v30d_existing_hard_block_still_wins():
     out=evaluate_event_v25(_base(state="JI"),_personal("SUPPORT"),chi_thang="DAN",chi_ngay="NGO"); assert out["hard_block"] is True; assert out["decision_state"]=="BLOCKED"; assert out["label"]=="Bị chặn"
 
 
-def test_v30d_schema_remains_explicit_after_v30e8():
+def test_v30d_schema_remains_explicit_after_v30e9():
     s=v25_schema_overlay({"implemented_scopes":[],"pending_scopes":[],"principles":[]}); assert s["hiep_ky_v25"]["coverage"]=="V2_5_PARTIAL_12_TRUC_PLUS_MONTH_BRANCH_5"; assert s["hiep_ky_v25"]["effective_coverage"]==COVERAGE; assert "hiep_ky_v30d_shi_de" in s["implemented_scopes"]; v=s["hiep_ky_v30d"]; assert v["activated_token"]=="時徳"; assert v["calculator"]=="MONTH_BRANCH_RELATIONS_V25_V30D"; assert v["decision_effect"]=="FAVORABLE_SUPPORT_ONLY"; assert v["creates_hard_block"] is False; assert v["numeric_score"] is None
