@@ -54,8 +54,8 @@ Hiện chỉ `DIEU_TRI / 求醫療病` có `天醫` trong `宜` của inventory 
 
 1. Khóa đủ 12 tháng → 12 Chi ngày.
 2. Input sai fail closed.
-3. Positive gate: tháng Dần + ngày Tuất + DIEU_TRI → `天醫` hỗ trợ.
-4. Conflict gate: tháng Ngọ + ngày Dần + DIEU_TRI → `天醫` YI nhưng `月建` JI thắng → CAUTION.
+3. Positive gate: tháng Mão + ngày Hợi + DIEU_TRI → `天醫` hỗ trợ, không có JI trong fixture.
+4. Conflict gate: tháng Dần + ngày Tuất + DIEU_TRI → `天醫` YI nhưng `月厭` JI thắng → CAUTION.
 5. HARD_BLOCK vẫn thắng.
 6. Không cần `current_stem`.
 7. Không leak sang event không hỗ trợ.
