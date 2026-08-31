@@ -1,0 +1,26 @@
+case_id: HK-0019
+category: GOLD-HK
+title_vi: "Tướng Nhật hỗ trợ Nhậm chức"
+ruleset_version: "V3.0E14-XIANG-RI"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Theo 欽定協紀辨方書卷五, 相日 dùng phép xuân Tỵ, hạ Thân,
+  thu Hợi, đông Dần. Ca vàng chờ duyệt độc lập; không cứu JI/HARD_BLOCK.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: TI
+  event_code: NHAM_CHUC
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [相日]
+      matched_yi_tokens: [相日]
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
