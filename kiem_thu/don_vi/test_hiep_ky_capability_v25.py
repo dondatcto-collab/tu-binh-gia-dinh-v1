@@ -1,5 +1,5 @@
 from loi.quyet_dinh.hiep_ky_capability_v25 import (
-    DAY_BRANCH_TOKENS, MONTH_BRANCH_DAY_PILLAR_TOKENS, MONTH_BRANCH_DAY_STEM_TOKENS, MONTH_BRANCH_TOKENS,
+    DAY_BRANCH_TOKENS, MONTH_BRANCH_DAY_BRANCH_TOKENS, MONTH_BRANCH_DAY_PILLAR_TOKENS, MONTH_BRANCH_DAY_STEM_TOKENS, MONTH_BRANCH_TOKENS,
     SEASON_DAY_BRANCH_TOKENS, SEASON_DAY_PILLAR_TOKENS, SEASON_DAY_STEM_TOKENS, TRUC_TOKEN_TO_CODE,
     capability_inventory, token_capability,
 )
@@ -48,13 +48,18 @@ def test_v30e8_opens_exactly_one_day_branch_token():
     row=token_capability("五合"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="DAY_BRANCH_V30E8"; assert row["normalized_code"]=="五合"
 
 
+def test_v30e9_opens_exactly_one_month_day_branch_token():
+    assert MONTH_BRANCH_DAY_BRANCH_TOKENS==frozenset({"天醫"})
+    row=token_capability("天醫"); assert row["calculator_status"]=="ACTIVE_CALCULABLE"; assert row["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E9"; assert row["normalized_code"]=="天醫"
+
+
 def test_other_named_stars_without_calculator_stay_pending():
-    for token in ("天徳","天醫","天徳合"):
+    for token in ("天徳","天徳合"):
         row=token_capability(token); assert row["calculator_status"]=="PENDING_CALCULATOR"; assert row["calculator"] is None
 
 
 def test_inventory_claims_only_partial_decision_expansion():
-    s=capability_inventory(); assert s["token_count"]==81; assert s["active_calculable_count"]==28; assert s["pending_calculator_count"]==53; assert s["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1"; assert s["extension_version"]=="V3_0E8_WU_HE"; assert s["numeric_score"] is None; assert s["numeric_score_status"]=="LOCKED_OFF"
+    s=capability_inventory(); assert s["token_count"]==81; assert s["active_calculable_count"]==29; assert s["pending_calculator_count"]==52; assert s["coverage"]=="12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1"; assert s["extension_version"]=="V3_0E9_TIAN_YI"; assert s["numeric_score"] is None; assert s["numeric_score_status"]=="LOCKED_OFF"
 
 
 def test_no_unknown_token_can_be_implicitly_activated():
