@@ -40,9 +40,10 @@ def test_wu_fu_event_scope_is_exactly_three_verified_events():
 
 
 def test_wu_fu_positive_gate_without_day_stem():
-    out=evaluate_event_v25(_base(event_code="CAU_TAI"),_personal(),chi_thang="DAN",chi_ngay="HOI")
+    out=evaluate_event_v25(_base(event_code="CAU_TAI"),_personal(),chi_thang="MAO",chi_ngay="DAN")
     assert "五富" in out["active_hiep_ky_tokens"]
     assert "五富" in out["matched_yi_tokens"]
+    assert out["matched_ji_tokens"]==[]
     assert out["event_signal_v25"]=="FAVORABLE"
     assert out["label"]=="Ưu tiên"
     assert out["numeric_score"] is None
