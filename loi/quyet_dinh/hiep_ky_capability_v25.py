@@ -6,7 +6,8 @@ V3.0E4 mở 四相 bằng calculator mùa + Can ngày.
 V3.0E5 mở 天願 bằng calculator Chi tháng + đủ Can Chi ngày.
 V3.0E6 mở 天赦 bằng calculator mùa + đủ Can Chi ngày.
 V3.0E7 mở 天喜 bằng calculator mùa + Chi ngày.
-V3.0E8 mở 五合 bằng calculator Chi ngày Dần/Mão. Mọi token khác vẫn PENDING_CALCULATOR.
+V3.0E8 mở 五合 bằng calculator Chi ngày Dần/Mão.
+V3.0E9 mở 天醫 bằng calculator Chi tháng + Chi ngày. Mọi token khác vẫn PENDING_CALCULATOR.
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ MONTH_BRANCH_DAY_PILLAR_TOKENS = frozenset({"天願"})
 SEASON_DAY_PILLAR_TOKENS = frozenset({"天赦"})
 SEASON_DAY_BRANCH_TOKENS = frozenset({"天喜"})
 DAY_BRANCH_TOKENS = frozenset({"五合"})
+MONTH_BRANCH_DAY_BRANCH_TOKENS = frozenset({"天醫"})
 
 
 def token_capability(token: str) -> dict:
@@ -42,6 +44,8 @@ def token_capability(token: str) -> dict:
         return {"token":token,"calculator":"SEASON_DAY_BRANCH_V30E7","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     if token in DAY_BRANCH_TOKENS:
         return {"token":token,"calculator":"DAY_BRANCH_V30E8","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
+    if token in MONTH_BRANCH_DAY_BRANCH_TOKENS:
+        return {"token":token,"calculator":"MONTH_BRANCH_DAY_BRANCH_V30E9","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     return {"token":token,"calculator":None,"calculator_status":"PENDING_CALCULATOR","normalized_code":None}
 
 
@@ -57,8 +61,8 @@ def capability_inventory() -> dict:
         "active_tokens":tuple(x["token"] for x in active),
         "pending_tokens":tuple(x["token"] for x in pending),
         "decision_expansion_status":"PARTIAL_ACTIVE",
-        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1",
-        "extension_version":"V3_0E8_WU_HE",
+        "coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1",
+        "extension_version":"V3_0E9_TIAN_YI",
         "numeric_score":None,
         "numeric_score_status":"LOCKED_OFF",
     }
