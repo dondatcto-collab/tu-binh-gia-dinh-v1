@@ -1,0 +1,33 @@
+case_id: HK-0016
+category: GOLD-HK
+title_vi: "Ngũ Phú không cứu Nguyệt Hình"
+ruleset_version: "V3.0E11-WU-FU"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E11 chờ duyệt độc lập. Theo 欽定協紀辨方書卷六,
+  五富 chính nguyệt khởi Hợi rồi thuận hành bốn Mạnh. Với tháng Tỵ + ngày Thân,
+  五富 thuộc 宜 của 開市 nhưng 月刑 thuộc 忌; phải giữ cả hai evidence và kết luận
+  CAUTION/Không ưu tiên. Không dùng điểm số.
+input:
+  month_branch: TI
+  day_stem: null
+  day_branch: THAN
+  event_code: KHAI_TRUONG
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 五富
+        - 月刑
+      matched_yi_tokens:
+        - 五富
+      matched_ji_tokens:
+        - 月刑
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
