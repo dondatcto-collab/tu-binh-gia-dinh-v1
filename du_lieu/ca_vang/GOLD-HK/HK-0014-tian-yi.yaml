@@ -1,0 +1,35 @@
+case_id: HK-0014
+category: GOLD-HK
+title_vi: "Thiên Y không cứu Nguyệt Kiến"
+ruleset_version: "V3.0E9-TIAN-YI"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E9 chờ duyệt độc lập. Theo 欽定協紀辨方書卷五,
+  天醫正月起戌順行十二辰. Với tháng Ngọ, Thiên Y ở ngày Dần.
+  Trong sự kiện DIEU_TRI/求醫療病, 天醫 thuộc 宜 nhưng ngày Dần đồng thời
+  gặp 月建 trong 忌; phải giữ cả hai evidence, kết luận CAUTION/Không ưu tiên,
+  không sinh HARD_BLOCK và không có điểm số. Chỉ dùng chọn thời điểm khi y khoa
+  cho phép, không trì hoãn cấp cứu hoặc điều trị cần thiết.
+input:
+  month_branch: NGO
+  day_stem: null
+  day_branch: DAN
+  event_code: DIEU_TRI
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 天醫
+        - 月建
+      matched_yi_tokens:
+        - 天醫
+      matched_ji_tokens:
+        - 月建
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
