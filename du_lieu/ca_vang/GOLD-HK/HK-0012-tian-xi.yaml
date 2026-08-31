@@ -1,34 +1,34 @@
 case_id: HK-0012
 category: GOLD-HK
+title_vi: "Thiên Hỷ không cứu Nguyệt Sát"
+ruleset_version: "V3.0E7-TIAN-XI"
+calendar_ruleset_id: CAL-V1
 review_status: PENDING
-title: "Thiên Hỷ gặp Nguyệt Sát — 忌 thắng 宜"
-release: V3.0E7
-source_formula:
-  token: "天喜"
-  source: "御定星曆考原 卷三 · 天喜"
-  formula: "春午、夏丑、秋辰、冬未"
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Ca vàng V3.0E7 chờ duyệt độc lập. Tháng Ngọ thuộc mùa Hạ, ngày Sửu
+  mang 天喜 theo quy tắc 御定星曆考原卷三: 春午、夏丑、秋辰、冬未 và đồng thời
+  là 月煞 theo quan hệ Chi tháng-ngày. Với CUOI_HOI, 天喜 thuộc 宜 nhưng 月煞
+  thuộc 忌; phải giữ cả hai evidence và kết luận CAUTION/Không ưu tiên. Thiên Hỷ
+  không cần Can ngày, không sinh HARD_BLOCK và không có điểm số.
 input:
   month_branch: NGO
-  day_branch: SUU
   day_stem: null
+  day_branch: SUU
   event_code: CUOI_HOI
-  personal_state: SUPPORT
 expected:
-  active_tokens_include:
-    - "天喜"
-    - "月煞"
-  matched_yi_tokens_include:
-    - "天喜"
-  matched_ji_tokens_include:
-    - "月煞"
-  event_signal_v25: CAUTION
-  label: "Không ưu tiên"
-  hard_block: false
-  numeric_score: null
-policy:
-  effect: FAVORABLE_SUPPORT_ONLY
-  conflict: "JI wins over YI"
-  requires_day_stem: false
-notes:
-  - "Ca này cố ý kiểm xung đột: mùa Hạ + ngày Sửu kích hoạt 天喜, đồng thời tháng Ngọ + ngày Sửu kích hoạt 月煞."
-  - "Giữ PENDING cho tới review độc lập; không tự coi là golden đã duyệt."
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens:
+        - 天喜
+        - 月煞
+      matched_yi_tokens:
+        - 天喜
+      matched_ji_tokens:
+        - 月煞
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
