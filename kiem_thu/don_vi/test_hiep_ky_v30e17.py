@@ -1,4 +1,4 @@
-from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory, token_capability
+from loi.quyet_dinh.hiep_ky_capability_v25 import token_capability
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_runtime_v25 import evaluate_event_v25
 from loi.quyet_dinh.hiep_ky_yi_ma_v30e17 import YI_MA_BRANCH_BY_MONTH_BRANCH, active_yi_ma_tokens, calculator_status, yi_ma_branch
@@ -45,10 +45,9 @@ def test_yi_ma_support_and_hard_block_precedence():
     assert blocked["decision_state"]=="BLOCKED" and blocked["hard_block"] is True
 
 
-def test_e17_capability_contract():
-    cap=capability_inventory()
-    assert cap["active_calculable_count"]==37
-    assert cap["pending_calculator_count"]==44
-    assert cap["extension_version"]=="V3_0E17_YI_MA"
+def test_e17_contract_remains_bound_after_later_releases():
     assert token_capability("驛馬")["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E17_YI_MA"
-    assert calculator_status()["numeric_score"] is None
+    status=calculator_status()
+    assert status["active_tokens"]==("驛馬",)
+    assert status["numeric_score"] is None
+    assert status["numeric_score_status"]=="LOCKED_OFF"
