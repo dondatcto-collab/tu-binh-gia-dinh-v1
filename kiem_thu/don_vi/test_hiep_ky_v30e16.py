@@ -1,4 +1,4 @@
-from loi.quyet_dinh.hiep_ky_capability_v25 import capability_inventory, token_capability
+from loi.quyet_dinh.hiep_ky_capability_v25 import token_capability
 from loi.quyet_dinh.hiep_ky_evidence_v25 import evidence_for_event
 from loi.quyet_dinh.hiep_ky_lin_ri_v30e16 import LIN_RI_BRANCH_BY_MONTH_BRANCH, active_lin_ri_tokens, calculator_status, lin_ri_branch
 from loi.quyet_dinh.hiep_ky_runtime_v25 import evaluate_event_v25
@@ -44,10 +44,9 @@ def test_lin_ri_support_and_hard_block_precedence():
     assert blocked["decision_state"]=="BLOCKED" and blocked["hard_block"] is True
 
 
-def test_e16_capability_contract():
-    cap=capability_inventory()
-    assert cap["active_calculable_count"]==36
-    assert cap["pending_calculator_count"]==45
-    assert cap["extension_version"]=="V3_0E16_LIN_RI"
+def test_e16_contract_remains_bound_after_later_releases():
     assert token_capability("臨日")["calculator"]=="MONTH_BRANCH_DAY_BRANCH_V30E16_LIN_RI"
-    assert calculator_status()["numeric_score"] is None
+    status=calculator_status()
+    assert status["active_tokens"]==("臨日",)
+    assert status["numeric_score"] is None
+    assert status["numeric_score_status"]=="LOCKED_OFF"

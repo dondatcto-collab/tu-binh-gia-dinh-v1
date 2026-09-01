@@ -1,0 +1,27 @@
+case_id: HK-0022
+category: GOLD-HK
+title_vi: "Dịch Mã hỗ trợ Xuất hành"
+ruleset_version: "V3.0E17-YI-MA"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Theo 欽定協紀辨方書卷六, 驛馬 dùng phép 正月起申，逆行四孟.
+  Với tháng Dần + ngày Thân, 驛馬 thuộc 宜 của 行幸遣使〈出行同〉.
+  Ca vàng chờ duyệt độc lập; rule không cứu JI/HARD_BLOCK và không dùng điểm số.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: THAN
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [驛馬]
+      matched_yi_tokens: [驛馬]
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null

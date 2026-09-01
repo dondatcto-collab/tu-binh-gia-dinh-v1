@@ -14,7 +14,8 @@ V3.0E12 mở 王日 bằng calculator mùa + Chi ngày.
 V3.0E13 mở 官日 bằng calculator mùa + Chi ngày.
 V3.0E14 mở 相日 bằng calculator mùa + Chi ngày.
 V3.0E15 mở 民日 bằng calculator mùa + Chi ngày.
-V3.0E16 mở 臨日 bằng calculator Chi tháng + Chi ngày. Mọi token khác vẫn PENDING_CALCULATOR.
+V3.0E16 mở 臨日 bằng calculator Chi tháng + Chi ngày.
+V3.0E17 mở 驛馬 bằng calculator Chi tháng + Chi ngày. Mọi token khác vẫn PENDING_CALCULATOR.
 """
 from __future__ import annotations
 
@@ -36,6 +37,7 @@ SEASON_GUAN_RI_TOKENS=frozenset({"官日"})
 SEASON_XIANG_RI_TOKENS=frozenset({"相日"})
 SEASON_MIN_RI_TOKENS=frozenset({"民日"})
 MONTH_LIN_RI_TOKENS=frozenset({"臨日"})
+MONTH_YI_MA_TOKENS=frozenset({"驛馬"})
 
 
 def token_capability(token:str)->dict:
@@ -55,10 +57,11 @@ def token_capability(token:str)->dict:
     if token in SEASON_XIANG_RI_TOKENS: return {"token":token,"calculator":"SEASON_DAY_BRANCH_V30E14_XIANG_RI","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     if token in SEASON_MIN_RI_TOKENS: return {"token":token,"calculator":"SEASON_DAY_BRANCH_V30E15_MIN_RI","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     if token in MONTH_LIN_RI_TOKENS: return {"token":token,"calculator":"MONTH_BRANCH_DAY_BRANCH_V30E16_LIN_RI","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
+    if token in MONTH_YI_MA_TOKENS: return {"token":token,"calculator":"MONTH_BRANCH_DAY_BRANCH_V30E17_YI_MA","calculator_status":"ACTIVE_CALCULABLE","normalized_code":token}
     return {"token":token,"calculator":None,"calculator_status":"PENDING_CALCULATOR","normalized_code":None}
 
 
 def capability_inventory()->dict:
     tokens=sorted({item.token for item in all_evidence()}); rows=[token_capability(token) for token in tokens]
     active=[x for x in rows if x["calculator_status"]=="ACTIVE_CALCULABLE"]; pending=[x for x in rows if x["calculator_status"]=="PENDING_CALCULATOR"]
-    return {"token_count":len(rows),"active_calculable_count":len(active),"pending_calculator_count":len(pending),"active_tokens":tuple(x["token"] for x in active),"pending_tokens":tuple(x["token"] for x in pending),"decision_expansion_status":"PARTIAL_ACTIVE","coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1_PLUS_PAIRED_MONTH_DAY_BRANCH_1_PLUS_QUARTERED_MONTH_DAY_BRANCH_1_PLUS_WANG_RI_1_PLUS_GUAN_RI_1_PLUS_XIANG_RI_1_PLUS_MIN_RI_1_PLUS_LIN_RI_1","extension_version":"V3_0E16_LIN_RI","numeric_score":None,"numeric_score_status":"LOCKED_OFF"}
+    return {"token_count":len(rows),"active_calculable_count":len(active),"pending_calculator_count":len(pending),"active_tokens":tuple(x["token"] for x in active),"pending_tokens":tuple(x["token"] for x in pending),"decision_expansion_status":"PARTIAL_ACTIVE","coverage":"12_TRUC_PLUS_MONTH_BRANCH_11_PLUS_DAY_STEM_3_PLUS_SEASON_STEM_1_PLUS_DAY_PILLAR_1_PLUS_SEASON_DAY_PILLAR_1_PLUS_SEASON_BRANCH_1_PLUS_DAY_BRANCH_1_PLUS_MONTH_DAY_BRANCH_1_PLUS_PAIRED_MONTH_DAY_BRANCH_1_PLUS_QUARTERED_MONTH_DAY_BRANCH_1_PLUS_WANG_RI_1_PLUS_GUAN_RI_1_PLUS_XIANG_RI_1_PLUS_MIN_RI_1_PLUS_LIN_RI_1_PLUS_YI_MA_1","extension_version":"V3_0E17_YI_MA","numeric_score":None,"numeric_score_status":"LOCKED_OFF"}
