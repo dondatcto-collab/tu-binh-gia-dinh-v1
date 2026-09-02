@@ -76,24 +76,27 @@ def test_v27_complete_result_contract_has_payload_growth_guard_for_max_window():
     assert len(encoded) < 512 * 1024
 
 
-def test_v27_ui_uses_one_event_search_source_for_search_and_event_calendar():
+def test_current_ui_uses_one_event_search_source_for_search_and_event_calendar():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
     assert ui.count("/api/v2/tim-ngay") >= 3
     assert "/api/stateless/tim-ngay" not in ui
     assert "all_results" in ui
     assert "3 lựa chọn nên xem trước" in ui
     assert "Xem tất cả" in ui
-    assert "Vì sao ngày này được xếp như vậy?" in ui
-    assert "Lịch đang đánh giá theo đúng loại việc đã chọn" in ui
+    assert "Vì sao?" in ui
+    assert "Nguồn & quy tắc" in ui
+    assert "Chi tiết kỹ thuật" in ui
+    assert "eventCalendarMap" in ui
+    assert "layeredResultHtml" in ui
     assert "numeric_score" not in ui
 
 
-def test_v28_ui_explains_confidence_without_changing_decision_tone():
+def test_current_ui_explains_confidence_without_changing_decision_tone():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
-    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '2.8'" in ui
+    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '3.0-ui-v1'" in ui
     assert "confidence_basis" in ui
     assert "Vì sao mức căn cứ là" in ui
-    assert "Mức căn cứ được đánh giá riêng theo chất lượng bằng chứng" in ui
+    assert "confidenceBasisHtml" in ui
     assert "function tone(r)" in ui
     assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function confidence(r)", 1)[0]
 
@@ -107,9 +110,9 @@ def test_v27_event_module_is_loaded_last_by_single_bootstrap():
     assert "ui-event-search-v27.js" not in index
 
 
-def test_v27_pwa_precaches_event_search_module_and_mirrors_match():
+def test_current_pwa_precaches_event_search_module_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
-    assert "tubinh-ui-v2.7" in sw
+    assert "tubinh-ui-v3.0-ui-v1" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
