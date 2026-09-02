@@ -21,3 +21,7 @@ UI-only. Không thay calculator, evidence, precedence, ranking hay scoring của
 
 ## PWA
 Cache được bump sang `tubinh-ui-v3.0-ui-v1` để thiết bị đang cài PWA nhận renderer mới.
+
+## Nghiệm thu Preview
+- Preview chỉ dùng để kiểm giao diện trước merge.
+- Không thay đổi logic engine hoặc dữ liệu production.
