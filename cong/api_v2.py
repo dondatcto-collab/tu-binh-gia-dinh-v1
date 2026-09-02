@@ -144,8 +144,6 @@ def v2_gio_ca_nhan(v: HourDecisionRequest):
     if not event_day:
         raise HTTPException(status_code=500, detail="Không dựng được kết luận ngày để hợp lưu giờ.")
 
-    # HARD_BLOCK vẫn được dựng trước và giữ quyền cao nhất. Bối cảnh Can Chi/Hỷ-Kỵ
-    # chỉ được dùng để làm sâu quyết định khi ngày đã qua cổng sự kiện.
     fused = hour_fusion_gate(ref, event_code=v.viec, event_day=event_day)
     if (fused.get("conclusion") or {}).get("state") == "HOUR_RULE_DECISION_READY":
         fused = enrich_hour_fusion_v29c(fused, personal_hours=_personal_hour_context(v, raw))
