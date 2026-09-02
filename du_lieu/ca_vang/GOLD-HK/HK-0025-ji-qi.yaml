@@ -1,0 +1,26 @@
+case_id: HK-0025
+category: GOLD-HK
+title_vi: "Cát Kỳ hỗ trợ Xuất hành / Nhậm chức"
+ruleset_version: "V3.0E20-JI-QI"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Theo 欽定協紀辨方書, 吉期常居月建前一辰. Ca vàng chờ duyệt độc lập;
+  không cứu JI/HARD_BLOCK và không cộng điểm.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: MAO
+  event_code: XUAT_HANH
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [吉期]
+      matched_yi_tokens: [吉期]
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
