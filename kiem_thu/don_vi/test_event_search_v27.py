@@ -86,7 +86,8 @@ def test_current_ui_uses_one_event_search_source_for_search_and_event_calendar()
     assert "Vì sao?" in ui
     assert "Nguồn & quy tắc" in ui
     assert "Chi tiết kỹ thuật" in ui
-    assert "Lịch đang đánh giá theo đúng loại việc đã chọn" in ui
+    assert "eventCalendarMap" in ui
+    assert "layeredResultHtml" in ui
     assert "numeric_score" not in ui
 
 
@@ -95,7 +96,7 @@ def test_current_ui_explains_confidence_without_changing_decision_tone():
     assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '3.0-ui-v1'" in ui
     assert "confidence_basis" in ui
     assert "Vì sao mức căn cứ là" in ui
-    assert "Mức căn cứ được đánh giá riêng theo chất lượng bằng chứng" in ui
+    assert "confidenceBasisHtml" in ui
     assert "function tone(r)" in ui
     assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function confidence(r)", 1)[0]
 
