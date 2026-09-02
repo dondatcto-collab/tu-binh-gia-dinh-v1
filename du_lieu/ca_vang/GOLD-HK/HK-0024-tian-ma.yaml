@@ -1,0 +1,15 @@
+golden_id: HK-0024
+rule: 天馬
+rule_vi: Thiên Mã
+release: V3.0E19
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+source_scope: "欽定協紀辨方書 卷六 · 天馬; 卷十/十一 · 行幸遣使般移"
+formula: "正月起午，順行六陽辰"
+verified_events:
+  - XUAT_HANH
+  - NHAP_TRACH
+expected_effect: FAVORABLE_SUPPORT_ONLY
+hard_block_rescue: false
+numeric_score: null
+note: "Golden chờ duyệt độc lập; implementation PASS không tự biến golden thành APPROVED."
