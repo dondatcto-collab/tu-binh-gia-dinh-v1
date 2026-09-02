@@ -17,3 +17,5 @@ Giảm độ dài màn hình và giúp người dùng phổ thông quyết đị
 - HARD_BLOCK > EVENT > PERSONAL giữ nguyên.
 - Không hiển thị điểm tổng hợp.
 - Nguồn/Rule ID/chi tiết kỹ thuật vẫn truy cập được nhưng không chiếm màn hình chính.
+
+Preview này chỉ để nghiệm thu UI; chưa merge production.
