@@ -81,24 +81,25 @@ def test_current_ui_uses_one_event_search_source_for_search_and_event_calendar()
     assert ui.count("/api/v2/tim-ngay") >= 3
     assert "/api/stateless/tim-ngay" not in ui
     assert "all_results" in ui
-    assert "3 lựa chọn nên xem trước" in ui
-    assert "Xem tất cả" in ui
+    assert "3 ngày nên xem trước" in ui
+    assert "Tất cả ngày đã xét" in ui
     assert "Vì sao?" in ui
     assert "Nguồn & quy tắc" in ui
     assert "Chi tiết kỹ thuật" in ui
     assert "eventCalendarMap" in ui
-    assert "layeredResultHtml" in ui
+    assert "openDayDetail" in ui
+    assert "u11-tabs" in ui
     assert "numeric_score" not in ui
 
 
 def test_current_ui_explains_confidence_without_changing_decision_tone():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
-    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '3.0-ui-v1'" in ui
+    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '3.1-ui-v1.1'" in ui
     assert "confidence_basis" in ui
-    assert "Vì sao mức căn cứ là" in ui
-    assert "confidenceBasisHtml" in ui
+    assert "Mức căn cứ:" in ui
+    assert "confidenceBlock" in ui
     assert "function tone(r)" in ui
-    assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function confidence(r)", 1)[0]
+    assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function shortDate", 1)[0]
 
 
 def test_v27_event_module_is_loaded_last_by_single_bootstrap():
@@ -112,7 +113,7 @@ def test_v27_event_module_is_loaded_last_by_single_bootstrap():
 
 def test_current_pwa_precaches_event_search_module_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
-    assert "tubinh-ui-v3.0-ui-v1" in sw
+    assert "tubinh-ui-v3.1-ui-v1-1" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
