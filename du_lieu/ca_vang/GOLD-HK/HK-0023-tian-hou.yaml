@@ -1,0 +1,26 @@
+case_id: HK-0023
+category: GOLD-HK
+title_vi: "Thiên Hậu hỗ trợ Điều trị"
+ruleset_version: "V3.0E18-TIAN-HOU"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Theo 欽定協紀辨方書, 天后與驛馬同位. Ca vàng chờ duyệt độc lập;
+  không cứu JI/HARD_BLOCK và không cộng điểm.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: THAN
+  event_code: DIEU_TRI
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [天后]
+      matched_yi_tokens: [天后]
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null

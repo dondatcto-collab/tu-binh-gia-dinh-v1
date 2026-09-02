@@ -1,0 +1,27 @@
+case_id: HK-0020
+category: GOLD-HK
+title_vi: "Dân Nhật hỗ trợ Cầu tài"
+ruleset_version: "V3.0E15-MIN-RI"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Theo 欽定協紀辨方書卷五, 民日 dùng phép cổ xuân Ngọ, hạ Dậu,
+  thu Tý, đông Mão. Ca vàng chờ duyệt độc lập; không cứu JI/HARD_BLOCK
+  và không dùng điểm số.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: NGO
+  event_code: CAU_TAI
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [民日]
+      matched_yi_tokens: [民日]
+      decision_effect: FAVORABLE
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null

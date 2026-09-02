@@ -1,0 +1,26 @@
+case_id: HK-0028
+category: GOLD-HK
+title_vi: "Đại Hao cảnh báo Khai trương"
+ruleset_version: "V3.0E23-DA-HAO"
+calendar_ruleset_id: CAL-V1
+review_status: PENDING
+source_id: SRC-HK-QD-V11-WIKISOURCE
+notes: >
+  Đại Hao cùng quan hệ đối xung tháng-ngày của Nguyệt Phá nhưng giữ token độc lập để truy vết.
+  Ca vàng chờ duyệt; Đại Hao tạo CAUTION, không tự tạo HARD_BLOCK và không cộng điểm.
+input:
+  month_branch: DAN
+  day_stem: null
+  day_branch: THAN
+  event_code: KHAI_TRUONG
+expected:
+  - stage: FINAL
+    stage_key: event_decision
+    payload:
+      active_tokens: [大耗]
+      matched_ji_tokens: [大耗]
+      decision_effect: CAUTION
+      creates_hard_block: false
+      numeric_score: null
+    review_status: PENDING
+    source_id: null
