@@ -38,11 +38,15 @@ _RULES={
 "hiep_ky_v30e17":("V3_0E17_YI_MA","驛馬","Dịch Mã","MONTH_BRANCH_DAY_BRANCH_V30E17_YI_MA","欽定協紀辨方書 卷六 · 驛馬","FAVORABLE_SUPPORT_ONLY"),
 "hiep_ky_v30e18":("V3_0E18_TIAN_HOU","天后","Thiên Hậu","MONTH_BRANCH_DAY_BRANCH_V30E18_TIAN_HOU","欽定協紀辨方書 卷六 · 天后與驛馬同位; 卷十一 · 求醫療病","FAVORABLE_SUPPORT_ONLY"),
 "hiep_ky_v30e19":("V3_0E19_TIAN_MA","天馬","Thiên Mã","MONTH_BRANCH_DAY_BRANCH_V30E19_TIAN_MA","欽定協紀辨方書 卷六 · 天馬: 正月起午順行六陽辰; 卷十/十一 · 行幸遣使般移","FAVORABLE_SUPPORT_ONLY"),
+"hiep_ky_v30e20":("V3_0E20_JI_QI","吉期","Cát Kỳ","MONTH_NEXT_BRANCH_V30E20_JI_QI","欽定協紀辨方書 卷四 · 吉期常居月建前一辰; 卷十 · 除日〈吉期〉","FAVORABLE_SUPPORT_ONLY"),
+"hiep_ky_v30e21":("V3_0E21_TIAN_CANG","天倉","Thiên Thương","MONTH_REVERSE_BRANCH_V30E21_TIAN_CANG","欽定協紀辨方書 卷六 · 天倉者正月起寅逆行十二辰; 納財","FAVORABLE_SUPPORT_ONLY"),
+"hiep_ky_v30e22":("V3_0E22_CHU_SHEN","除神","Trừ Thần","DAY_BRANCH_V30E22_CHU_SHEN","欽定協紀辨方書 卷五 · 五離〈除神〉: 申酉日; 卷十一 · 求醫療病","FAVORABLE_SUPPORT_ONLY"),
+"hiep_ky_v30e23":("V3_0E23_DA_HAO","大耗","Đại Hao","MONTH_OPPOSITION_V30E23_DA_HAO","欽定協紀辨方書 · 月破〈大耗〉: 正月起申順行十二辰; 卷十一","CAUTION_ONLY"),
 }
 
 def v25_schema_overlay(base:dict[str,Any])->dict[str,Any]:
     out=dict(base); implemented=list(out.get("implemented_scopes") or [])
-    scopes=["expanded_hiep_ky_event_search","hiep_ky_v30a_yue_xing","hiep_ky_v30b_sat_trio","hiep_ky_v30c_yue_yan","hiep_ky_v30d_shi_de","hiep_ky_v30e1_yue_de","hiep_ky_v30e2_yue_de_he","hiep_ky_v30e3_yue_en","hiep_ky_v30e4_si_xiang","hiep_ky_v30e5_tian_yuan","hiep_ky_v30e6_tian_she","hiep_ky_v30e7_tian_xi","hiep_ky_v30e8_wu_he","hiep_ky_v30e9_tian_yi","hiep_ky_v30e10_giai_than","hiep_ky_v30e11_wu_fu","hiep_ky_v30e12_wang_ri","hiep_ky_v30e13_guan_ri","hiep_ky_v30e14_xiang_ri","hiep_ky_v30e15_min_ri","hiep_ky_v30e16_lin_ri","hiep_ky_v30e17_yi_ma","hiep_ky_v30e18_tian_hou","hiep_ky_v30e19_tian_ma","hiep_ky_v1_coverage_gate"]
+    scopes=["expanded_hiep_ky_event_search","hiep_ky_v30a_yue_xing","hiep_ky_v30b_sat_trio","hiep_ky_v30c_yue_yan","hiep_ky_v30d_shi_de","hiep_ky_v30e1_yue_de","hiep_ky_v30e2_yue_de_he","hiep_ky_v30e3_yue_en","hiep_ky_v30e4_si_xiang","hiep_ky_v30e5_tian_yuan","hiep_ky_v30e6_tian_she","hiep_ky_v30e7_tian_xi","hiep_ky_v30e8_wu_he","hiep_ky_v30e9_tian_yi","hiep_ky_v30e10_giai_than","hiep_ky_v30e11_wu_fu","hiep_ky_v30e12_wang_ri","hiep_ky_v30e13_guan_ri","hiep_ky_v30e14_xiang_ri","hiep_ky_v30e15_min_ri","hiep_ky_v30e16_lin_ri","hiep_ky_v30e17_yi_ma","hiep_ky_v30e18_tian_hou","hiep_ky_v30e19_tian_ma","hiep_ky_v30e20_ji_qi","hiep_ky_v30e21_tian_cang","hiep_ky_v30e22_chu_shen","hiep_ky_v30e23_da_hao","hiep_ky_v1_coverage_gate"]
     for scope in scopes:
         if scope not in implemented: implemented.append(scope)
     pending=[x for x in (out.get("pending_scopes") or []) if x!="expanded_hiep_ky_event_search"]
@@ -53,7 +57,7 @@ def v25_schema_overlay(base:dict[str,Any])->dict[str,Any]:
     for key,(version,token,vi,calc,source,effect) in _RULES.items(): out[key]=_rule_block(version,"PARTIAL_ACTIVE_ONE_ADDITIONAL_RULE",token,vi,calc,source,effect)
     out["numeric_score"]="LOCKED_OFF"
     principles=list(out.get("principles") or [])
-    for note in ("Hiệp Kỷ chỉ kích hoạt rule đã có bộ tính; không coi inventory cổ thư là rule đã tính được.","V1 Engine dùng coverage-first: mục tiêu khoảng 45 rule (dải 42–48) và phải cân bằng rule thuận/tránh trên các event VERIFIED; không chạy theo 81/81.","V3.0E14 mở Tướng Nhật (相日); 守日 tạm không mở vì nguồn còn xung đột.","V3.0E19 mở Thiên Mã (天馬): chính nguyệt khởi Ngọ, thuận hành sáu Dương chi; chỉ hỗ trợ XUAT_HANH/NHAP_TRACH VERIFIED, JI/HARD_BLOCK vẫn thắng và không cộng điểm."):
+    for note in ("Hiệp Kỷ chỉ kích hoạt rule đã có bộ tính; không coi inventory cổ thư là rule đã tính được.","V1 Engine dừng mở rule ở 43 active để audit toàn hệ thống trước UI; không chạy theo 81/81.","V3.0E14 không mở 守日 vì nguồn còn xung đột.","V3.0E23 mở Đại Hao (大耗) như CAUTION_ONLY; tự nó không tạo HARD_BLOCK; numeric score vẫn LOCKED_OFF."):
         if note not in principles: principles.append(note)
     out["principles"]=principles
     return out
