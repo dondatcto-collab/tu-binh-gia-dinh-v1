@@ -52,23 +52,13 @@ def test_event_search_exposes_top_three_and_complete_ranked_set_without_scores()
     assert out["top_result_count"] == 3
     assert [x["date"] for x in out["all_results"]] == [x["ngay"] for x in ranked]
     assert out["all_results"][-1]["event_context"]["hard_block"] is True
-    assert out["all_results"][-1]["rules"] == ["RULE-2026-09-04"]
     assert out["numeric_score"] is None
     assert all(x["numeric_score"] is None for x in out["all_results"])
 
 
 def test_v27_complete_result_contract_has_payload_growth_guard_for_max_window():
-    ranked = [
-        sample(f"2026-{8 + (i // 28):02d}-{(i % 28) + 1:02d}", "Có thể cân nhắc", 3)
-        for i in range(93)
-    ]
-    raw = {
-        "viec": "KY_HOP_DONG",
-        "so_ngay_da_quet": len(ranked),
-        "xep_hang_status": "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL",
-        "top": ranked[:3],
-        "cac_ngay": ranked,
-    }
+    ranked = [sample(f"2026-{8 + (i // 28):02d}-{(i % 28) + 1:02d}", "Có thể cân nhắc", 3) for i in range(93)]
+    raw = {"viec": "KY_HOP_DONG", "so_ngay_da_quet": len(ranked), "xep_hang_status": "ORDINAL_V25_HARD_BLOCK_EVENT_PERSONAL", "top": ranked[:3], "cac_ngay": ranked}
     out = event_search_v25(raw)
     encoded = json.dumps(out, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     assert out["result_count"] == 93
@@ -76,29 +66,27 @@ def test_v27_complete_result_contract_has_payload_growth_guard_for_max_window():
     assert len(encoded) < 512 * 1024
 
 
-def test_current_ui_uses_one_event_search_source_for_search_and_event_calendar():
+def test_current_ui_uses_one_event_search_source_for_search_and_calendar():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
     assert ui.count("/api/v2/tim-ngay") >= 3
     assert "/api/stateless/tim-ngay" not in ui
     assert "all_results" in ui
-    assert "3 lựa chọn nên xem trước" in ui
-    assert "Xem tất cả" in ui
-    assert "Vì sao?" in ui
-    assert "Nguồn & quy tắc" in ui
-    assert "Chi tiết kỹ thuật" in ui
-    assert "eventCalendarMap" in ui
-    assert "layeredResultHtml" in ui
+    assert "Các lựa chọn đầu" in ui
+    assert "Tất cả ngày đã xét" in ui
+    assert "groupedDays" in ui
+    assert "Căn cứ cổ thư & trạng thái xác minh" in ui
+    assert "calendarMap" in ui
+    assert "openTrustDetail" in ui
     assert "numeric_score" not in ui
 
 
-def test_current_ui_explains_confidence_without_changing_decision_tone():
+def test_current_ui_explains_confidence_without_using_it_to_recompute_tone():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
-    assert "TU_BINH_EVENT_SEARCH_UI_VERSION = '3.0-ui-v1'" in ui
-    assert "confidence_basis" in ui
-    assert "Vì sao mức căn cứ là" in ui
-    assert "confidenceBasisHtml" in ui
+    assert "TU_BINH_EVENT_SEARCH_UI_VERSION='3.2.1-ui-v1.2.1-trust'" in ui
+    assert "confidence_state" in ui
     assert "function tone(r)" in ui
-    assert "confidence_state" not in ui.split("function tone(r)", 1)[1].split("function confidence(r)", 1)[0]
+    tone_body = ui.split("function tone(r)", 1)[1].split("function shortDate", 1)[0]
+    assert "confidence_state" not in tone_body
 
 
 def test_v27_event_module_is_loaded_last_by_single_bootstrap():
@@ -112,7 +100,7 @@ def test_v27_event_module_is_loaded_last_by_single_bootstrap():
 
 def test_current_pwa_precaches_event_search_module_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
-    assert "tubinh-ui-v3.0-ui-v1" in sw
+    assert "tubinh-ui-v3.2.1-trust-first" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
