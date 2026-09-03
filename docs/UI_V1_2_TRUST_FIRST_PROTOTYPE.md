@@ -26,3 +26,5 @@ Biến kết quả kỹ thuật thành nội dung người dùng có thể hiể
 - Màn chính không trở thành bức tường chữ.
 - Nội dung nguồn/kỹ thuật vẫn truy vết được nhưng không chiếm màn chính.
 - Source và public renderer phải giống hệt nhau.
+
+Preview này chỉ dùng để nghiệm thu UX; chưa được phép merge production trước phản hồi người dùng.
