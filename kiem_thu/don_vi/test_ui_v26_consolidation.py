@@ -12,11 +12,11 @@ def read(path: Path) -> str:
 def test_v26_index_still_uses_one_controlled_bootstrap():
     index = read(PUBLIC / "index.html")
     assert index.count("/static/ui-bootstrap-v26.js") == 1
-    for path in ("ui-work-v21.js", "ui-finance-v22.js", "ui-relationship-v23.js", "ui-hour-v24.js", "ui-event-search-v27.js", "ui-home-v122.js"):
+    for path in ("ui-work-v21.js", "ui-finance-v22.js", "ui-relationship-v23.js", "ui-hour-v24.js", "ui-event-search-v27.js", "ui-home-v122.js", "ui-home-v123.js"):
         assert f"/static/{path}" not in index
 
 
-def test_single_bootstrap_owns_all_current_modules_once_and_home_loads_last():
+def test_single_bootstrap_owns_all_current_modules_once_and_home_action_loads_last():
     bootstrap = read(PUBLIC / "static" / "ui-bootstrap-v26.js")
     paths = (
         "/static/ui-work-v21.js",
@@ -25,10 +25,11 @@ def test_single_bootstrap_owns_all_current_modules_once_and_home_loads_last():
         "/static/ui-hour-v24.js",
         "/static/ui-event-search-v27.js",
         "/static/ui-home-v122.js",
+        "/static/ui-home-v123.js",
     )
     for path in paths:
         assert bootstrap.count(path) == 1
-    assert bootstrap.index("ui-event-search-v27.js") < bootstrap.index("ui-home-v122.js")
+    assert bootstrap.index("ui-event-search-v27.js") < bootstrap.index("ui-home-v122.js") < bootstrap.index("ui-home-v123.js")
     assert "TU_BINH_UI_READY" in bootstrap
     assert "TU_BINH_PRODUCT_UI_VERSION" in bootstrap
 
@@ -57,9 +58,10 @@ def test_domain_cards_hide_internal_component_versions():
 
 def test_pwa_cache_keeps_single_bootstrap_and_current_cache():
     sw = read(PUBLIC / "service-worker.js")
-    assert "tubinh-ui-v3.2.2-home-decision" in sw
+    assert "tubinh-ui-v3.2.3-action-first" in sw
     assert "/static/ui-bootstrap-v26.js" in sw
     assert "/static/ui-home-v122.js?v=3.2.2" in sw
+    assert "/static/ui-home-v123.js?v=3.2.3" in sw
 
 
 def test_runtime_and_source_ui_copies_stay_identical():
@@ -73,6 +75,7 @@ def test_runtime_and_source_ui_copies_stay_identical():
         (PUBLIC / "static" / "ui-hour-v24.js", SOURCE_UI / "ui-hour-v24.js"),
         (PUBLIC / "static" / "ui-event-search-v27.js", SOURCE_UI / "ui-event-search-v27.js"),
         (PUBLIC / "static" / "ui-home-v122.js", SOURCE_UI / "ui-home-v122.js"),
+        (PUBLIC / "static" / "ui-home-v123.js", SOURCE_UI / "ui-home-v123.js"),
     ]
     for runtime, source in pairs:
         assert read(runtime) == read(source), f"UI mirror lệch: {runtime.name}"
