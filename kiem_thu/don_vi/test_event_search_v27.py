@@ -71,8 +71,9 @@ def test_current_ui_uses_one_event_search_source_for_search_and_calendar():
     assert ui.count("/api/v2/tim-ngay") >= 3
     assert "/api/stateless/tim-ngay" not in ui
     assert "all_results" in ui
-    assert "So sánh 3 ngày đầu" in ui
+    assert "Các lựa chọn đầu" in ui
     assert "Tất cả ngày đã xét" in ui
+    assert "groupedDays" in ui
     assert "Căn cứ cổ thư & trạng thái xác minh" in ui
     assert "calendarMap" in ui
     assert "openTrustDetail" in ui
@@ -81,7 +82,7 @@ def test_current_ui_uses_one_event_search_source_for_search_and_calendar():
 
 def test_current_ui_explains_confidence_without_using_it_to_recompute_tone():
     ui = (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8")
-    assert "TU_BINH_EVENT_SEARCH_UI_VERSION='3.2-ui-v1.2-trust'" in ui
+    assert "TU_BINH_EVENT_SEARCH_UI_VERSION='3.2.1-ui-v1.2.1-trust'" in ui
     assert "confidence_state" in ui
     assert "function tone(r)" in ui
     tone_body = ui.split("function tone(r)", 1)[1].split("function shortDate", 1)[0]
@@ -99,7 +100,7 @@ def test_v27_event_module_is_loaded_last_by_single_bootstrap():
 
 def test_current_pwa_precaches_event_search_module_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
-    assert "tubinh-ui-v3.2-trust-first" in sw
+    assert "tubinh-ui-v3.2.1-trust-first" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
