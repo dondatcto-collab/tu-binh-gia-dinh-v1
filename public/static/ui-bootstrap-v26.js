@@ -7,6 +7,7 @@
     ['relationship', '/static/ui-relationship-v23.js?v=2.7'],
     ['hour', '/static/ui-hour-v24.js?v=2.7'],
     ['event-search', '/static/ui-event-search-v27.js?v=2.7'],
+    ['home-decision', '/static/ui-home-v122.js?v=3.2.2'],
   ];
 
   function loadModule(name, src){
