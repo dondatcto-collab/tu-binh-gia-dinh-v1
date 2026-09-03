@@ -1,4 +1,4 @@
-const CACHE = 'tubinh-ui-v3.0-ui-v1';
+const CACHE = 'tubinh-ui-v3.2-trust-first';
 const SHELL = [
   '/',
   '/static/app.css?v=0.5.0',
