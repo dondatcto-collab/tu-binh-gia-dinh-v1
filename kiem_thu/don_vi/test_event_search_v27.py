@@ -101,9 +101,9 @@ def test_v27_event_module_remains_after_hour_and_before_home_overlay():
 
 def test_current_pwa_precaches_event_search_and_home_modules_and_mirrors_match():
     sw = (ROOT / "public/service-worker.js").read_text(encoding="utf-8")
-    assert "tubinh-ui-v3.2.2-home-decision" in sw
+    assert "tubinh-ui-v3.2.3-content-first" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
-    assert "/static/ui-home-v122.js?v=3.2.2" in sw
+    assert "/static/ui-home-v122.js?v=3.2.3" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.6" in sw
     assert "/static/ui-bootstrap-v26.js?v=2.7" in sw
     assert (ROOT / "public/static/ui-event-search-v27.js").read_text(encoding="utf-8") == (ROOT / "giao_dien/ui-event-search-v27.js").read_text(encoding="utf-8")
