@@ -11,52 +11,57 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_ui_v1_source_and_public_are_identical():
+def test_ui_source_public_and_pwa_mirrors_are_identical():
     assert _text(SRC) == _text(PUBLIC)
     assert _text(SW_SRC) == _text(SW_PUBLIC)
 
 
-def test_ui_v1_exposes_five_layers_without_recomputing_engine_decision():
+def test_ui_v12_is_trust_first_and_preserves_engine_authority():
     js = _text(SRC)
     for marker in (
-        "1</span><b>Kết luận",
-        "2</span><b>Vì sao?",
-        "3</span><b>Cá nhân Tử Bình",
-        "4</span><b>Nguồn & quy tắc",
-        "5 · Chi tiết kỹ thuật",
+        "TRUST FIRST",
+        "LỰA CHỌN #1",
+        "So sánh 3 ngày đầu",
+        "Riêng với",
+        "Giờ tham khảo có căn cứ hiện tại",
+        "Căn cứ cổ thư & trạng thái xác minh",
     ):
         assert marker in js
-    assert "UI không tự cộng điểm hay tự suy lại kết quả" in js
-    assert "HARD_BLOCK → sự kiện → cá nhân" in js
+    assert "thứ tự xếp hạng vẫn lấy nguyên từ engine" in js
+    assert "UI không tự cộng điểm" in js
+    assert "HARD_BLOCK luôn thắng" in js
 
 
-def test_ui_v1_preserves_block_and_caution_policy_in_wording():
+def test_ui_v12_explains_evidence_in_user_language_without_hiding_traceability():
     js = _text(SRC)
-    assert "không được dùng để đảo ngược điều kiện chặn" in js
-    assert "không được cứu ngày đã bị HARD_BLOCK" in js
-    assert "matched_yi_tokens" in js
-    assert "matched_ji_tokens" in js
+    assert "tokenMeaning" in js
+    assert "Đại Hao — tín hiệu hao tán" in js
+    assert "Ngũ Phú — tín hiệu thuận liên quan tài lộc" in js
     assert "matched_evidence" in js
-
-
-def test_ui_v1_exposes_source_status_and_traceability():
-    js = _text(SRC)
-    assert "Đã xác minh" in js
-    assert "Tạm dùng / cần đối chiếu thêm" in js
-    assert "Đang chờ xác minh" in js
+    assert "evidence_status" in js
+    assert "source_location" in js
     assert "Rule ID:" in js
     assert "Source ID:" in js
-    assert "source_location" in js
 
 
-def test_ui_v1_does_not_display_numeric_score():
+def test_ui_v12_is_honest_when_personal_or_hour_data_is_incomplete():
     js = _text(SRC)
-    assert "Không hiển thị điểm tổng hợp" in js
-    assert "score}/10" not in js
-    assert "numeric_score}/10" not in js
+    assert "Chưa có căn cứ cá nhân đủ rõ" in js
+    assert "không giả vờ cá nhân hóa" in js
+    assert "Chưa đủ dữ liệu giờ cá nhân" in js
+    assert "Chưa phải “giờ tốt/xấu cá nhân hoàn chỉnh”" in js
 
 
-def test_ui_v1_bumps_pwa_cache():
+def test_ui_v12_has_direct_top3_comparison_but_does_not_recompute_rank():
+    js = _text(SRC)
+    assert "compareReason" in js
+    assert "#1 có" in js
+    assert "+${yi(r).length} hỗ trợ" in js
+    assert "thứ tự cuối cùng vẫn lấy nguyên từ engine" in js
+    assert "numeric_score" not in js
+
+
+def test_ui_v12_bumps_pwa_cache():
     sw = _text(SW_SRC)
-    assert "tubinh-ui-v3.0-ui-v1" in sw
+    assert "tubinh-ui-v3.2-trust-first" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
