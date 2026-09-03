@@ -8,6 +8,7 @@
     ['hour', '/static/ui-hour-v24.js?v=2.7'],
     ['event-search', '/static/ui-event-search-v27.js?v=2.7'],
     ['home-decision', '/static/ui-home-v122.js?v=3.2.2'],
+    ['home-action', '/static/ui-home-v123.js?v=3.2.3'],
   ];
 
   function loadModule(name, src){
