@@ -68,6 +68,7 @@ def test_ui_v121_is_honest_when_hour_data_is_incomplete():
 
 def test_current_ui_bumps_pwa_cache_without_regressing_event_search_module():
     sw = _text(SW_SRC)
-    assert "tubinh-ui-v3.2.2-home-decision" in sw
+    assert "tubinh-ui-v3.2.3-action-first" in sw
     assert "/static/ui-event-search-v27.js?v=2.7" in sw
     assert "/static/ui-home-v122.js?v=3.2.2" in sw
+    assert "/static/ui-home-v123.js?v=3.2.3" in sw
