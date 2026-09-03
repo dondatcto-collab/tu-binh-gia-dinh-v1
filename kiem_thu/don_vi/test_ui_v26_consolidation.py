@@ -57,9 +57,9 @@ def test_domain_cards_hide_internal_component_versions():
 
 def test_pwa_cache_keeps_single_bootstrap_and_current_cache():
     sw = read(PUBLIC / "service-worker.js")
-    assert "tubinh-ui-v3.2.2-home-decision" in sw
+    assert "tubinh-ui-v3.2.3-content-first" in sw
     assert "/static/ui-bootstrap-v26.js" in sw
-    assert "/static/ui-home-v122.js?v=3.2.2" in sw
+    assert "/static/ui-home-v122.js?v=3.2.3" in sw
 
 
 def test_runtime_and_source_ui_copies_stay_identical():
