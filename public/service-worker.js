@@ -1,4 +1,4 @@
-const CACHE = 'tubinh-ui-v3.2.1-trust-first';
+const CACHE = 'tubinh-ui-v3.2.2-home-decision';
 const SHELL = [
   '/',
   '/static/app.css?v=0.5.0',
@@ -7,6 +7,7 @@ const SHELL = [
   '/static/ui-bootstrap-v26.js?v=2.6',
   '/static/ui-bootstrap-v26.js?v=2.7',
   '/static/ui-event-search-v27.js?v=2.7',
+  '/static/ui-home-v122.js?v=3.2.2',
   '/manifest.webmanifest',
   '/icon-192.png',
   '/icon-512.png'
