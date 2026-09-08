@@ -38,10 +38,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p app/src/main/assets
-          cat html.part1.b64 html.part2.b64 html.part3.b64 | base64 -d | gunzip > app/src/main/assets/index.html
+          cat html.v2.part1.b64 html.v2.part2.b64 html.v2.part3.b64 html.v2.part4.b64 | base64 -d | gunzip > app/src/main/assets/index.html
           test -s app/src/main/assets/index.html
           grep -q '<!DOCTYPE html>' app/src/main/assets/index.html
           grep -q 'Theo sách / vì sao app kết luận vậy?' app/src/main/assets/index.html
+          grep -q 'Nên làm' app/src/main/assets/index.html
+          grep -q 'Nên tránh' app/src/main/assets/index.html
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
