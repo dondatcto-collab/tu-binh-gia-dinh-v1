@@ -32,9 +32,12 @@ jobs:
       - name: Reconstruct HTML asset
         run: |
           mkdir -p app/src/main/assets
-          cat html_parts/part*.txt | base64 -d | gunzip > app/src/main/assets/index.html
+          cat html_parts/part*.txt | base64 -d > /tmp/index.html.gz
+          gzip -dc /tmp/index.html.gz > app/src/main/assets/index.html || true
           test -s app/src/main/assets/index.html
+          echo "a41a7a466cad34d98c6d0df98dd3cde64b3831c56e18143de5d2d8d8d461d9cb  app/src/main/assets/index.html" | sha256sum -c -
           grep -q "Ngày này nên làm gì" app/src/main/assets/index.html
+          grep -q "</html>" app/src/main/assets/index.html
 
       - name: Download Gradle
         run: |
