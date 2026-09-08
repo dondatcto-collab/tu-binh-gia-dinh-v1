@@ -34,6 +34,15 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Verify web payload
+        shell: bash
+        run: |
+          sha256sum html.v2.part*.b64
+          echo '052c4427c5fd3797c7512de19d8c81a64b83216d2f02600513536e79a1a96f10  html.v2.part1.b64' | sha256sum -c -
+          echo '835d376fb88ee83be86c5ebfd8dc8de3656410be890fb6d1dff3e265c6d6971b  html.v2.part2.b64' | sha256sum -c -
+          echo 'd17bd012b722922262494cf3e4cd3e57d3f9236063fe6924f43a159fa91067bc  html.v2.part3.b64' | sha256sum -c -
+          echo '489d9be00cb7906e0cd81b1b1f7b0195ed65e8ed1b139647f521bb649a7e2882  html.v2.part4.b64' | sha256sum -c -
+
       - name: Rebuild web app asset
         shell: bash
         run: |
