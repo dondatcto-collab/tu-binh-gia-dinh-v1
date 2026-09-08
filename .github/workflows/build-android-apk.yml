@@ -1,0 +1,51 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - build/android-apk-20260908
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-apk
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Reconstruct HTML asset
+        run: |
+          mkdir -p app/src/main/assets
+          cat html_parts/part*.txt | base64 -d | gunzip > app/src/main/assets/index.html
+          test -s app/src/main/assets/index.html
+          grep -q "Ngày này nên làm gì" app/src/main/assets/index.html
+
+      - name: Download Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle-8.7-bin.zip
+
+      - name: Build debug APK
+        run: ./gradle-8.7/bin/gradle assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: so-tay-tu-binh-samsung
+          path: android-apk/app/build/outputs/apk/debug/app-debug.apk
