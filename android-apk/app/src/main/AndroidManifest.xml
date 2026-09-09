@@ -3,9 +3,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
-        android:label="Sổ tay Tử Bình"
+        android:icon="@drawable/app_icon"
+        android:roundIcon="@drawable/app_icon"
+        android:label="Tử Bình Đạt Võ"
         android:usesCleartextTraffic="false"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
             android:name=".MainActivity"
             android:exported="true"

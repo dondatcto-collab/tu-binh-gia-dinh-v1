@@ -1,4 +1,4 @@
-name: Build So tay Tu Binh APK
+name: Build Tu Binh Dat Vo APK
 
 on:
   pull_request:
@@ -30,24 +30,24 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Prepare embedded HTML
+      - name: Prepare final branded HTML
         working-directory: android-apk
         run: |
-          mkdir -p app/src/main/assets/htmlparts
-          cp htmlparts/*.txt app/src/main/assets/htmlparts/
+          python3 build_final_html_wrapper.py
           test $(ls app/src/main/assets/htmlparts/part*.txt | wc -l) -eq 10
+          test -f app/src/main/res/drawable/app_icon.xml
 
       - name: Build debug APK
         working-directory: android-apk
         run: gradle assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk So-tay-Tu-Binh-Samsung.apk
+        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: So-tay-Tu-Binh-Samsung-APK
-          path: So-tay-Tu-Binh-Samsung.apk
+          name: Tu-Binh-Dat-Vo-Samsung-APK
+          path: Tu-Binh-Dat-Vo-Samsung.apk
           if-no-files-found: error
           retention-days: 14
