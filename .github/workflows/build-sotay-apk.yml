@@ -34,20 +34,21 @@ jobs:
         working-directory: android-apk
         run: |
           python - <<'PY'
-          import base64, gzip, glob, hashlib, pathlib
-          parts = sorted(glob.glob('htmlparts/part[0-9][0-9].txt'))
-          assert len(parts) == 10, parts
-          raw = ''.join(open(p, encoding='ascii').read() for p in parts)
-          html_bytes = gzip.decompress(base64.b64decode(raw))
+          import base64, gzip, hashlib, pathlib
+          p = pathlib.Path('htmlparts/payload.txt')
+          assert p.is_file() and p.stat().st_size > 100000, p
+          html_bytes = gzip.decompress(base64.b64decode(p.read_text(encoding='ascii')))
           html = html_bytes.decode('utf-8')
           sha = hashlib.sha256(html_bytes).hexdigest()
-          expected = '1f9a4769570fc29ecb0c526ed3cec01ae99f5c5631560a9f36f09da67871934f'
+          expected = '963420896cf0638300df9981d4393455e5359f0ea18eb6577c13da55fbdaf447'
           assert sha == expected, (sha, expected)
           assert '<html' in html.lower() and '</html>' in html.lower()
           assert 'Tử Bình Đạt Võ' in html
           assert 'Ngày này nên làm gì' in html
           assert 'Theo sách' in html
-          assert 'data:image/png;base64,' in html
+          assert 'class="brand-logo"' in html
+          assert 'data:image/webp;base64,' in html
+          assert 'branding/logo.webp' not in html
           print('HTML bytes:', len(html_bytes))
           print('HTML SHA256:', sha)
           PY
@@ -56,14 +57,15 @@ jobs:
           grep -q "@drawable/app_icon_art" app/src/main/AndroidManifest.xml
           test -s app/src/main/res/drawable/app_icon_art.webp
           ! grep -q "personalizeHtml" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q 'getAssets().open("htmlparts/payload.txt")' app/src/main/java/vn/tubinh/sotay/MainActivity.java
           grep -q "loadDataWithBaseURL.*loadHtml()" app/src/main/java/vn/tubinh/sotay/MainActivity.java
 
       - name: Prepare embedded HTML
         working-directory: android-apk
         run: |
           mkdir -p app/src/main/assets/htmlparts
-          cp htmlparts/part*.txt app/src/main/assets/htmlparts/
-          test $(ls app/src/main/assets/htmlparts/part*.txt | wc -l) -eq 10
+          cp htmlparts/payload.txt app/src/main/assets/htmlparts/payload.txt
+          test -s app/src/main/assets/htmlparts/payload.txt
 
       - name: Build debug APK
         working-directory: android-apk
@@ -72,10 +74,25 @@ jobs:
       - name: Rename APK
         run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung-v1.2.apk
 
-      - name: Verify APK
+      - name: Verify APK payload and identity
         run: |
           test -s Tu-Binh-Dat-Vo-Samsung-v1.2.apk
-          unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q 'assets/htmlparts/part09.txt'
+          unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q 'assets/htmlparts/payload.txt'
+          unzip -p Tu-Binh-Dat-Vo-Samsung-v1.2.apk assets/htmlparts/payload.txt > /tmp/payload.txt
+          python - <<'PY'
+          import base64, gzip, hashlib, pathlib
+          raw = pathlib.Path('/tmp/payload.txt').read_text(encoding='ascii')
+          html_bytes = gzip.decompress(base64.b64decode(raw))
+          html = html_bytes.decode('utf-8')
+          expected = '963420896cf0638300df9981d4393455e5359f0ea18eb6577c13da55fbdaf447'
+          sha = hashlib.sha256(html_bytes).hexdigest()
+          assert sha == expected, (sha, expected)
+          assert 'Tử Bình Đạt Võ' in html
+          assert 'class="brand-logo"' in html
+          assert 'data:image/webp;base64,' in html
+          assert 'branding/logo.webp' not in html
+          print('APK embedded HTML SHA256:', sha)
+          PY
           sha256sum Tu-Binh-Dat-Vo-Samsung-v1.2.apk
           ls -lh Tu-Binh-Dat-Vo-Samsung-v1.2.apk
 
