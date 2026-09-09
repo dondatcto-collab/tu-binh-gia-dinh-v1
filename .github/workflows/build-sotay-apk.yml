@@ -1,4 +1,4 @@
-name: Build Tu Binh Dat Vo APK
+name: Build Tu Binh Dat Vo APK v1.2
 
 on:
   pull_request:
@@ -30,22 +30,33 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Verify embedded HTML source
+      - name: Verify locked v1.2 sources
         working-directory: android-apk
         run: |
           python - <<'PY'
-          import base64, gzip, glob, hashlib
+          import base64, gzip, glob, hashlib, pathlib
           parts = sorted(glob.glob('htmlparts/part[0-9][0-9].txt'))
           assert len(parts) == 10, parts
           raw = ''.join(open(p, encoding='ascii').read() for p in parts)
-          html = gzip.decompress(base64.b64decode(raw)).decode('utf-8')
+          html_bytes = gzip.decompress(base64.b64decode(raw))
+          html = html_bytes.decode('utf-8')
+          sha = hashlib.sha256(html_bytes).hexdigest()
+          expected = '1f9a4769570fc29ecb0c526ed3cec01ae99f5c5631560a9f36f09da67871934f'
+          assert sha == expected, (sha, expected)
           assert '<html' in html.lower() and '</html>' in html.lower()
-          assert 'Ngày này nên làm gì' in html or 'Ngày này phù hợp để làm gì' in html
-          print('HTML bytes:', len(html.encode('utf-8')))
-          print('HTML SHA256:', hashlib.sha256(html.encode('utf-8')).hexdigest())
+          assert 'Tử Bình Đạt Võ' in html
+          assert 'Ngày này nên làm gì' in html
+          assert 'Theo sách' in html
+          assert 'data:image/png;base64,' in html
+          print('HTML bytes:', len(html_bytes))
+          print('HTML SHA256:', sha)
           PY
-          grep -q "Tử Bình Đạt Võ" app/src/main/java/vn/tubinh/sotay/MainActivity.java
-          grep -q "@drawable/app_icon" app/src/main/AndroidManifest.xml
+          grep -q "versionCode 3" app/build.gradle
+          grep -q "versionName '1.2.0'" app/build.gradle
+          grep -q "@drawable/app_icon_art" app/src/main/AndroidManifest.xml
+          test -s app/src/main/res/drawable/app_icon_art.webp
+          ! grep -q "personalizeHtml" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q "loadDataWithBaseURL.*loadHtml()" app/src/main/java/vn/tubinh/sotay/MainActivity.java
 
       - name: Prepare embedded HTML
         working-directory: android-apk
@@ -59,18 +70,19 @@ jobs:
         run: gradle assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung-v1.2.apk
 
-      - name: Verify APK exists
+      - name: Verify APK
         run: |
-          test -s Tu-Binh-Dat-Vo-Samsung-v1.1.apk
-          sha256sum Tu-Binh-Dat-Vo-Samsung-v1.1.apk
-          ls -lh Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+          test -s Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+          unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q 'assets/htmlparts/part09.txt'
+          sha256sum Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+          ls -lh Tu-Binh-Dat-Vo-Samsung-v1.2.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Tu-Binh-Dat-Vo-Samsung-v1.1-APK
-          path: Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+          name: Tu-Binh-Dat-Vo-Samsung-v1.2-APK
+          path: Tu-Binh-Dat-Vo-Samsung-v1.2.apk
           if-no-files-found: error
           retention-days: 14
