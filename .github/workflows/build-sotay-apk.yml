@@ -1,0 +1,76 @@
+name: Build Tu Binh Dat Vo APK
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Verify embedded HTML source
+        working-directory: android-apk
+        run: |
+          python - <<'PY'
+          import base64, gzip, glob, hashlib
+          parts = sorted(glob.glob('htmlparts/part[0-9][0-9].txt'))
+          assert len(parts) == 10, parts
+          raw = ''.join(open(p, encoding='ascii').read() for p in parts)
+          html = gzip.decompress(base64.b64decode(raw)).decode('utf-8')
+          assert '<html' in html.lower() and '</html>' in html.lower()
+          assert 'Ngày này nên làm gì' in html or 'Ngày này phù hợp để làm gì' in html
+          print('HTML bytes:', len(html.encode('utf-8')))
+          print('HTML SHA256:', hashlib.sha256(html.encode('utf-8')).hexdigest())
+          PY
+          grep -q "Tử Bình Đạt Võ" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q "@drawable/app_icon" app/src/main/AndroidManifest.xml
+
+      - name: Prepare embedded HTML
+        working-directory: android-apk
+        run: |
+          mkdir -p app/src/main/assets/htmlparts
+          cp htmlparts/part*.txt app/src/main/assets/htmlparts/
+          test $(ls app/src/main/assets/htmlparts/part*.txt | wc -l) -eq 10
+
+      - name: Build debug APK
+        working-directory: android-apk
+        run: gradle assembleDebug --stacktrace
+
+      - name: Rename APK
+        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+
+      - name: Verify APK exists
+        run: |
+          test -s Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+          sha256sum Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+          ls -lh Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tu-Binh-Dat-Vo-Samsung-v1.1-APK
+          path: Tu-Binh-Dat-Vo-Samsung-v1.1.apk
+          if-no-files-found: error
+          retention-days: 14
