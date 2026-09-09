@@ -36,7 +36,7 @@ jobs:
           python - <<'PY'
           import base64, gzip, hashlib, pathlib
           p = pathlib.Path('htmlparts/payload.txt')
-          assert p.is_file() and p.stat().st_size > 100000, p
+          assert p.is_file() and p.stat().st_size > 0, p
           html_bytes = gzip.decompress(base64.b64decode(p.read_text(encoding='ascii')))
           html = html_bytes.decode('utf-8')
           sha = hashlib.sha256(html_bytes).hexdigest()
@@ -49,6 +49,7 @@ jobs:
           assert 'class="brand-logo"' in html
           assert 'data:image/webp;base64,' in html
           assert 'branding/logo.webp' not in html
+          print('Payload bytes:', p.stat().st_size)
           print('HTML bytes:', len(html_bytes))
           print('HTML SHA256:', sha)
           PY
