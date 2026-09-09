@@ -45,14 +45,11 @@ public class MainActivity extends Activity {
     private String loadHtml() {
         try {
             StringBuilder encoded = new StringBuilder();
-            for (int i = 0; i < 10; i++) {
-                String name = String.format("htmlparts/part%02d.txt", i);
-                try (InputStream in = getAssets().open(name)) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) != -1) {
-                        encoded.append(new String(buffer, 0, n, StandardCharsets.US_ASCII));
-                    }
+            try (InputStream in = getAssets().open("htmlparts/payload.txt")) {
+                byte[] buffer = new byte[8192];
+                int n;
+                while ((n = in.read(buffer)) != -1) {
+                    encoded.append(new String(buffer, 0, n, StandardCharsets.US_ASCII));
                 }
             }
 
