@@ -83,7 +83,7 @@ jobs:
         run: |
           test -s Tu-Binh-Dat-Vo-Samsung-v1.2.apk
           rm -f /tmp/payload.txt
-          for i in $(seq -w 0 9); do
+          for i in 00 01 02 03 04 05 06 07 08 09; do
             unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q "assets/htmlparts/part${i}.txt"
             unzip -p Tu-Binh-Dat-Vo-Samsung-v1.2.apk "assets/htmlparts/part${i}.txt" >> /tmp/payload.txt
           done
