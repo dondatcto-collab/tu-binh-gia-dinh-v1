@@ -35,9 +35,11 @@ jobs:
         run: |
           python - <<'PY'
           import base64, gzip, hashlib, pathlib
-          p = pathlib.Path('htmlparts/payload.txt')
-          assert p.is_file() and p.stat().st_size > 0, p
-          html_bytes = gzip.decompress(base64.b64decode(p.read_text(encoding='ascii')))
+
+          parts = [pathlib.Path(f'htmlparts/part{i:02d}.txt') for i in range(10)]
+          assert all(p.is_file() and p.stat().st_size > 0 for p in parts), parts
+          raw = ''.join(p.read_text(encoding='ascii') for p in parts)
+          html_bytes = gzip.decompress(base64.b64decode(raw))
           html = html_bytes.decode('utf-8')
           sha = hashlib.sha256(html_bytes).hexdigest()
           expected = '963420896cf0638300df9981d4393455e5359f0ea18eb6577c13da55fbdaf447'
@@ -49,7 +51,7 @@ jobs:
           assert 'class="brand-logo"' in html
           assert 'data:image/webp;base64,' in html
           assert 'branding/logo.webp' not in html
-          print('Payload bytes:', p.stat().st_size)
+          print('Payload chars:', len(raw))
           print('HTML bytes:', len(html_bytes))
           print('HTML SHA256:', sha)
           PY
@@ -58,15 +60,17 @@ jobs:
           grep -q "@drawable/app_icon_art" app/src/main/AndroidManifest.xml
           test -s app/src/main/res/drawable/app_icon_art.webp
           ! grep -q "personalizeHtml" app/src/main/java/vn/tubinh/sotay/MainActivity.java
-          grep -q 'getAssets().open("htmlparts/payload.txt")' app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q "HTML_PART_COUNT = 10" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q 'htmlparts/part%02d.txt' app/src/main/java/vn/tubinh/sotay/MainActivity.java
           grep -q "loadDataWithBaseURL.*loadHtml()" app/src/main/java/vn/tubinh/sotay/MainActivity.java
 
       - name: Prepare embedded HTML
         working-directory: android-apk
         run: |
+          rm -rf app/src/main/assets/htmlparts
           mkdir -p app/src/main/assets/htmlparts
-          cp htmlparts/payload.txt app/src/main/assets/htmlparts/payload.txt
-          test -s app/src/main/assets/htmlparts/payload.txt
+          cp htmlparts/part*.txt app/src/main/assets/htmlparts/
+          test "$(find app/src/main/assets/htmlparts -name 'part*.txt' | wc -l)" -eq 10
 
       - name: Build debug APK
         working-directory: android-apk
@@ -78,8 +82,11 @@ jobs:
       - name: Verify APK payload and identity
         run: |
           test -s Tu-Binh-Dat-Vo-Samsung-v1.2.apk
-          unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q 'assets/htmlparts/payload.txt'
-          unzip -p Tu-Binh-Dat-Vo-Samsung-v1.2.apk assets/htmlparts/payload.txt > /tmp/payload.txt
+          rm -f /tmp/payload.txt
+          for i in $(seq -w 0 9); do
+            unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q "assets/htmlparts/part${i}.txt"
+            unzip -p Tu-Binh-Dat-Vo-Samsung-v1.2.apk "assets/htmlparts/part${i}.txt" >> /tmp/payload.txt
+          done
           python - <<'PY'
           import base64, gzip, hashlib, pathlib
           raw = pathlib.Path('/tmp/payload.txt').read_text(encoding='ascii')

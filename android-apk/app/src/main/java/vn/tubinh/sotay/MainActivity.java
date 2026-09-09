@@ -13,9 +13,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 public class MainActivity extends Activity {
+    private static final int HTML_PART_COUNT = 10;
     private WebView web;
 
     @Override
@@ -44,19 +46,22 @@ public class MainActivity extends Activity {
 
     private String loadHtml() {
         try {
-            StringBuilder encoded = new StringBuilder();
-            try (InputStream in = getAssets().open("htmlparts/payload.txt")) {
-                byte[] buffer = new byte[8192];
-                int n;
-                while ((n = in.read(buffer)) != -1) {
-                    encoded.append(new String(buffer, 0, n, StandardCharsets.US_ASCII));
+            StringBuilder encoded = new StringBuilder(140000);
+            byte[] buffer = new byte[8192];
+
+            for (int i = 0; i < HTML_PART_COUNT; i++) {
+                String assetName = String.format(Locale.US, "htmlparts/part%02d.txt", i);
+                try (InputStream in = getAssets().open(assetName)) {
+                    int n;
+                    while ((n = in.read(buffer)) != -1) {
+                        encoded.append(new String(buffer, 0, n, StandardCharsets.US_ASCII));
+                    }
                 }
             }
 
             byte[] gzip = Base64.decode(encoded.toString(), Base64.DEFAULT);
             try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(gzip));
                  ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[8192];
                 int n;
                 while ((n = gis.read(buffer)) != -1) {
                     output.write(buffer, 0, n);
