@@ -1,0 +1,113 @@
+name: Build Tu Binh Dat Vo APK v1.2
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Verify locked v1.2 sources
+        working-directory: android-apk
+        run: |
+          python - <<'PY'
+          import base64, gzip, hashlib, pathlib
+
+          parts = [pathlib.Path(f'htmlparts/part{i:02d}.txt') for i in range(10)]
+          assert all(p.is_file() and p.stat().st_size > 0 for p in parts), parts
+          raw = ''.join(p.read_text(encoding='ascii') for p in parts)
+          html_bytes = gzip.decompress(base64.b64decode(raw))
+          html = html_bytes.decode('utf-8')
+          sha = hashlib.sha256(html_bytes).hexdigest()
+          expected = '963420896cf0638300df9981d4393455e5359f0ea18eb6577c13da55fbdaf447'
+          assert sha == expected, (sha, expected)
+          assert '<html' in html.lower() and '</html>' in html.lower()
+          assert 'Tử Bình Đạt Võ' in html
+          assert 'Ngày này nên làm gì' in html
+          assert 'Theo sách' in html
+          assert 'class="brand-logo"' in html
+          assert 'data:image/webp;base64,' in html
+          assert 'branding/logo.webp' not in html
+          print('Payload chars:', len(raw))
+          print('HTML bytes:', len(html_bytes))
+          print('HTML SHA256:', sha)
+          PY
+          grep -q "versionCode 3" app/build.gradle
+          grep -q "versionName '1.2.0'" app/build.gradle
+          grep -q "@drawable/app_icon_art" app/src/main/AndroidManifest.xml
+          test -s app/src/main/res/drawable/app_icon_art.webp
+          ! grep -q "personalizeHtml" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q "HTML_PART_COUNT = 10" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q 'htmlparts/part%02d.txt' app/src/main/java/vn/tubinh/sotay/MainActivity.java
+          grep -q "loadDataWithBaseURL.*loadHtml()" app/src/main/java/vn/tubinh/sotay/MainActivity.java
+
+      - name: Prepare embedded HTML
+        working-directory: android-apk
+        run: |
+          rm -rf app/src/main/assets/htmlparts
+          mkdir -p app/src/main/assets/htmlparts
+          cp htmlparts/part*.txt app/src/main/assets/htmlparts/
+          test "$(find app/src/main/assets/htmlparts -name 'part*.txt' | wc -l)" -eq 10
+
+      - name: Build debug APK
+        working-directory: android-apk
+        run: gradle assembleDebug --stacktrace
+
+      - name: Rename APK
+        run: cp android-apk/app/build/outputs/apk/debug/app-debug.apk Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+
+      - name: Verify APK payload and identity
+        run: |
+          test -s Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+          rm -f /tmp/payload.txt
+          for i in 00 01 02 03 04 05 06 07 08 09; do
+            unzip -l Tu-Binh-Dat-Vo-Samsung-v1.2.apk | grep -q "assets/htmlparts/part${i}.txt"
+            unzip -p Tu-Binh-Dat-Vo-Samsung-v1.2.apk "assets/htmlparts/part${i}.txt" >> /tmp/payload.txt
+          done
+          python - <<'PY'
+          import base64, gzip, hashlib, pathlib
+          raw = pathlib.Path('/tmp/payload.txt').read_text(encoding='ascii')
+          html_bytes = gzip.decompress(base64.b64decode(raw))
+          html = html_bytes.decode('utf-8')
+          expected = '963420896cf0638300df9981d4393455e5359f0ea18eb6577c13da55fbdaf447'
+          sha = hashlib.sha256(html_bytes).hexdigest()
+          assert sha == expected, (sha, expected)
+          assert 'Tử Bình Đạt Võ' in html
+          assert 'class="brand-logo"' in html
+          assert 'data:image/webp;base64,' in html
+          assert 'branding/logo.webp' not in html
+          print('APK embedded HTML SHA256:', sha)
+          PY
+          sha256sum Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+          ls -lh Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tu-Binh-Dat-Vo-Samsung-v1.2-APK
+          path: Tu-Binh-Dat-Vo-Samsung-v1.2.apk
+          if-no-files-found: error
+          retention-days: 14
